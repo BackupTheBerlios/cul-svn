@@ -17,12 +17,14 @@ enum _CulStringType {
 	CUL_STRING_PUNCT  = 1 << 7,
 	CUL_STRING_SPACE  = 1 << 8,
 	CUL_STRING_UPPER  = 1 << 9,
-	CUL_STRING_XDIGIT = 1 << 10
+	CUL_STRING_WHITE  = 1 << 10,
+	CUL_STRING_XDIGIT = 1 << 11
 };
 
 extern const uint16_t *const cul_string_type_ascii;
 
 static inline int cul_isspace(int c)                                            { return isspace(c); };
 static inline int cul_isspace_ascii(int c)                                      { return ( (cul_string_type_ascii[ (uint8_t)c ] & CUL_STRING_SPACE) != 0 ); };
+static inline int cul_iswhite_ascii(int c)                                      { return ( (cul_string_type_ascii[ (uint8_t)c ] & CUL_STRING_WHITE) != 0 ); };
 
 #endif
