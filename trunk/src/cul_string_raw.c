@@ -107,6 +107,20 @@ char *cul_strtrim_compress(char *str) {
 	return str;
 }
 
+char *cul_strtolower(char *str) {
+	char *begin = str;
+	for( ; *str; ++str)
+		*str = cul_tolower_ascii(*str);
+	return begin;
+}
+
+char *cul_strtoupper(char *str) {
+	char *begin = str;
+	for( ; *str; ++str)
+		*str = cul_toupper_ascii(*str);
+	return begin;
+}
+
 char **cul_strsplit_delimiter(const char *s, const char *delimiter) {
 	const size_t delimiter_size = cul_strlen(delimiter);
 	const char *string = s;

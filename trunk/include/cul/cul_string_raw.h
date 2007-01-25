@@ -54,6 +54,9 @@ char *cul_strtrim_left(char *str);
 
 char *cul_strtrim_compress(char *str);
 
+char *cul_strtolower(char *str);
+char *cul_strtoupper(char *str);
+
 /* Misc */
 
 char **cul_strsplit_delimiter(const char *s, const char *delimiter);
