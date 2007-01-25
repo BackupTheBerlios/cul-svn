@@ -38,14 +38,19 @@ size_t _cul_strtrim_compress_size(char *str, size_t size) {
 
 	/* copy internal parts */
 	for( ; str <= end; ++str, ++cur) {
-		/* copy character */
-		*cur = *str;
-
-		/* omit next spaces if present */
-		/* NOTICE: we know that at the end of string is NON space character */
+		/* check if character is space */
 		if( cul_isspace_ascii(*str) ) {
-			for( ; str <= end && cul_isspace_ascii(*str); ++str );
+			*cur = CUL_STR_SPACE;
+
+			/* omit next spaces if present */
+			/* NOTICE: we know that at the end of string is NON space character */
+			for( ++str; str <= end && cul_isspace_ascii(*str); ++str );
+			/* go back to non space character */
 			--str;
+		}
+		else {
+			/* copy character */
+			*cur = *str;
 		}
 	}
 	return end - begin;
