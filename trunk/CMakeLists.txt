@@ -21,9 +21,14 @@ SET(CUL_VERSION "${CUL_MAJOR_VERSION}.${CUL_MINOR_VERSION}.${CUL_PATCH_VERSION}"
 
 SET(CUL_SOURCES
 	src/cul_arg.c
+	src/cul_file.c
+	src/cul_error.c
 	src/cul_list.c
+	src/cul_log.c
+	src/cul_mem.c
 	src/cul_tree.c
 	src/cul_tree_bb.c
+	src/cul_stream.c
 	src/cul_string.c
 	src/cul_string_raw.c
 	src/cul_string_type.c
@@ -37,11 +42,6 @@ SET(CUL_SOURCES
 	src/base/cul_base_minmax.c
 	src/base/cul_base_oper.c
 	src/base/cul_base_stat.c
-	src/global/cul_global.c
-	src/global/cul_error.c
-	src/global/cul_log.c
-	src/global/cul_mem.c
-	src/global/cul_stream.c
 	src/matrix/cul_matrix_init.c
 	src/matrix/cul_matrix_io.c
 	src/matrix/cul_matrix_copy.c
