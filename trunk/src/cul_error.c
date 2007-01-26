@@ -6,6 +6,7 @@ const char *cul_error_string(CulErrno eid) {
 	switch( eid ) {
 		case CUL_SUCCESS:   return "success";
 		case CUL_FAILURE:   return "failure";
+		case CUL_ESTUB:     return "missing implementation";
 		case CUL_EINVAL:    return "invalid argument";
 		case CUL_EINIT:     return "initialization failed";
 		case CUL_EFAILED:   return "operation failed";
@@ -20,6 +21,8 @@ const char *cul_error_string(CulErrno eid) {
 		case CUL_EARGCONV:  return "argument conversion failed";
 		case CUL_EARGSHORT: return "bad format of short switch";
 		case CUL_EARGLONG:  return "bad format of long switch";
+		case CUL_EFACCESS:  return "file access error";
+		case CUL_EFIO:      return "input/output error";
 	}
 	return "unknown error code";
 }
