@@ -69,13 +69,10 @@ cul_errno cul_file_read_lines(const char *filename, size_t size, char ***content
 		list_size += 1;
 	}
 
-	/* back to front of the list */
-	list = cul_list_first(list);
-
 	char **linesv = cul_malloc( (list_size+1)*sizeof(char *) );
 	if( linesv == NULL ) {
 		/* clean */
-		cul_list_free_all(list, cul_free);
+		cul_list_free_all(cul_list_first(list), cul_free);
 		cul_fclose(stream);
 		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
 	}
@@ -84,13 +81,13 @@ cul_errno cul_file_read_lines(const char *filename, size_t size, char ***content
 	*contents = linesv;
 	*lines = list_size;
 
-	/* copy data */
+	/* copy data, we are currently at the end of the list */
 	linesv[list_size] = NULL;
-	for( CulList *node = list; list_size--; node = cul_list_next(node) )
-		linesv[list_size] = list->data;
+	for( CulList *node = list; list_size--; node = cul_list_prev(node) )
+		linesv[list_size] = node->data;
 
 	/* remove temporary data */
-	cul_list_free_all(list, NULL);
+	cul_list_free_all(cul_list_first(list), NULL);
 	cul_fclose(stream);
 
 	return CUL_SUCCESS;
