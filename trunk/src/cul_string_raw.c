@@ -81,7 +81,7 @@ char *cul_strndup(const char *str, size_t size) {
 	}
 	else
 		/* whole input string would fit */
-		cul_memcpy(dup, str, len);
+		cul_memcpy(dup, str, len+1);
 
 	return dup;
 }
