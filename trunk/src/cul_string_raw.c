@@ -121,6 +121,16 @@ char *cul_strtoupper(char *str) {
 	return begin;
 }
 
+char *cul_strchr_space(const char *str) {
+	for( ; *str && !cul_isspace_ascii(*str); ++str) ;
+	return (char *)str;
+}
+
+char *cul_strchr_nonspace(const char *str) {
+	for( ; *str && cul_isspace_ascii(*str); ++str) ;
+	return (char *)str;
+}
+
 char **cul_strsplit_delimiter(const char *s, const char *delimiter) {
 	const size_t delimiter_size = cul_strlen(delimiter);
 	const char *string = s;

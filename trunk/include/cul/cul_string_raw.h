@@ -51,11 +51,13 @@ char *cul_strndup(char *str, size_t size);
 char *cul_strtrim(char *str);
 char *cul_strtrim_right(char *str);
 char *cul_strtrim_left(char *str);
-
 char *cul_strtrim_compress(char *str);
 
 char *cul_strtolower(char *str);
 char *cul_strtoupper(char *str);
+
+char *cul_strchr_space(const char *str);
+char *cul_strchr_nonspace(const char *str);
 
 /* Misc */
 
