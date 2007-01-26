@@ -10,6 +10,7 @@ enum _CulErrno {
 	CUL_FAILURE  = -1,
 	CUL_SUCCESS  =  0,
 
+	CUL_ESTUB,
 	CUL_EINVAL,
 	CUL_EINIT,
 	CUL_EFAILED,
@@ -23,7 +24,9 @@ enum _CulErrno {
 	CUL_EARGUNK,
 	CUL_EARGCONV,
 	CUL_EARGSHORT,
-	CUL_EARGLONG
+	CUL_EARGLONG,
+	CUL_EFACCESS,
+	CUL_EFIO
 };
 
 const char *cul_error_string(CulErrno eid);
