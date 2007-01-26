@@ -179,7 +179,7 @@ char **cul_strsplit_delimiter(const char *s, const char *delimiter) {
 	return strv;
 }
 
-size_t cul_strv_size(const char **strv) {
+size_t cul_strv_size(char **strv) {
 	size_t size = 0;
 	for(; *strv != NULL; ++strv)
 		++size;
