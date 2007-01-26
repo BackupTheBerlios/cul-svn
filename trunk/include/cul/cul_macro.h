@@ -42,6 +42,13 @@
       cul_error_string(errno));                              \
     return;                                                  \
   } CUL_STMT_END
+#define CUL_ERROR_ERRNO(errno) CUL_STMT_START {              \
+    cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
+      __PRETTY_FUNCTION__,                                   \
+      __FILE__,                                              \
+      __LINE__,                                              \
+      cul_error_string(errno));                              \
+  } CUL_STMT_END
 #define CUL_ERROR_RET_VAL(val, ...) CUL_STMT_START {         \
     cul_log(CUL_MODULE, CUL_LOG_ERROR, __VA_ARGS__);         \
     return (val);                                            \
