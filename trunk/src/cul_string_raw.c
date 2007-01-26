@@ -56,7 +56,7 @@ size_t _cul_strtrim_compress_size(char *str, size_t size) {
 	return end - begin;
 }
 
-char *cul_strdup(char *str) {
+char *cul_strdup(const char *str) {
 	const size_t size = cul_strlen(str) + 1;
 	char *dup;
 
@@ -67,7 +67,7 @@ char *cul_strdup(char *str) {
 	return dup;
 }
 
-char *cul_strndup(char *str, size_t size) {
+char *cul_strndup(const char *str, size_t size) {
 	const size_t len = cul_strlen(str);
 	char *dup;
 
