@@ -57,13 +57,17 @@ size_t _cul_strtrim_compress_size(char *str, size_t size) {
 }
 
 char *cul_strdup(const char *str) {
-	const size_t size = cul_strlen(str) + 1;
+	return cul_strdup_size(str, cul_strlen(str));
+}
+
+char *cul_strdup_size(const char *str, size_t size) {
 	char *dup;
 
-	if( (dup = cul_malloc(size * sizeof(char))) == NULL )
+	if( (dup = cul_malloc(size+1 * sizeof(char))) == NULL )
 		return NULL;
 
 	cul_memcpy(dup, str, size);
+	cul_strnull(dup + size);
 	return dup;
 }
 

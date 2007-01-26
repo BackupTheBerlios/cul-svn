@@ -46,6 +46,7 @@ static inline char *cul_strstr(const char *str, const char *find)               
 /* Additional functions */
 
 char *cul_strdup(const char *str);
+char *cul_strdup_size(const char *str, size_t size);
 char *cul_strndup(const char *str, size_t size);
 
 char *cul_strtrim(char *str);
