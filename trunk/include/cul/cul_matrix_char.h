@@ -44,9 +44,7 @@ CulCVectorView *cul_cmatrix_superdiag(CulCVectorView *vv, const CulCMatrix *base
 /* Free */
 void cul_cmatrix_free(CulCMatrix *m);
 void cul_cmatrix_free_data(CulCMatrix *m);
-void cul_cmatrix_free_null(CulCMatrix **m);
 void cul_cmatrixview_free(CulCMatrixView *mv);
-void cul_cmatrixview_free_null(CulCMatrixView **mv);
 
 /* Data Access */
 

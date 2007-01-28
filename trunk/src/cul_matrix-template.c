@@ -113,12 +113,6 @@ void FUNCTION(matrix_free_data)(TYPE(Matrix) *m) {
 		free(m->data);
 }
 
-void FUNCTION(matrix_free_null)(TYPE(Matrix) **m) {
-	FUNCTION(matrix_free_data)(*m);
-	free(*m);
-	*m = NULL;
-}
-
 void FUNCTION(matrixview_free)(VIEW(Matrix) *mv) {
 	free(mv);
 }
