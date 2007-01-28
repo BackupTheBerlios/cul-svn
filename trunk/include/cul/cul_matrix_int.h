@@ -63,8 +63,8 @@ static inline const int *cul_imatrixview_const_ptr(const CulIMatrixView *mv, siz
 
 cul_errno cul_imatrix_copy(CulIMatrix *m, const CulIMatrix *base_m);
 cul_errno cul_imatrix_copy_offset(CulIMatrix *m, const CulIMatrix *base_m, size_t offset_x, size_t offset_y);
+cul_errno cul_imatrix_copy_submatrix(CulIMatrix *m, const CulIMatrix *base_m, size_t base_offset_x, size_t base_offset_y);
 cul_errno cul_imatrix_copy_view(CulIMatrix *m, const CulIMatrixView *base_mv);
-cul_errno cul_imatrix_copy_view_offset(CulIMatrix *m, const CulIMatrixView *base_mv, size_t offset_x, size_t offset_y);
 cul_errno cul_imatrixview_copy(CulIMatrixView *mv, const CulIMatrixView *base_mv);
 
 cul_errno cul_imatrix_copy_row(CulIMatrix *m, const CulIMatrix *base_m, size_t row, size_t base_row);
@@ -82,7 +82,7 @@ cul_errno cul_imatrix_swap_row(CulIMatrix *ma, CulIMatrix *mb, size_t row_a, siz
 cul_errno cul_imatrix_swap_col(CulIMatrix *ma, CulIMatrix *mb, size_t col_a, size_t col_b);
 
 cul_errno cul_imatrix_transpose(CulIMatrix *m);
-cul_errno cul_imatrix_transpose_cpy(CulIMatrix *m, const CulIMatrix *base_m);
+cul_errno cul_imatrix_transpose_copy(CulIMatrix *m, const CulIMatrix *base_m);
 
 /* Data Resize */
 

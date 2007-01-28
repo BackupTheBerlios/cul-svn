@@ -12,6 +12,13 @@ cul_errno FUNCTION(matrix_copy_offset)(TYPE(Matrix) *m, const TYPE(Matrix) *base
 	return CUL_SUCCESS;
 }
 
+cul_errno FUNCTION(matrix_copy_submatrix)(TYPE(Matrix) *m, const TYPE(Matrix) *base_m, size_t base_offset_x, size_t base_offset_y) {
+	if( base_m->size_x - base_offset_x < m->size_x || base_m->size_y - base_offset_y < m->size_y )
+		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADPOS, CUL_EBADPOS);
+	FUNCTION(copy_tda)(m->data, base_m->data + base_offset_x + base_m->size_x * base_offset_y, m->size_x * m->size_y, m->size_x, 0, base_m->size_x - base_offset_x);
+	return CUL_SUCCESS;
+}
+
 cul_errno FUNCTION(matrix_copy_view)(TYPE(Matrix) *m, const VIEW(Matrix) *base_mv) {
 	if( m->size_x != base_mv->size_x || m->size_y == base_mv->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
@@ -19,13 +26,6 @@ cul_errno FUNCTION(matrix_copy_view)(TYPE(Matrix) *m, const VIEW(Matrix) *base_m
 		FUNCTION(copy)(m->data, base_mv->data, base_mv->size_x * base_mv->size_y);
 	else
 		FUNCTION(copy_tda)(m->data, base_mv->data, base_mv->size_x * base_mv->size_y, base_mv->size_x, 0, base_mv->tda - base_mv->size_x);
-	return CUL_SUCCESS;
-}
-
-cul_errno FUNCTION(matrix_copy_view_offset)(TYPE(Matrix) *m, const VIEW(Matrix) *base_mv, size_t offset_x, size_t offset_y) {
-	if( m->size_x - offset_x < base_mv->size_x || m->size_y - offset_y < base_mv->size_y )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(m->data + offset_x + m->size_x * offset_y, base_mv->data, base_mv->size_x * base_mv->size_y, base_mv->size_x, m->size_x - offset_x, base_mv->tda - base_mv->size_x);
 	return CUL_SUCCESS;
 }
 
@@ -118,13 +118,11 @@ cul_errno FUNCTION(matrix_swap_col)(TYPE(Matrix) *ma, TYPE(Matrix) *mb, size_t c
 cul_errno FUNCTION(matrix_transpose)(TYPE(Matrix) *m) {
 	if( m->size_x != m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	/* TODO matrix_transpose implementation */
-	return CUL_SUCCESS;
+	CUL_ERROR_ERRNO_RET_VAL(CUL_ESTUB, CUL_ESTUB);
 }
 
-cul_errno FUNCTION(matrix_transpose_cpy)(TYPE(Matrix) *m, const TYPE(Matrix) *base_m) {
+cul_errno FUNCTION(matrix_transpose_copy)(TYPE(Matrix) *m, const TYPE(Matrix) *base_m) {
 	if( m->size_x != base_m->size_y || m->size_y != base_m->size_x )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	/* TODO matrix_transpose_cpy implementation */
-	return CUL_SUCCESS;
+	CUL_ERROR_ERRNO_RET_VAL(CUL_ESTUB, CUL_ESTUB);
 }
