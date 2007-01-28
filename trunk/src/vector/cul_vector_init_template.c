@@ -13,28 +13,6 @@ TYPE(Vector) *FUNCTION(vector_new_empty)(void) {
 	return FUNCTION(vector_new)(0);
 }
 
-TYPE(Vector) *FUNCTION(vector_new_vector)(const TYPE(Vector) *base_v) {
-	TYPE(Vector) *v;
-	if( (v = FUNCTION(vector_new_struct)()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( FUNCTION(vector_init_vector)(v, base_v) == NULL ) {
-		FUNCTION(vector_free_struct)(v);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
-	return v;
-}
-
-TYPE(Vector) *FUNCTION(vector_new_view)(const VIEW(Vector) *base_vv) {
-	TYPE(Vector) *v;
-	if( (v = FUNCTION(vector_new_struct)()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( FUNCTION(vector_init_view)(v, base_vv) == NULL ) {
-		FUNCTION(vector_free_struct)(v);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
-	return v;
-}
-
 TYPE(Vector) *FUNCTION(vector_init)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
 
@@ -50,20 +28,6 @@ TYPE(Vector) *FUNCTION(vector_init)(TYPE(Vector) *v, size_t size) {
 
 TYPE(Vector) *FUNCTION(vector_init_empty)(TYPE(Vector) *v) {
 	return FUNCTION(vector_init)(v, 0);
-}
-
-TYPE(Vector) *FUNCTION(vector_init_vector)(TYPE(Vector) *v, const TYPE(Vector) *base_v) {
-	if( (v = FUNCTION(vector_init)(v, base_v->size)) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	FUNCTION(vector_copy)(v, base_v);
-	return v;
-}
-
-TYPE(Vector) *FUNCTION(vector_init_view)(TYPE(Vector) *v, const VIEW(Vector) *base_vv) {
-	if( (v = FUNCTION(vector_init)(v, base_vv->size)) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	FUNCTION(vector_copy_view)(v, base_vv);
-	return v;
 }
 
 VIEW(Vector) *FUNCTION(vectorview_new)(void) {
@@ -106,18 +70,8 @@ void FUNCTION(vector_free_data)(TYPE(Vector) *v) {
 	if( v != NULL ) cul_free(v->data);
 }
 
-void FUNCTION(vector_free_null)(TYPE(Vector) **v) {
-	FUNCTION(vector_free)(*v);
-	*v = NULL;
-}
-
 void FUNCTION(vectorview_free)(VIEW(Vector) *vv) {
 	FUNCTION(vectorview_free_struct)(vv);
-}
-
-void FUNCTION(vectorview_free_null)(VIEW(Vector) **vv) {
-	FUNCTION(vectorview_free_struct)(*vv);
-	*vv = NULL;
 }
 
 void FUNCTION(vector_set_all)(TYPE(Vector) *v, ATOM val) {

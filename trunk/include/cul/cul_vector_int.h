@@ -35,12 +35,8 @@ static inline CulIVectorView *cul_ivectorview_init_struct(CulIVectorView *vv, si
 /* Uninitialized data elements */
 CulIVector *cul_ivector_new(size_t size);
 CulIVector *cul_ivector_new_empty(void);
-CulIVector *cul_ivector_new_vector(const CulIVector *base_v);
-CulIVector *cul_ivector_new_view(const CulIVectorView *base_vv);
 CulIVector *cul_ivector_init(CulIVector *v, size_t size);
 CulIVector *cul_ivector_init_empty(CulIVector *v);
-CulIVector *cul_ivector_init_vector(CulIVector *v, const CulIVector *base_v);
-CulIVector *cul_ivector_init_view(CulIVector *v, const CulIVectorView *base_vv);
 
 CulIVectorView *cul_ivectorview_new(void);
 CulIVectorView *cul_ivectorview_init(CulIVectorView *vv);
@@ -52,9 +48,7 @@ CulIVectorView *cul_ivectorview_init_subvector_stride(CulIVectorView *vv, const 
 
 void cul_ivector_free(CulIVector *v);
 void cul_ivector_free_data(CulIVector *v);
-void cul_ivector_free_null(CulIVector **v);
 void cul_ivectorview_free(CulIVectorView *vv);
-void cul_ivectorview_free_null(CulIVectorView **vv);
 
 /* Initialization */
 
@@ -82,8 +76,8 @@ static inline int *cul_ivectorview_next(CulIVectorView *vv, int *ptr);
 
 cul_errno cul_ivector_copy(CulIVector *v, const CulIVector *base_v);
 cul_errno cul_ivector_copy_offset(CulIVector *v, const CulIVector *base_v, size_t offset);
+cul_errno cul_ivector_copy_subvector(CulIVector *v, const CulIVector *base_v, size_t base_offset);
 cul_errno cul_ivector_copy_view(CulIVector *v, const CulIVectorView *base_vv);
-cul_errno cul_ivector_copy_view_offset(CulIVector *v, const CulIVectorView *base_vv, size_t offset);
 cul_errno cul_ivectorview_copy(CulIVectorView *vv, const CulIVectorView *base_vv);
 
 cul_errno cul_ivector_swap(CulIVector *a, CulIVector *b);

@@ -1,21 +1,10 @@
 #if !defined(TEMPLATE_CUL_PTR)
 	void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size) {
-		const ATOM *const end = data_b + size;
-		for( ; data_b < end; ++data_a, ++data_b)
-			*data_a = *data_b;
+		cul_memcpy(data_a, data_b, size*sizeof(ATOM));
 	}
 
 	void FUNCTION(copy_overlap)(ATOM *data_a, const ATOM *data_b, size_t size) {
-		if( data_b < data_a ) {
-			const ATOM *const end = data_b + size;
-			for( ; data_b < end; ++data_a, ++data_b)
-				*data_a = *data_b;
-		}
-		else {
-			const ATOM *const start = data_b;
-			for( data_a += size - 1, data_b += size - 1; data_b >= start; --data_a, --data_b)
-				*data_a = *data_b;
-		}
+		cul_memmove(data_a, data_b, size*sizeof(ATOM));
 	}
 
 	void FUNCTION(copy_stride)(ATOM *data_a, const ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
