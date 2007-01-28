@@ -28,6 +28,7 @@ SET(CUL_SOURCES
 	src/cul_mem.c
 	src/cul_tree.c
 	src/cul_tree_bb.c
+	src/cul_vector.c
 	src/cul_stream.c
 	src/cul_string.c
 	src/cul_string_raw.c
@@ -47,14 +48,6 @@ SET(CUL_SOURCES
 	src/matrix/cul_matrix_copy.c
 	src/matrix/cul_matrix_minmax.c
 	src/matrix/cul_matrix_resize.c
-	src/vector/cul_vector_balg.c
-	src/vector/cul_vector_copy.c
-	src/vector/cul_vector_init.c
-	src/vector/cul_vector_io.c
-	src/vector/cul_vector_minmax.c
-	src/vector/cul_vector_resize.c
-	src/vector/cul_vector_oper.c
-	src/vector/cul_vector_stat.c
 )
 
 # headers directory
