@@ -25,6 +25,7 @@ SET(CUL_SOURCES
 	src/cul_error.c
 	src/cul_list.c
 	src/cul_log.c
+	src/cul_matrix.c
 	src/cul_mem.c
 	src/cul_tree.c
 	src/cul_tree_bb.c
@@ -43,11 +44,6 @@ SET(CUL_SOURCES
 	src/base/cul_base_minmax.c
 	src/base/cul_base_oper.c
 	src/base/cul_base_stat.c
-	src/matrix/cul_matrix_init.c
-	src/matrix/cul_matrix_io.c
-	src/matrix/cul_matrix_copy.c
-	src/matrix/cul_matrix_minmax.c
-	src/matrix/cul_matrix_resize.c
 )
 
 # headers directory
