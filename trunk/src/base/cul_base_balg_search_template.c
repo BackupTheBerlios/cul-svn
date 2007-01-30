@@ -78,16 +78,28 @@ ATOM *FUNCTION(bfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride, c
 
 #if !defined(TEMPLATE_CUL_PTR)
 	ATOM *FUNCTION(lfind_eq)(ATOM key, ATOM *data, size_t size) {
-		CUL_UNUSED(key);
-		CUL_UNUSED(data);
-		CUL_UNUSED(size);
-		return NULL;
+		ATOM *const end = data + size;
+		for( ; data < end; ++data)
+			if( *data == key )
+				break;
+		return data == end? NULL: data;
 	}
 
 	ATOM *FUNCTION(bfind_eq)(ATOM key, ATOM *data, size_t size) {
-		CUL_UNUSED(key);
-		CUL_UNUSED(data);
-		CUL_UNUSED(size);
+		ATOM *end = data + size;
+		for( size >>= 1; size > 0; size >>= 1) {
+			const ATOM val = *(data + size);
+			if( val < key ) {
+				data += size + 1;
+				size = end - data;
+			}
+			else if( val > key )
+				end = data + size;
+			else
+				return data + size;
+		}
+		if( *data == key )
+			return data;
 		return NULL;
 	}
 #endif /* !defined(TEMPLATE_CUL_PTR) */
