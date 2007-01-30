@@ -1,5 +1,6 @@
 #include <cul/cul_global.h>
 #include <cul/cul_base.h>
+#include <cul/cul_random.h>
 
 #define TEMPLATE_CUL_DOUBLE
 #include "templates_on.h"

@@ -25,10 +25,12 @@ void cul_pcopy_tda(cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t t
 void cul_pswap(cul_ptr *data_a, cul_ptr *data_b, size_t size);
 void cul_pswap_stride(cul_ptr *data_a, cul_ptr *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_pswap_tda(cul_ptr *data_a, cul_ptr *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
-void cul_pswap_pos(cul_ptr *data_a, size_t i, size_t j);
+static inline void cul_pswap_pos(cul_ptr *data_a, size_t i, size_t j);
 
 void cul_preverse(cul_ptr *data, size_t size);
 void cul_preverse_stride(cul_ptr *data, size_t size, size_t stride);
+void cul_ppermutation(cul_ptr *data, size_t size);
+void cul_ppermutation_stride(cul_ptr *data, size_t size, size_t stride);
 
 /* Basic Algorithms */
 
@@ -75,5 +77,12 @@ static inline void cul_pfree_items_null(cul_ptr **data, size_t size, cul_free_f 
 	*data = NULL;
 }
 
+static inline void cul_pswap_pos(cul_ptr *data, size_t i, size_t j) {
+	cul_ptr tmp;
+
+	tmp = *(data + i);
+	*(data + i) = *(data + j);
+	*(data + j) = tmp;
+}
 
 #endif

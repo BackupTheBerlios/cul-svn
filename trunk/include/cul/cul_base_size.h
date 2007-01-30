@@ -23,10 +23,12 @@ void cul_ucopy_tda(size_t *data_a, const size_t *data_b, size_t size, size_t tda
 void cul_uswap(size_t *data_a, size_t *data_b, size_t size);
 void cul_uswap_stride(size_t *data_a, size_t *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_uswap_tda(size_t *data_a, size_t *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
-void cul_uswap_pos(size_t *data_a, size_t i, size_t j);
+static inline void cul_uswap_pos(size_t *data, size_t i, size_t j);
 
 void cul_ureverse(size_t *data, size_t size);
 void cul_ureverse_stride(size_t *data, size_t size, size_t stride);
+void cul_upermutation(size_t *data, size_t size);
+void cul_upermutation_stride(size_t *data, size_t size, size_t stride);
 
 /* I/O */
 
@@ -128,6 +130,14 @@ static inline void cul_ufree(size_t *data) {
 static inline void cul_ufree_null(size_t **data) {
 	cul_free(*data);
 	*data = NULL;
+}
+
+static inline void cul_uswap_pos(size_t *data, size_t i, size_t j) {
+	size_t tmp;
+
+	tmp = *(data + i);
+	*(data + i) = *(data + j);
+	*(data + j) = tmp;
 }
 
 static inline size_t cul_umin_pair(size_t a, size_t b) {

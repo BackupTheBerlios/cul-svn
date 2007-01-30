@@ -83,9 +83,11 @@ cul_errno cul_uvector_copy_view(CulUVector *v, const CulUVectorView *base_vv);
 cul_errno cul_uvectorview_copy(CulUVectorView *vv, const CulUVectorView *base_vv);
 
 cul_errno cul_uvector_swap(CulUVector *a, CulUVector *b);
-cul_errno cul_uvectorview_swap(CulUVectorView *a, CulUVectorView *b);
+cul_errno cul_uvectorview_swap(CulUVectorView *va, CulUVectorView *vb);
 void cul_uvector_reverse(CulUVector *v);
 void cul_uvectorview_reverse(CulUVectorView *vv);
+void cul_uvector_permutation(CulUVector *v);
+void cul_uvectorview_permutation(CulUVectorView *vv);
 
 /* Data Resize */
 
@@ -147,10 +149,10 @@ cul_errno cul_uvector_div(CulUVector *a, const CulUVector *b);
 
 void cul_uvectorview_add_scalar(CulUVectorView *vv, size_t val);
 void cul_uvectorview_mul_scalar(CulUVectorView *vv, size_t val);
-cul_errno cul_uvectorview_add(CulUVectorView *a, const CulUVectorView *b);
-cul_errno cul_uvectorview_sub(CulUVectorView *a, const CulUVectorView *b);
-cul_errno cul_uvectorview_mul(CulUVectorView *a, const CulUVectorView *b);
-cul_errno cul_uvectorview_div(CulUVectorView *a, const CulUVectorView *b);
+cul_errno cul_uvectorview_add(CulUVectorView *va, const CulUVectorView *vb);
+cul_errno cul_uvectorview_sub(CulUVectorView *va, const CulUVectorView *vb);
+cul_errno cul_uvectorview_mul(CulUVectorView *va, const CulUVectorView *vb);
+cul_errno cul_uvectorview_div(CulUVectorView *va, const CulUVectorView *vb);
 
 /* Input/Output */
 

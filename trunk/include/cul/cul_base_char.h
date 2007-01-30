@@ -23,10 +23,12 @@ void cul_ccopy_tda(char *data_a, const char *data_b, size_t size, size_t tda_siz
 void cul_cswap(char *data_a, char *data_b, size_t size);
 void cul_cswap_stride(char *data_a, char *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_cswap_tda(char *data_a, char *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
-void cul_cswap_pos(char *data_a, size_t i, size_t j);
+static inline void cul_cswap_pos(char *data, size_t i, size_t j);
 
 void cul_creverse(char *data, size_t size);
 void cul_creverse_stride(char *data, size_t size, size_t stride);
+void cul_cpermutation(char *data, size_t size);
+void cul_cpermutation_stride(char *data, size_t size, size_t stride);
 
 /* I/O */
 
@@ -128,6 +130,14 @@ static inline void cul_cfree(char *data) {
 static inline void cul_cfree_null(char **data) {
 	cul_free(*data);
 	*data = NULL;
+}
+
+static inline void cul_cswap_pos(char *data, size_t i, size_t j) {
+	char tmp;
+
+	tmp = *(data + i);
+	*(data + i) = *(data + j);
+	*(data + j) = tmp;
 }
 
 static inline char cul_cmin_pair(char a, char b) {

@@ -106,14 +106,6 @@ void FUNCTION(swap_tda)(ATOM *data_a, ATOM *data_b, size_t size, size_t tda_size
 	}
 }
 
-void FUNCTION(swap_pos)(ATOM *data, size_t i, size_t j) {
-	ATOM tmp;
-
-	tmp = *(data + i);
-	*(data + i) = *(data + j);
-	*(data + j) = tmp;
-}
-
 void FUNCTION(reverse)(ATOM *data, size_t size) {
 	ATOM tmp, *end;
 	for( end = data + size - 1; data < end; ++data, --end) {
@@ -129,5 +121,18 @@ void FUNCTION(reverse_stride)(ATOM *data, size_t size, size_t stride) {
 		tmp = *data;
 		*data = *end;
 		*end = tmp;
+	}
+}
+
+void FUNCTION(permutation)(ATOM *data, size_t size) {
+	for( size_t i=size-1; i>0; --i)
+		FUNCTION(swap_pos)(data, i, cul_urandom() % (i+1));
+}
+
+void FUNCTION(permutation_stride)(ATOM *data, size_t size, size_t stride) {
+	for( size_t i=size-stride; i>0; i -= stride) {
+		size_t pos = cul_urandom() % (i+1);
+		size_t pos_stride = pos % stride;
+		FUNCTION(swap_pos)(data, i, pos - pos_stride);
 	}
 }

@@ -151,19 +151,27 @@ cul_errno FUNCTION(vector_swap)(TYPE(Vector) *a, TYPE(Vector) *b) {
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(vectorview_swap)(VIEW(Vector) *a, VIEW(Vector) *b) {
-	if( a->size != b->size )
+cul_errno FUNCTION(vectorview_swap)(VIEW(Vector) *va, VIEW(Vector) *vb) {
+	if( va->size != vb->size )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(swap_stride)(a->data, b->data, a->size, a->stride, b->stride);
+	FUNCTION(swap_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
-void FUNCTION(vector_reverse)(TYPE(Vector) *a) {
-	FUNCTION(reverse)(a->data, a->size);
+void FUNCTION(vector_reverse)(TYPE(Vector) *v) {
+	FUNCTION(reverse)(v->data, v->size);
 }
 
-void FUNCTION(vectorview_reverse)(VIEW(Vector) *a) {
-	FUNCTION(reverse_stride)(a->data, a->size, a->stride);
+void FUNCTION(vectorview_reverse)(VIEW(Vector) *vv) {
+	FUNCTION(reverse_stride)(vv->data, vv->size, vv->stride);
+}
+
+void FUNCTION(vector_permutation)(TYPE(Vector) *v) {
+	FUNCTION(permutation)(v->data, v->size);
+}
+
+void FUNCTION(vectorview_permutation)(VIEW(Vector) *vv) {
+	FUNCTION(permutation_stride)(vv->data, vv->size, vv->stride);
 }
 
 TYPE(Vector) *FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
@@ -378,31 +386,31 @@ void FUNCTION(vectorview_mul_scalar)(VIEW(Vector)  *vv, ATOM val) {
 	FUNCTION(mul_scalar_stride)(vv->data, vv->size, vv->stride, val);
 }
 
-cul_errno FUNCTION(vectorview_add)(VIEW(Vector)  *a, const VIEW(Vector)  *b) {
-	if( a->size != b->size )
+cul_errno FUNCTION(vectorview_add)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
+	if( va->size != vb->size )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(add_stride)(a->data, b->data, a->size, a->stride, b->stride);
+	FUNCTION(add_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(vectorview_sub)(VIEW(Vector)  *a, const VIEW(Vector)  *b) {
-	if( a->size != b->size )
+cul_errno FUNCTION(vectorview_sub)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
+	if( va->size != vb->size )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(sub_stride)(a->data, b->data, a->size, a->stride, b->stride);
+	FUNCTION(sub_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(vectorview_mul)(VIEW(Vector)  *a, const VIEW(Vector)  *b) {
-	if( a->size != b->size )
+cul_errno FUNCTION(vectorview_mul)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
+	if( va->size != vb->size )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(mul_stride)(a->data, b->data, a->size, a->stride, b->stride);
+	FUNCTION(mul_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(vectorview_div)(VIEW(Vector)  *a, const VIEW(Vector)  *b) {
-	if( a->size != b->size )
+cul_errno FUNCTION(vectorview_div)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
+	if( va->size != vb->size )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(div_stride)(a->data, b->data, a->size, a->stride, b->stride);
+	FUNCTION(div_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
