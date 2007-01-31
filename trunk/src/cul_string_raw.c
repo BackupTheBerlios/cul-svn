@@ -31,7 +31,6 @@ size_t _cul_strtrim_compress_size(char *str, size_t size) {
 	for( ; str <= end && cul_isspace_ascii(*str); ++str);
 	/* omit end whitespaces */
 	for( ; str <= end && cul_isspace_ascii(*end); --end);
-	*(end+1) = CUL_STR_NULL;
 
 	/* remember string beginning */
 	const char *begin = str;
@@ -53,6 +52,9 @@ size_t _cul_strtrim_compress_size(char *str, size_t size) {
 			*cur = *str;
 		}
 	}
+	/* set ending null character */
+	*str = CUL_STR_NULL;
+
 	return end - begin;
 }
 
@@ -188,6 +190,29 @@ size_t cul_strv_size(char **strv) {
 	for(; *strv != NULL; ++strv)
 		++size;
 	return size;
+}
+char **cul_strv_dup(char **strv) {
+	return cul_strv_dup_size(strv, cul_strv_size(strv));
+}
+
+
+char **cul_strv_dup_size(char **strv, size_t size) {
+	char **dupv;
+
+	if( (dupv = cul_malloc( (size+1)*sizeof(char *) )) == NULL )
+	 return NULL;
+
+	/* copy strings */
+	for( size_t i=0; i<size; ++i)
+		if( (dupv[i] = cul_strdup(strv[i])) == NULL ) {
+			cul_strv_free(dupv);
+			return NULL;
+		}
+
+	/* set dupv end */
+	dupv[size] = NULL;
+
+	return dupv;
 }
 
 void cul_strv_free(char **strv) {

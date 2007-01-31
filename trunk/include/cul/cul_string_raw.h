@@ -64,7 +64,13 @@ char *cul_strchr_nonspace(const char *str);
 
 char **cul_strsplit_delimiter(const char *s, const char *delimiter);
 
+/* strv functions */
+
 size_t cul_strv_size(char **strv);
+
+char **cul_strv_dup(char **strv);
+char **cul_strv_dup_size(char **strv, size_t size);
+
 void cul_strv_free(char **strv);
 
 #endif
