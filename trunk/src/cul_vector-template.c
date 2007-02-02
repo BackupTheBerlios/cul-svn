@@ -45,19 +45,17 @@ VIEW(Vector) *FUNCTION(vectorview_init)(VIEW(Vector) *vv) {
 	return FUNCTION(vectorview_init_struct)(vv, 0, 0, NULL);
 }
 
-VIEW(Vector) *FUNCTION(vectorview_init_vector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v) {
+VIEW(Vector) *FUNCTION(vector_view_vector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v) {
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_v->size, 1, base_v->data);
 }
 
-VIEW(Vector) *FUNCTION(vectorview_init_subvector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v, size_t base_offset, size_t base_size) {
+VIEW(Vector) *FUNCTION(vector_view_subvector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v, size_t base_offset, size_t base_size, size_t base_stride) {
 	if( base_offset + base_size > base_v->size )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
-	return FUNCTION(vectorview_init_struct)(vv, base_size, 1, base_v->data + base_offset);
-}
-
-VIEW(Vector) *FUNCTION(vectorview_init_subvector_stride)(VIEW(Vector) *vv, const TYPE(Vector) *base_v, size_t base_offset, size_t base_size, size_t base_stride) {
-	if( base_offset + base_size > base_v->size )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_size, base_stride, base_v->data + base_offset);
 }
 
@@ -67,7 +65,8 @@ void FUNCTION(vector_free)(TYPE(Vector) *v) {
 }
 
 void FUNCTION(vector_free_data)(TYPE(Vector) *v) {
-	if( v != NULL ) cul_free(v->data);
+	if( v != NULL )
+		cul_free(v->data);
 }
 
 void FUNCTION(vectorview_free)(VIEW(Vector) *vv) {

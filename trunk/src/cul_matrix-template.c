@@ -59,47 +59,55 @@ VIEW(Matrix) *FUNCTION(matrixview_init)(VIEW(Matrix) *mv) {
 	return FUNCTION(matrixview_init_all)(mv, 0, 0, 0, NULL);
 }
 
-VIEW(Matrix) *FUNCTION(matrixview_init_matrix)(VIEW(Matrix) *mv, TYPE(Matrix) *base_m) {
+VIEW(Matrix) *FUNCTION(matrix_view_matrix)(VIEW(Matrix) *mv, TYPE(Matrix) *base_m) {
+	if( mv == NULL && (mv = FUNCTION(matrixview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(matrixview_init_all)(mv, base_m->size_x, base_m->size_y, base_m->size_x, base_m->data);
 }
 
-VIEW(Matrix) *FUNCTION(matrixview_init_submatrix)(VIEW(Matrix) *mv, TYPE(Matrix) *base_m, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y) {
+VIEW(Matrix) *FUNCTION(matrix_view_submatrix)(VIEW(Matrix) *mv, TYPE(Matrix) *base_m, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y) {
 	if( base_offset_x + base_size_x > base_m->size_x || base_offset_y + base_size_y > base_m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( mv == NULL && (mv = FUNCTION(matrixview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(matrixview_init_all)(mv, base_size_x, base_size_y, base_m->size_x, base_m->data + base_offset_x + base_m->size_x * base_offset_y);
 }
 
-VIEW(Vector) *FUNCTION(matrix_row)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_row) {
-#if defined(CUL_RANGE_CHECK)
-	if( base_row >= base_m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
-#endif
+VIEW(Vector) *FUNCTION(matrix_view_row)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_row) {
+	if( base_row >= base_m->size_y )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_m->size_x, 1, base_m->data + base_m->size_x * base_row);
 }
 
-VIEW(Vector) *FUNCTION(matrix_col)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_col) {
-#if defined(CUL_RANGE_CHECK)
-	if( base_col >= base_m->size_x ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
-#endif
+VIEW(Vector) *FUNCTION(matrix_view_col)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_col) {
+	if( base_col >= base_m->size_x )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_m->size_y, base_m->size_x, base_m->data + base_col);
 }
 
-VIEW(Vector) *FUNCTION(matrix_diag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m) {
+VIEW(Vector) *FUNCTION(matrix_view_diag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m) {
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, cul_umin_pair(base_m->size_x, base_m->size_y), base_m->size_x + 1, base_m->data);
 }
 
-VIEW(Vector) *FUNCTION(matrix_subdiag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_k) {
-#if defined(CUL_RANGE_CHECK)
+VIEW(Vector) *FUNCTION(matrix_view_subdiag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_k) {
 	if( base_k >= base_m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
-#endif
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, cul_umin_pair(base_m->size_x - base_k, base_m->size_y), base_m->size_x + 1, base_m->data + base_m->size_x * base_k);
 }
 
-VIEW(Vector) *FUNCTION(matrix_superdiag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_k) {
-#if defined(CUL_RANGE_CHECK)
+VIEW(Vector) *FUNCTION(matrix_view_superdiag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_k) {
 	if( base_k >= base_m->size_x )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);;
-#endif
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, cul_umin_pair(base_m->size_x, base_m->size_y - base_k), base_m->size_x + 1, base_m->data + base_k);
 }
 

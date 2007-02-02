@@ -31,15 +31,16 @@ static inline CulIMatrix *cul_imatrix_init_all(CulIMatrix *m, size_t x, size_t y
 
 CulIMatrixView *cul_imatrixview_new(void);
 CulIMatrixView *cul_imatrixview_init(CulIMatrixView *mv);
-CulIMatrixView *cul_imatrixview_init_matrix(CulIMatrixView *mv, CulIMatrix *base_m);
-CulIMatrixView *cul_imatrixview_init_submatrix(CulIMatrixView *mv, CulIMatrix *base_m, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y);
 static inline CulIMatrixView *cul_imatrixview_init_all(CulIMatrixView *mv, size_t size_x, size_t size_y, size_t tda, int *data);
 
-CulIVectorView *cul_imatrix_row(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_row);
-CulIVectorView *cul_imatrix_col(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_col);
-CulIVectorView *cul_imatrix_diag(CulIVectorView *vv, const CulIMatrix *base_m);
-CulIVectorView *cul_imatrix_subdiag(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_k);
-CulIVectorView *cul_imatrix_superdiag(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_k);
+/* Assign views */
+CulIMatrixView *cul_imatrix_view_matrix(CulIMatrixView *mv, CulIMatrix *base_m);
+CulIMatrixView *cul_imatrix_view_submatrix(CulIMatrixView *mv, CulIMatrix *base_m, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y);
+CulIVectorView *cul_imatrix_view_row(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_row);
+CulIVectorView *cul_imatrix_view_col(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_col);
+CulIVectorView *cul_imatrix_view_diag(CulIVectorView *vv, const CulIMatrix *base_m);
+CulIVectorView *cul_imatrix_view_subdiag(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_k);
+CulIVectorView *cul_imatrix_view_superdiag(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_k);
 
 /* Free */
 void cul_imatrix_free(CulIMatrix *m);

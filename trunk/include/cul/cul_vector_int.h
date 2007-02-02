@@ -40,9 +40,10 @@ CulIVector *cul_ivector_init_empty(CulIVector *v);
 
 CulIVectorView *cul_ivectorview_new(void);
 CulIVectorView *cul_ivectorview_init(CulIVectorView *vv);
-CulIVectorView *cul_ivectorview_init_vector(CulIVectorView *vv, const CulIVector *base_v);
-CulIVectorView *cul_ivectorview_init_subvector(CulIVectorView *vv, const CulIVector *base_v, size_t base_offset, size_t base_size);
-CulIVectorView *cul_ivectorview_init_subvector_stride(CulIVectorView *vv, const CulIVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
+
+/* Assign views */
+CulIVectorView *cul_ivector_view_vector(CulIVectorView *vv, const CulIVector *base_v);
+CulIVectorView *cul_ivector_view_subvector(CulIVectorView *vv, const CulIVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
 
 /* Free */
 
