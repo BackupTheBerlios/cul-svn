@@ -23,13 +23,11 @@ CulList *cul_list_new(cul_ptr data);
 CulList *cul_list_init(CulList *l, cul_ptr data);
 void cul_list_free(CulList *l, cul_free_f *free_item);
 void cul_list_free_all(CulList *l, cul_free_f *free_data);
-void cul_list_free_all_null(CulList **l, cul_free_f *free_data);
 
 /* Basic List Operators */
 
 static inline CulList *cul_list_next(CulList *l);
 static inline CulList *cul_list_prev(CulList *l);
-
 CulList *cul_list_first(CulList *l);
 CulList *cul_list_last(CulList *l);
 CulList *cul_list_half(CulList *l);
@@ -39,11 +37,8 @@ size_t cul_list_size(CulList *l);
 /* Resize */
 
 CulList *cul_list_insert_next(CulList *l, cul_ptr data);
-CulList *cul_list_insert_next_node(CulList *l, CulList *node);
 CulList *cul_list_insert_prev(CulList *l, cul_ptr data);
-CulList *cul_list_insert_prev_node(CulList *l, CulList *node);
 CulList *cul_list_remove(CulList *l, cul_free_f *free_item);
-void cul_list_remove_all(CulList *l, cul_free_f *free_item);
 
 /* Copy */
 

@@ -23,53 +23,47 @@ void cul_list_free(CulList *l, cul_free_f *free_data) {
 }
 
 void cul_list_free_all(CulList *l, cul_free_f *free_data) {
-	CulList *n;
-	for( ; l != NULL; l = n) {
-		n = l->next;
+	for( CulList *n; l != NULL; l = n) {
+		n = cul_list_next(l);
 		if( free_data != NULL )
 			free_data(l->data);
 		cul_list_free_struct(l);
 	}
 }
 
-void cul_list_free_all_null(CulList **l, cul_free_f *free_item) {
-	cul_list_free_all(*l, free_item);
-	*l = NULL;
-}
-
 CulList *cul_list_first(CulList *l) {
 	if( l != NULL )
-		while( l->prev != NULL )
-			l = l->prev;
+		while( cul_list_prev(l) != NULL )
+			l = cul_list_prev(l);
 	return l;
 }
 
 CulList *cul_list_last(CulList *l) {
 	if( l != NULL )
-		while( l->next != NULL )
-			l = l->next;
+		while( cul_list_next(l) != NULL )
+			l = cul_list_next(l);
 	return l;
 }
 
 CulList *cul_list_half(CulList *l) {
-	CulList *n = NULL;
-	for( ; l != NULL; l = l->next) {
-		if( (l = l->next) == NULL )
+	CulList *n = l;
+	for( ; l != NULL; l = cul_list_next(l)) {
+		if( (l = cul_list_next(l)) == NULL )
 			break;
-		n = n->next;
+		n = cul_list_next(n);
 	}
 	return n;
 }
 
 CulList *cul_list_nth(CulList *l, size_t n) {
 	while( l != NULL && n-- )
-		l = l->next;
+		l = cul_list_next(l);
 	return l;
 }
 
 size_t cul_list_size(CulList *l) {
 	size_t size = 0;
-	for( ; l != NULL; l = l->next)
+	for( ; l != NULL; l = cul_list_next(l))
 		++size;
 	return size;
 }
@@ -80,29 +74,17 @@ CulList *cul_list_insert_next(CulList *l, cul_ptr data) {
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 
 	if( l != NULL ) {
-		cul_list_init_struct(n, l->next, l, data);
+		CulList *next = cul_list_next(l);
+
+		cul_list_init_struct(n, next, l, data);
 		/* adjust list pointers */
-		if( l->next != NULL )
-			l->next->prev = n;
+		if( next != NULL )
+			next->prev = n;
 		l->next = n;
 	}
 	else
 		cul_list_init_struct(n, NULL, NULL, data);
 	return n;
-}
-
-CulList *cul_list_insert_next_node(CulList *l, CulList *node) {
-	if( l != NULL ) {
-		/* init node */
-		node->next = l->next;
-		node->prev = l;
-
-		/* adjust list */
-		if( l->next != NULL )
-			l->next->prev = node;
-		l->next = node;
-	}
-	return node;
 }
 
 CulList *cul_list_insert_prev(CulList *l, cul_ptr data) {
@@ -111,10 +93,12 @@ CulList *cul_list_insert_prev(CulList *l, cul_ptr data) {
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 
 	if( l != NULL ) {
-		cul_list_init_struct(n, l, l->prev, data);
+		CulList *prev = cul_list_prev(l);
+
+		cul_list_init_struct(n, l, prev, data);
 		/* adjust list pointers */
-		if( l->prev != NULL )
-			l->prev->next = n;
+		if( prev != NULL )
+			prev->next = n;
 		l->prev = n;
 	}
 	else
@@ -122,30 +106,16 @@ CulList *cul_list_insert_prev(CulList *l, cul_ptr data) {
 	return n;
 }
 
-CulList *cul_list_insert_prev_node(CulList *l, CulList *node) {
-	if( l != NULL ) {
-		/* init node */
-		node->next = l;
-		node->prev = l->prev;
-
-		/* adjust list */
-		if( l->prev != NULL )
-			l->prev->next = node;
-		l->prev = node;
-	}
-	return node;
-}
-
 CulList *cul_list_remove(CulList *l, cul_free_f *free_item) {
 	if( l != NULL ) {
 		CulList *n = NULL;
-		if( l->prev != NULL ) {
-			n = l->prev;
-			n->next = l->next;
+		if( cul_list_prev(l) != NULL ) {
+			n = cul_list_prev(l);
+			n->next = cul_list_next(l);
 		}
-		if( l->next != NULL ) {
-			n = l->next;
-			n->prev = l->prev;
+		if( cul_list_next(l) != NULL ) {
+			n = cul_list_next(l);
+			n->prev = cul_list_prev(l);
 		}
 		cul_list_free(l, free_item);
 		return n;
@@ -153,25 +123,17 @@ CulList *cul_list_remove(CulList *l, cul_free_f *free_item) {
 	return l;
 }
 
-void cul_list_remove_all(CulList *l, cul_free_f *free_item) {
-	if( l != NULL ) {
-		if( l->prev != NULL )
-			l->prev->next = NULL;
-		cul_list_free_all(l, free_item);
-	}
-}
-
 CulList *cul_list_copy(CulList *l) {
 	CulList *first = NULL, *n;
 	if( l != NULL ) {
 		if( (first = cul_list_insert_next(first, l->data)) == NULL ) {
-			cul_list_free_all(l, NULL);
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-		}
-		for( n = first, l = l->next; l != NULL; l = l->next)
-			if( (n = cul_list_insert_next(n, l->data)) == NULL ) {
 			cul_list_free_all(first, NULL);
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		}
+		for( n = first, l = cul_list_next(l); l != NULL; l = cul_list_next(l))
+			if( (n = cul_list_insert_next(n, l->data)) == NULL ) {
+				cul_list_free_all(first, NULL);
+				CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 			}
 	}
 	return first;
@@ -179,10 +141,10 @@ CulList *cul_list_copy(CulList *l) {
 
 CulList *cul_list_detach(CulList *l, cul_cpy_f *cpy) {
 	CulList *first = l;
-	for( ; l != NULL; l = l->next) {
+	for( ; l != NULL; l = cul_list_next(l)) {
 		if( (l->data = cpy(l->data)) == NULL ) {
 			/* erase rest of undetached pointers */
-			for( l = l->next; l != NULL; l = l->next)
+			for( l = cul_list_next(l); l != NULL; l = cul_list_next(l))
 				l->data = NULL;
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 		}
@@ -193,8 +155,8 @@ CulList *cul_list_detach(CulList *l, cul_cpy_f *cpy) {
 CulList *cul_list_reverse(CulList *l) {
 	CulList *last;
 	for( last = l; l != NULL; last = l) {
-		l = last->next;
-		last->next = last->prev;
+		l = cul_list_next(last);
+		last->next = cul_list_prev(last);
 		last->prev = l;
 	}
 	return last;
@@ -202,11 +164,11 @@ CulList *cul_list_reverse(CulList *l) {
 
 CulList *cul_list_find(CulList *l, cul_ptr data, cul_eq_f *eq) {
 	if( eq == NULL )
-		for( ; l != NULL; l = l->next)
+		for( ; l != NULL; l = cul_list_next(l))
 			if( l->data == data )
 				return l;
 	else
-		for( ; l != NULL; l = l->next)
+		for( ; l != NULL; l = cul_list_next(l))
 			if( eq(l->data, data) )
 				return l;
 	return NULL;
@@ -221,11 +183,11 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp) {
 	/* initialise result (head of return list) */
 	if( cmp(l1->data, l2->data) <= 0 ) {
 		result = l1;
-		l1 = l1->next;
+		l1 = cul_list_next(l1);
 	}
 	else {
 		result = l2;
-		l2 = l2->next;
+		l2 = cul_list_next(l2);
 	}
 	result->prev = NULL;
 
@@ -236,19 +198,19 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp) {
 	while( l1 != NULL && l2 != NULL ) {
 		if( cmp(l1->data, l2->data) <= 0 ) {
 			l->next = l1;
-			l1 = l1->next;
+			l1 = cul_list_next(l1);
 		}
 		else {
 			l->next = l2;
-			l2 = l2->next;
+			l2 = cul_list_next(l2);
 		}
-		l = l->next;
+		l = cul_list_next(l);
 		l->prev = l_prev;
 		l_prev = l;
 	}
 
 	l->next = l1 != NULL? l1: l2;
-	l->next->prev = l;
+	cul_list_next(l)->prev = l;
 
 	return result;
 }
@@ -261,7 +223,7 @@ CulList *_cul_list_sort(CulList *l, cul_cmp_f *cmp, size_t size) {
 		return l;
 
 	l_half = cul_list_nth(l, i_half);
-	l_half->prev->next = NULL;
+	cul_list_prev(l_half)->next = NULL;
 
 	return _cul_list_merge(_cul_list_sort(l, cmp, i_half), _cul_list_sort(l_half, cmp, size - i_half), cmp);
 }
@@ -281,7 +243,7 @@ size_t cul_list_unique(CulList *l, cul_eq_f *eq) {
 
 size_t cul_list_foreach(CulList *l, cul_foreach_f *foreach) {
 	size_t i_foreach = 0;
-	for( ; l != NULL; l = l->next, ++i_foreach )
+	for( ; l != NULL; l = cul_list_next(l), ++i_foreach )
 		if( foreach(l->data) )
 			break;
 
