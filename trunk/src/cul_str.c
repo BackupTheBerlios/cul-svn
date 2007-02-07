@@ -1,5 +1,5 @@
-#include <cul/cul_string_raw.h>
-#include <cul/cul_string_type.h>
+#include <cul/cul_str.h>
+#include <cul/cul_str_type.h>
 
 /* private functions */
 size_t _cul_strtrim_right_size(char *str, size_t size);

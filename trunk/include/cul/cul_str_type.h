@@ -44,11 +44,11 @@ static inline int cul_isspace(int c) {
 }
 
 static inline int cul_isspace_ascii(int c) {
-	return ( (cul_string_type_ascii[ (uint8_t)c ] & CUL_STRING_SPACE) != 0 );
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_SPACE) != 0 );
 }
 
 static inline int cul_iswhite_ascii(int c) {
-	return ( (cul_string_type_ascii[ (uint8_t)c ] & CUL_STRING_WHITE) != 0 );
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_WHITE) != 0 );
 }
 
 static inline int cul_isupper(int c) {
@@ -56,7 +56,7 @@ static inline int cul_isupper(int c) {
 }
 
 static inline int cul_isupper_ascii(int c) {
-	return ( (cul_string_type_ascii[ (uint8_t)c ] & CUL_STRING_UPPER) != 0 );
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_UPPER) != 0 );
 }
 
 static inline int cul_islower(int c) {
@@ -64,7 +64,7 @@ static inline int cul_islower(int c) {
 }
 
 static inline int cul_islower_ascii(int c) {
-	return ( (cul_string_type_ascii[ (uint8_t)c ] & CUL_STRING_LOWER) != 0 );
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_LOWER) != 0 );
 }
 
 static inline int cul_tolower(int c) {

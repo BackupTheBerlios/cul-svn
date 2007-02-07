@@ -3,7 +3,7 @@
 #include <cul/cul_stream.h>
 #include <cul/cul_base_char.h>
 #include <cul/cul_base_ptr.h>
-#include <cul/cul_string_raw.h>
+#include <cul/cul_str.h>
 
 /* private functions */
 CulArg *_cul_arg_next(CulArg *t);
