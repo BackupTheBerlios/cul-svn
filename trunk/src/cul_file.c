@@ -56,16 +56,19 @@ cul_errno cul_file_read_lines(const char *filename, size_t size, char ***content
 		if( buffer[buffer_size-1] == CUL_STR_NEWLINE )
 			cul_strnull(buffer + (--buffer_size));
 
-		CulList *node = cul_list_new(cul_strdup_size(buffer, buffer_size));
-		if( node == NULL ) {
-			/* clean */
+		char *data = cul_strdup_size(buffer, buffer_size);
+		CulList *node = cul_list_insert_next(list, data);
+		if( node == NULL || data == NULL ) {
 			cul_list_free_all(cul_list_first(list), cul_free);
+			if( node == NULL )
+				cul_free(data);
+
 			cul_fclose(stream);
 			CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
 		}
 
 		/* insert list node */
-		list = cul_list_insert_next_node(list, node);
+		list = node;
 		list_size += 1;
 	}
 
