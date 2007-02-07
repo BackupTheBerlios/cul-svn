@@ -1,7 +1,7 @@
 #include <cul/cul_global.h>
 #include <cul/cul_string_type.h>
 
-static const uint16_t cul_string_type_ascii_data[256] = {
+static const uint16_t cul_str_type_ascii_data[256] = {
 	/* 0x00 - 0x07 */
 	CUL_STRING_CNTRL,
 	CUL_STRING_CNTRL,
@@ -151,4 +151,4 @@ static const uint16_t cul_string_type_ascii_data[256] = {
 	/* 0x80 - 0xff */
 };
 
-const uint16_t *const cul_string_type_ascii = cul_string_type_ascii_data;
+const uint16_t *const cul_str_type_ascii = cul_str_type_ascii_data;

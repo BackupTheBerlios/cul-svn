@@ -31,9 +31,9 @@ SET(CUL_SOURCES
 	src/cul_tree_bb.c
 	src/cul_vector.c
 	src/cul_stream.c
+	src/cul_str.c
+	src/cul_str_type.c
 	src/cul_string.c
-	src/cul_string_raw.c
-	src/cul_string_type.c
 
 	src/base/cul_base_balg_search.c
 	src/base/cul_base_balg_sort.c
