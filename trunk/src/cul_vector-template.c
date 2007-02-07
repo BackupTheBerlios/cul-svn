@@ -413,11 +413,11 @@ cul_errno FUNCTION(vectorview_div)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(vector_print_stream)(const TYPE(Vector) *v, const char *format, const char *separator) {
+cul_errno FUNCTION(vector_printf_stream)(const TYPE(Vector) *v, const char *format, const char *separator) {
 
-	if( !FUNCTION(stream_printf)(format, separator, v->data, v->size) )
+	if( !FUNCTION(printf_stream)(format, separator, v->data, v->size) )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
-	if( cul_stream_printf("\n") < 0 )
+	if( cul_printf_stream("\n") < 0 )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
 
 	return CUL_SUCCESS;
@@ -441,11 +441,11 @@ cul_errno FUNCTION(vector_fscanf)(FILE *id, TYPE(Vector) *v, const char *format,
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(vectorview_print_stream)(const VIEW(Vector) *vv, const char *format, const char *separator) {
+cul_errno FUNCTION(vectorview_printf_stream)(const VIEW(Vector) *vv, const char *format, const char *separator) {
 
-	if( !FUNCTION(stream_printf_stride)(format, separator, vv->data, vv->size, vv->stride) )
+	if( !FUNCTION(printf_stream_stride)(format, separator, vv->data, vv->size, vv->stride) )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
-	if( cul_stream_printf("\n") < 0 )
+	if( cul_printf_stream("\n") < 0 )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
 
 	return CUL_SUCCESS;

@@ -1,8 +1,5 @@
 #include <cul/cul_global.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
+#include <cul/cul_stream.h>
 #include <time.h>
 
 #define CUL_LOG_MSG_SIZE 1024
@@ -42,7 +39,7 @@ void cul_log(const char *module, CulLogType type, const char *format, ...) {
 	va_end(arg);
 
 	if( cul_log_handler_get() == NULL )
-		cul_stream_printf("%s", message);
+		cul_printf_stream("%s", message);
 	else
 		cul_log_handler_get()(module, type, message);
 

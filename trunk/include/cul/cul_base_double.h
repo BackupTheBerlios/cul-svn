@@ -32,9 +32,8 @@ void cul_dpermutation_stride(double *data, size_t size, size_t stride);
 
 /* I/O */
 
-cul_bool cul_dstream_printf(const char *format, const char *separator, const double *data, size_t size);
-cul_bool cul_dstream_printf_stride(const char *format, const char *separator, const double *data, size_t size, size_t stride);
-
+cul_bool cul_dprintf_stream(const char *format, const char *separator, const double *data, size_t size);
+cul_bool cul_dprintf_stream_stride(const char *format, const char *separator, const double *data, size_t size, size_t stride);
 cul_bool cul_dfprintf(FILE *stream, const char *format, const char *separator, const double *data, size_t size);
 cul_bool cul_dfprintf_stride(FILE *stream, const char *format, const char *separator, const double *data, size_t size, size_t strid);
 cul_bool cul_dfscanf(FILE *stream, const char *format, const char *separator, const double *data, size_t size);

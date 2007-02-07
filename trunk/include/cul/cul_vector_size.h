@@ -157,11 +157,11 @@ cul_errno cul_uvectorview_div(CulUVectorView *va, const CulUVectorView *vb);
 
 /* Input/Output */
 
-cul_errno cul_uvector_print_stream(const CulUVector *v, const char *format, const char *separator);
+cul_errno cul_uvector_printf_stream(const CulUVector *v, const char *format, const char *separator);
 cul_errno cul_uvector_fprintf(FILE *id, const CulUVector *v, const char *format, const char *separator);
 cul_errno cul_uvector_fscanf(FILE *id, CulUVector *v, const char *format, const char *separator);
 
-cul_errno cul_uvectorview_print_stream(const CulUVectorView *vv, const char *format, const char *separator);
+cul_errno cul_uvectorview_printf_stream(const CulUVectorView *vv, const char *format, const char *separator);
 cul_errno cul_uvectorview_fprintf(FILE *id, const CulUVectorView *vv, const char *format, const char *separator);
 cul_errno cul_uvectorview_fscanf(FILE *id, CulUVectorView *vv, const char *format, const char *separator);
 

@@ -101,7 +101,7 @@ void cul_cmatrix_minmax_index(const CulCMatrix *m, size_t *min_i, size_t *max_i)
 
 /* Input/Output */
 
-cul_errno cul_cmatrix_print_stream(const CulCMatrix *m, const char *format, const char *separator);
+cul_errno cul_cmatrix_printf_stream(const CulCMatrix *m, const char *format, const char *separator);
 cul_errno cul_cmatrix_fprintf(FILE *id, const CulCMatrix *m, const char *format, const char *separator);
 cul_errno cul_cmatrix_fscanf(FILE *id, CulCMatrix *m, const char *format, const char *separator);
 

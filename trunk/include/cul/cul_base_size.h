@@ -32,9 +32,8 @@ void cul_upermutation_stride(size_t *data, size_t size, size_t stride);
 
 /* I/O */
 
-cul_bool cul_ustream_printf(const char *format, const char *separator, const size_t *data, size_t size);
-cul_bool cul_ustream_printf_stride(const char *format, const char *separator, const size_t *data, size_t size, size_t stride);
-
+cul_bool cul_uprintf_stream(const char *format, const char *separator, const size_t *data, size_t size);
+cul_bool cul_uprintf_stream_stride(const char *format, const char *separator, const size_t *data, size_t size, size_t stride);
 cul_bool cul_ufprintf(FILE *stream, const char *format, const char *separator, const size_t *data, size_t size);
 cul_bool cul_ufprintf_stride(FILE *stream, const char *format, const char *separator, const size_t *data, size_t size, size_t strid);
 cul_bool cul_ufscanf(FILE *stream, const char *format, const char *separator, const size_t *data, size_t size);

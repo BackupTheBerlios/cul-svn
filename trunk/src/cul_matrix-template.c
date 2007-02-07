@@ -319,13 +319,13 @@ void FUNCTION(matrix_minmax_index)(const TYPE(Matrix) *m, size_t *min_i, size_t 
 	return FUNCTION(minmax_index)(m->data, m->size_x * m->size_y, min_i, max_i);
 }
 
-cul_errno FUNCTION(matrix_print_stream)(const TYPE(Matrix) *m, const char *format, const char *separator) {
+cul_errno FUNCTION(matrix_printf_stream)(const TYPE(Matrix) *m, const char *format, const char *separator) {
 	size_t i;
 
 	for( i=0; i< m->size_y; ++i) {
-		if( FUNCTION(stream_printf)(format, separator, FUNCTION(matrix_const_ptr)(m, 0, i), m->size_x) < 0 )
+		if( FUNCTION(printf_stream)(format, separator, FUNCTION(matrix_const_ptr)(m, 0, i), m->size_x) < 0 )
 			CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
-		if( cul_stream_printf("\n") < 0 )
+		if( cul_printf_stream("\n") < 0 )
 			CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
 	}
 	return CUL_SUCCESS;
