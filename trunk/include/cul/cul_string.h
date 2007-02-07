@@ -2,7 +2,7 @@
 #define CUL_STRING_H
 
 #include <cul/cul_global.h>
-#include <cul/cul_string_raw.h>
+#include <cul/cul_str.h>
 #include <cul/cul_list.h>
 
 #define CUL_STRING(ptr) ((CulString *)(ptr))
