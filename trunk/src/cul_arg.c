@@ -1,77 +1,112 @@
 #include <cul/cul_arg.h>
 
+#include <cul/cul_stream.h>
 #include <cul/cul_base_char.h>
 #include <cul/cul_base_ptr.h>
 #include <cul/cul_string_raw.h>
 
-/* private CulArg functions */
-CulArg *cul_arg_next(CulArg *t);
-CulArg *cul_arg_next_option(CulArg *t);
-CulArg *cul_arg_next_group(CulArg *t);
+/* private functions */
+CulArg *_cul_arg_next(CulArg *t);
+CulArg *_cul_arg_next_option(CulArg *t);
 
-/* private data types */
-typedef enum _CulArgType CulArgType;
-enum _CulArgType {
-	CUL_ARG_TYPE_UNK,
-	CUL_ARG_TYPE_SHORT,
-	CUL_ARG_TYPE_LONG,
-	CUL_ARG_TYPE_END
-};
+static inline void _cul_arg_cmd_next(int *argc, char ***argv);
+cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table);
+cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table);
+cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t);
 
-/* private command line functions */
-static inline void cul_arg_cmd_next(int *argc, char ***argv);
-CulArgType cul_arg_cmd_type(const char *arg);
+/* Parse program arguments using argument tables */
+cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 
-cul_errno cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table);
-cul_errno cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table);
-cul_bool cul_arg_cmd_convert(const char *arg, CulArg *t);
+	/* omit first parameter */
+	_cul_arg_cmd_next(argc, argv);
 
-/* Find and return next valid argument description, from argument table */
-CulArg *cul_arg_next(CulArg *t) {
-	if( (++t)->flags == CUL_ARG_END )
-		return NULL;
-	return t;
+	while( *argc > 0 ) {
+		char *arg = **argv;
+		cul_errno result;
+
+		if( *(arg++) == '-' ) {
+			if( *(arg++) == '-' ) {
+				if( cul_strisnull(arg) )
+					/* finish parsing */
+					break;
+
+				/* long option */
+				result = _cul_arg_cmd_parse_long(argc, argv, *table);
+				if( result != CUL_SUCCESS )
+					return result;
+			}
+			if( cul_strisnull(arg) )
+				return CUL_EARGUNK;
+
+			/* short option */
+			result = _cul_arg_cmd_parse_short(argc, argv, *table);
+			if( result != CUL_SUCCESS )
+				return result;
+		}
+		else
+			return CUL_EARGUNK;
+	}
+
+	CulArg *t;
+	if( (t = cul_arg_check_required(*table)) != NULL ) {
+		*table = t;
+		return CUL_EARGMISS;
+	}
+	return CUL_SUCCESS;
 }
 
-/* Find and return next option, short or long, from argument table */
-CulArg *cul_arg_next_option(CulArg *t) {
+/* Print all help string information from table */
+void cul_arg_print_help(CulArg *table) {
+	CulArg *t = table;
 	while( t ) {
-		switch( (++t)->flags & ~CUL_ARG_MASK ) {
-			case CUL_ARG_END:
-				return NULL;
+		switch( t->flags & ~CUL_ARG_MASK ) {
 			case CUL_ARG_HELP:
-			case CUL_ARG_GROUP:
-				continue;
+				cul_printf_stream("%s\n", t->desciption);
+				break;
 			default:
+				if( t->short_name ) {
+					if( t->long_name )
+						cul_printf_stream("  -%c, --%-16s  %s\n", t->short_name, t->long_name, t->desciption);
+					else
+						cul_printf_stream("  -%-21c  %s\n", t->short_name, t->desciption);
+				}
+				else if( t->long_name )
+					cul_printf_stream("  --%-20s  %s\n", t->long_name, t->desciption);
 				break;
 		}
-		break;
+		t = _cul_arg_next(t);
 	}
-	return t;
 }
 
-/* Find and return next group from argument table */
-CulArg *cul_arg_next_group(CulArg *t) {
-	while( t ) {
-		switch( (++t)->flags & ~CUL_ARG_MASK ) {
-			case CUL_ARG_END:
-				return NULL;
-			case CUL_ARG_GROUP:
-				break;
-			default:
-				continue;
+void cul_arg_free(CulArg *table) {
+	while( table != NULL ) {
+		CulArgFlag flag = table->flags;
+		if( flag & CUL_ARG_FOUND ) {
+			if( flag & CUL_ARG_STRING ) {
+				cul_free(*((char **)table->value));
+				*((char **)table->value) = NULL;
+			}
 		}
-		break;
+		table = _cul_arg_next_option(table);
 	}
-	return t;
+}
+
+/* Check argument table if all required arguments were found */
+CulArg *cul_arg_check_required(CulArg *table) {
+	while( table != NULL ) {
+		if( table->flags & CUL_ARG_REQUIRED && !(table->flags & CUL_ARG_FOUND) )
+			return table;
+		table = _cul_arg_next_option(table);
+	}
+	return NULL;
 }
 
 /* Find and return specific short argument in argument table */
 CulArg *cul_arg_search_short(CulArg *t, char arg) {
-	while( t ) {
+	while( t != NULL ) {
 		if( t->short_name == arg )
 			break;
-		t = cul_arg_next_option(t);
+		t = _cul_arg_next_option(t);
 	}
 	return t;
 }
@@ -86,33 +121,53 @@ CulArg *cul_arg_search_long(CulArg *t, const char *arg) {
 	else
 		length = cul_strlen(arg);
 
-	while( t ) {
-		if( t->long_name && (!cul_strncmp(arg, t->long_name, length) && cul_strisnull(t->long_name + length)) )
+	while( t != NULL ) {
+		if( t->long_name != NULL &&
+				( !cul_strncmp(arg, t->long_name, length) &&
+				cul_strisnull(t->long_name + length)) )
 			break;
-		t = cul_arg_next_option(t);
+		t = _cul_arg_next_option(t);
 	}
 	return t;
 }
 
-static inline void cul_arg_cmd_next(int *argc, char ***argv) {
+/* Find and return next valid argument description, from argument table */
+CulArg *_cul_arg_next(CulArg *t) {
+	if( (++t)->flags & CUL_ARG_END ) {
+		if( t->flags & CUL_ARG_JOIN )
+			t = t->value;
+		else
+			return NULL;
+	}
+	return t;
+}
+
+/* Find and return next option, short or long, from argument table */
+CulArg *_cul_arg_next_option(CulArg *t) {
+	while( t != NULL ) {
+		switch( (++t)->flags & ~CUL_ARG_MASK ) {
+			case CUL_ARG_END:
+				return NULL;
+			case CUL_ARG_JOIN:
+			case CUL_ARG_END|CUL_ARG_JOIN:
+				t = t->value;
+				continue;
+			case CUL_ARG_HELP:
+				continue;
+			default:
+				break;
+		}
+		break;
+	}
+	return t;
+}
+
+static inline void _cul_arg_cmd_next(int *argc, char ***argv) {
 	--(*argc);
 	++(*argv);
 }
 
-CulArgType cul_arg_cmd_type(const char *arg) {
-	if( *arg == '-' ) {
-		if( *(arg + 1) == '-' )
-			if( *(arg + 2) )
-				return CUL_ARG_TYPE_LONG;
-			else
-				return CUL_ARG_TYPE_END;
-		else
-			return CUL_ARG_TYPE_SHORT;
-	}
-	return CUL_ARG_TYPE_UNK;
-}
-
-cul_errno cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table) {
+cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table) {
 	const char *arg_string = **argv + 1;
 	cul_bool is_multi_flag = CUL_FALSE;
 	CulArg *t;
@@ -131,14 +186,14 @@ cul_errno cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table) {
 				return CUL_EARGSHORT;
 
 			/* convert flag option */
-			if( cul_arg_cmd_convert(arg_string, t) )
+			if( _cul_arg_cmd_convert(arg_string, t) )
 				t->flags |= CUL_ARG_FOUND;
 			else
 				return CUL_EARGCONV;
 
 			/* end of multiple bool short flags */
 			if( cul_strisnull(++arg_string) ) {
-				cul_arg_cmd_next(argc, argv);
+				_cul_arg_cmd_next(argc, argv);
 				return CUL_SUCCESS;
 			}
 		}
@@ -177,7 +232,7 @@ cul_errno cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table) {
 			}
 
 			/* convert flag option */
-			if( cul_arg_cmd_convert(arg_string, t) )
+			if( _cul_arg_cmd_convert(arg_string, t) )
 				t->flags |= CUL_ARG_FOUND;
 			else
 				return CUL_EARGCONV;
@@ -185,7 +240,7 @@ cul_errno cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table) {
 			if( size > 0 ) {
 				/* move to next argument */
 				while( size-- > 0 )
-					cul_arg_cmd_next(argc, argv);
+					_cul_arg_cmd_next(argc, argv);
 
 				return CUL_SUCCESS;
 			}
@@ -194,7 +249,7 @@ cul_errno cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table) {
 	return CUL_EARGSHORT;
 }
 
-cul_errno cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table) {
+cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table) {
 	const char *arg_string = **argv + 2;
 	const char *arg_option = cul_strchr(arg_string, '=');
 	CulArg *t;
@@ -237,21 +292,21 @@ cul_errno cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table) {
 		}
 
 		/* convert flag option */
-		if( cul_arg_cmd_convert(arg_string, t) )
+		if( _cul_arg_cmd_convert(arg_string, t) )
 			t->flags |= CUL_ARG_FOUND;
 		else
 			return CUL_EARGCONV;
 
 		/* move to next argument */
 		while( size-- > 0 )
-			cul_arg_cmd_next(argc, argv);
+			_cul_arg_cmd_next(argc, argv);
 
 		return CUL_SUCCESS;
 	}
 	return CUL_EARGLONG;
 }
 
-cul_bool cul_arg_cmd_convert(const char *arg, CulArg *t) {
+cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t) {
 	char *end;
 
 	switch( t->flags & CUL_ARG_MASK ) {
@@ -302,90 +357,4 @@ cul_bool cul_arg_cmd_convert(const char *arg, CulArg *t) {
 			break;
 	}
 	return CUL_FALSE;
-}
-
-/* Parse program arguments using argument tables */
-cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
-	CulArg *t;
-	cul_errno result;
-
-  /* omit first parameter */
-	cul_arg_cmd_next(argc, argv);
-
-	while( *argc > 0 ) {
-		switch( cul_arg_cmd_type(**argv) ) {
-			case CUL_ARG_TYPE_LONG:
-				result = cul_arg_cmd_parse_long(argc, argv, *table);
-				if( result != CUL_SUCCESS )
-					return result;
-
-				break;
-			case CUL_ARG_TYPE_END:
-				break;
-			case CUL_ARG_TYPE_SHORT:
-				result = cul_arg_cmd_parse_short(argc, argv, *table);
-				if( result != CUL_SUCCESS )
-					return result;
-
-				break;
-			case CUL_ARG_TYPE_UNK:
-				return CUL_EARGUNK;
-		}
-	}
-	if( (t = cul_arg_check_required(*table)) != NULL ) {
-		*table = t;
-		return CUL_EARGMISS;
-	}
-	return CUL_SUCCESS;
-}
-
-/* Print all help string information from table */
-void cul_arg_print_help(CulArg *table) {
-	CulArg *t = table;
-	while( t ) {
-		switch( t->flags & ~CUL_ARG_MASK ) {
-			case CUL_ARG_HELP:
-				cul_printf("%s\n", t->desciption);
-				break;
-			case CUL_ARG_GROUP:
-				if( t != table )
-					cul_printf("\n");
-				cul_printf("%s\n", t->desciption);
-				break;
-			default:
-				if( t->short_name ) {
-					if( t->long_name )
-						cul_printf("  -%c, --%-16s  %s\n", t->short_name, t->long_name, t->desciption);
-					else
-						cul_printf("  -%-21c  %s\n", t->short_name, t->desciption);
-				}
-				else if( t->long_name )
-					cul_printf("  --%-20s  %s\n", t->long_name, t->desciption);
-				break;
-		}
-		t = cul_arg_next(t);
-	}
-}
-
-/* Check argument table if all required arguments were found */
-CulArg *cul_arg_check_required(CulArg *table) {
-	while( table ) {
-		if( table->flags & CUL_ARG_REQUIRED && !(table->flags & CUL_ARG_FOUND) )
-			return table;
-		table = cul_arg_next_option(table);
-	}
-	return NULL;
-}
-
-void cul_arg_free(CulArg *table) {
-	while( table ) {
-		CulArgFlag flag = table->flags;
-		if( flag & CUL_ARG_FOUND ) {
-			if( flag & CUL_ARG_STRING ) {
-				cul_free(*((char **)table->value));
-				*((char **)table->value) = NULL;
-			}
-		}
-		table = cul_arg_next_option(table);
-	}
 }
