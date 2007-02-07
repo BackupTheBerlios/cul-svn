@@ -12,14 +12,10 @@ int cul_printf(const char *format, ...) {
 	int done;
 
 	va_start(arg, format);
-	done = vprintf(format, arg);
+	done = cul_vprintf(format, arg);
 	va_end(arg);
 
 	return done;
-}
-
-int cul_vprintf(const char *format, va_list ap) {
-	return vprintf(format, ap);
 }
 
 int cul_fprintf(FILE *stream, const char *format, ...) {
@@ -27,14 +23,10 @@ int cul_fprintf(FILE *stream, const char *format, ...) {
 	int done;
 
 	va_start(arg, format);
-	done = vfprintf(stream, format, arg);
+	done = cul_vfprintf(stream, format, arg);
 	va_end(arg);
 
 	return done;
-}
-
-int cul_vfprintf(FILE *stream, const char *format, va_list ap) {
-	return vfprintf(stream, format, ap);
 }
 
 int cul_fscanf(FILE *stream, const char *format, ...) {
@@ -42,30 +34,26 @@ int cul_fscanf(FILE *stream, const char *format, ...) {
 	int done;
 
 	va_start(arg, format);
-	done = vfscanf(stream, format, arg);
+	done = cul_vfscanf(stream, format, arg);
 	va_end(arg);
 
 	return done;
 }
 
-int cul_vfscanf(FILE *stream, const char *format, va_list ap) {
-	return vfscanf(stream, format, ap);
-}
-
-int cul_stream_printf(const char *format, ...) {
+int cul_printf_stream(const char *format, ...) {
 	va_list arg;
-	int done = 0;
+	int done;
 
 	if( cul_stream_get() ) {
 		va_start(arg, format);
-		done = vfprintf(cul_stream_get(), format, arg);
+		done = cul_vfprintf(cul_stream_get(), format, arg);
 		va_end(arg);
 	}
 
 	return done;
 }
 
-int cul_stream_vprintf(const char *format, va_list ap) {
+int cul_vprintf_stream(const char *format, va_list ap) {
 	return vfprintf(cul_stream_get(), format, ap);
 }
 
