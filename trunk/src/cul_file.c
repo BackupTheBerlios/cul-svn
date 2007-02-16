@@ -13,7 +13,7 @@ cul_bool cul_file_readable(const char *filename) {
 cul_bool cul_file_writeable(const char *filename) {
 	FILE *fid;
 
-	if( filename == NULL || (fid = cul_fopen(filename, "w")) == NULL )
+	if( filename == NULL || (fid = cul_fopen(filename, "r+")) == NULL )
 		return CUL_FALSE;
 	cul_fclose(fid);
 	return CUL_TRUE;
@@ -47,6 +47,9 @@ cul_errno cul_file_read_lines(const char *filename, size_t size, char ***content
 		if( !cul_fgets(buffer, size, stream) ) {
 			if( cul_feof(stream) )
 				break;
+
+			/* free all read data */
+			cul_list_free_all(cul_list_first(list), cul_free);
 			CUL_ERROR_ERRNO_RET_VAL(CUL_EFIO, CUL_EFIO);
 		}
 
@@ -101,10 +104,18 @@ cul_errno cul_file_write_lines(const char *filename, char **contents) {
 	if( filename == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EINVAL, CUL_EINVAL);
 
-	FILE *fid = cul_fopen(filename, "w");
-	if( fid == NULL )
+	FILE *stream = cul_fopen(filename, "w");
+	if( stream == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EFACCESS, CUL_EFACCESS);
-	cul_fclose(fid);
 
-	CUL_ERROR_ERRNO_RET_VAL(CUL_ESTUB, CUL_ESTUB);
+	/* write contents if present */
+	if( contents != NULL ) {
+		const size_t lines = cul_strv_size(contents);
+		for( size_t i=0; i<lines; ++i)
+			if( cul_fputs(contents[i], stream) < 0 )
+				CUL_ERROR_ERRNO_RET_VAL(CUL_EFIO, CUL_EFIO);
+	}
+
+	cul_fclose(stream);
+	return CUL_SUCCESS;
 }
