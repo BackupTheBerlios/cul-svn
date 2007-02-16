@@ -25,16 +25,16 @@ void PFUNCTION(qsort)(ATOM *l, ATOM *r, cul_cmp_f *cmp) {
 	else {
 		pivot += (r - l) >> 1;
 #if !defined(TEMPLATE_CUL_PTR)
-		if( cmp(pivot, l) < 0 ) CUL_SWAP(pivot, l, val);
+		if( cmp(pivot, l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		if( cmp(r, pivot) < 0 ) {
-			CUL_SWAP(pivot, r, val);
-			if( cmp(pivot, l) < 0 ) CUL_SWAP(pivot, l, val);
+			CUL_SWAP(*pivot, *r, val);
+			if( cmp(pivot, l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		}
 #else
-		if( cmp(*pivot, *l) < 0 ) CUL_SWAP(pivot, l, val);
+		if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		if( cmp(*r, *pivot) < 0 ) {
-			CUL_SWAP(pivot, r, val);
-			if( cmp(*pivot, *l) < 0 ) CUL_SWAP(pivot, l, val);
+			CUL_SWAP(*pivot, *r, val);
+			if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		}
 #endif
 		++l; --r;
@@ -47,7 +47,7 @@ void PFUNCTION(qsort)(ATOM *l, ATOM *r, cul_cmp_f *cmp) {
 			while( cmp(*pivot, *r) < 0 ) --r;
 #endif
 			if( l < r ) {
-				CUL_SWAP(l, r, val);
+				CUL_SWAP(*l, *r, val);
 				if( pivot == l )      pivot = r;
 				else if( pivot == r ) pivot = l;
 				++l; --r;
@@ -84,16 +84,16 @@ void PFUNCTION(qsort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp) {
 	else {
 		pivot += (r - l)/stride >> 1;
 #if !defined(TEMPLATE_CUL_PTR)
-		if( cmp(pivot, l) < 0 ) CUL_SWAP(pivot, l, val);
+		if( cmp(pivot, l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		if( cmp(r, pivot) < 0 ) {
-			CUL_SWAP(pivot, r, val);
-			if( cmp(pivot, l) < 0 ) CUL_SWAP(pivot, l, val);
+			CUL_SWAP(*pivot, *r, val);
+			if( cmp(pivot, l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		};
 #else
-		if( cmp(*pivot, *l) < 0 ) CUL_SWAP(pivot, l, val);
+		if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		if( cmp(*r, *pivot) < 0 ) {
-			CUL_SWAP(pivot, r, val);
-			if( cmp(*pivot, *l) < 0 ) CUL_SWAP(pivot, l, val);
+			CUL_SWAP(*pivot, *r, val);
+			if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
 		};
 #endif
 		l += stride; r -= stride;
@@ -106,7 +106,7 @@ void PFUNCTION(qsort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp) {
 			while( cmp(*pivot, *r) < 0 ) r -= stride;
 #endif
 			if( l < r ) {
-				CUL_SWAP(l, r, val);
+				CUL_SWAP(*l, *r, val);
 				if( pivot == l )      pivot = r;
 				else if( pivot == r ) pivot = l;
 				l += stride; r -= stride;
@@ -156,17 +156,17 @@ void FUNCTION(sort_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cm
 			PFUNCTION(isort_asc)(l, r);
 		else {
 			pivot += (r - l) >> 1;
-			if( *pivot < *l ) CUL_SWAP(pivot, l, val);
+			if( *pivot < *l ) CUL_SWAP(*pivot, *l, val);
 			if( *r < *pivot ) {
-				CUL_SWAP(pivot, r, val);
-				if( *pivot < *l ) CUL_SWAP(pivot, l, val);
+				CUL_SWAP(*pivot, *r, val);
+				if( *pivot < *l ) CUL_SWAP(*pivot, *l, val);
 			}
 			++l; --r;
 			do {
 				while( *l < *pivot ) ++l;
 				while( *pivot < *r ) --r;
 				if( l < r ) {
-					CUL_SWAP(l, r, val);
+					CUL_SWAP(*l, *r, val);
 					if( pivot == l )      pivot = r;
 					else if( pivot == r ) pivot = l;
 					++l; --r;
@@ -198,17 +198,17 @@ void FUNCTION(sort_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cm
 			PFUNCTION(isort_desc)(l, r);
 		else {
 			pivot += (r - l) >> 1;
-			if( *pivot > *l ) CUL_SWAP(pivot, l, val);
+			if( *pivot > *l ) CUL_SWAP(*pivot, *l, val);
 			if( *r > *pivot ) {
-				CUL_SWAP(pivot, r, val);
-				if( *pivot > *l ) CUL_SWAP(pivot, l, val);
+				CUL_SWAP(*pivot, *r, val);
+				if( *pivot > *l ) CUL_SWAP(*pivot, *l, val);
 			}
 			++l; --r;
 			do {
 				while( *l > *pivot ) ++l;
 				while( *pivot > *r ) --r;
 				if( l < r ) {
-					CUL_SWAP(l, r, val);
+					CUL_SWAP(*l, *r, val);
 					if( pivot == l )      pivot = r;
 					else if( pivot == r ) pivot = l;
 					++l; --r;
@@ -240,17 +240,17 @@ void FUNCTION(sort_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cm
 			PFUNCTION(isort_asc_stride)(l, r, stride);
 		else {
 			pivot += (r - l)/stride >> 1;
-			if( *pivot < *l ) CUL_SWAP(pivot, l, val);
+			if( *pivot < *l ) CUL_SWAP(*pivot, *l, val);
 			if( *r < *pivot ) {
-				CUL_SWAP(pivot, r, val);
-				if( *pivot < *l ) CUL_SWAP(pivot, l, val);
+				CUL_SWAP(*pivot, *r, val);
+				if( *pivot < *l ) CUL_SWAP(*pivot, *l, val);
 			};
 			l += stride; r -= stride;
 			do {
 				while( *l < *pivot ) l += stride;
 				while( *pivot < *r ) r -= stride;
 				if( l < r ) {
-					CUL_SWAP(l, r, val);
+					CUL_SWAP(*l, *r, val);
 					if( pivot == l )      pivot = r;
 					else if( pivot == r ) pivot = l;
 					l += stride; r -= stride;
@@ -282,17 +282,17 @@ void FUNCTION(sort_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cm
 			PFUNCTION(isort_asc_stride)(l, r, stride);
 		else {
 			pivot += (r - l)/stride >> 1;
-			if( *pivot > *l ) CUL_SWAP(pivot, l, val);
+			if( *pivot > *l ) CUL_SWAP(*pivot, *l, val);
 			if( *r > *pivot ) {
-				CUL_SWAP(pivot, r, val);
-				if( *pivot > *l ) CUL_SWAP(pivot, l, val);
+				CUL_SWAP(*pivot, *r, val);
+				if( *pivot > *l ) CUL_SWAP(*pivot, *l, val);
 			};
 			l += stride; r -= stride;
 			do {
 				while( *l > *pivot ) l += stride;
 				while( *pivot > *r ) r -= stride;
 				if( l < r ) {
-					CUL_SWAP(l, r, val);
+					CUL_SWAP(*l, *r, val);
 					if( pivot == l )      pivot = r;
 					else if( pivot == r ) pivot = l;
 					l += stride; r -= stride;

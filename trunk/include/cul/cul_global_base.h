@@ -29,13 +29,12 @@ typedef void cul_free_f(cul_ptr data);
 typedef void *cul_cpy_f(const cul_ptr data);
 
 typedef cul_bool cul_foreach_f(cul_ptr data);
-typedef cul_bool cul_foreach_key_f(cul_ptr key, cul_ptr data);
-typedef cul_bool cul_foreach_hash_f(cul_hash hash, cul_ptr data);
+typedef cul_bool cul_foreach_data_f(cul_ptr data, cul_ptr user_data);
 
 #define CUL_EQ_T(ptr)  ((cul_eq_f *)(ptr))
 #define CUL_CMP_T(ptr) ((cul_cmp_f *)(ptr))
 
-#define CUL_FREE_ITEM_T(ptr) ((cul_free_f *)(ptr))
-#define CUL_CPY_ITEM_T(ptr)  ((cul_cpy_f *)(ptr))
+#define CUL_FREE_F(ptr) ((cul_free_f *)(ptr))
+#define CUL_CPY_F(ptr)  ((cul_cpy_f *)(ptr))
 
 #endif

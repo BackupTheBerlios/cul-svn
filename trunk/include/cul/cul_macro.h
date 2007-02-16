@@ -10,10 +10,10 @@
 
 #define CUL_UNUSED(val) { ((void)val); }
 
+#define CUL_SWAP(a, b, hold) ((void)((hold = a), (a = b), (b = hold)))
+
 #define CUL_STMT_START do
 #define CUL_STMT_END   while(0)
-
-#define CUL_SWAP(a, b, hold) ((void)((hold = *a), (*a = *b), (*b = hold)))
 
 #define CUL_FATAL_ERRNO(errno) CUL_STMT_START {              \
     cul_log(CUL_MODULE, CUL_LOG_FATAL, "%s: (%s:%d) %s\n",   \
