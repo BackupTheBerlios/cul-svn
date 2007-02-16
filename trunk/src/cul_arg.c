@@ -24,9 +24,9 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 		char *arg = **argv;
 		cul_errno result;
 
-		if( *(arg++) == '-' ) {
-			if( *(arg++) == '-' ) {
-				if( cul_strisnull(arg) )
+		if( *arg == '-' ) {
+			if( *(++arg) == '-' ) {
+				if( cul_strisnull(++arg) )
 					/* finish parsing */
 					break;
 
@@ -34,6 +34,9 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 				result = _cul_arg_cmd_parse_long(argc, argv, *table);
 				if( result != CUL_SUCCESS )
 					return result;
+
+				/* parse next options */
+				continue;
 			}
 			if( cul_strisnull(arg) )
 				return CUL_EARGUNK;
@@ -42,6 +45,9 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 			result = _cul_arg_cmd_parse_short(argc, argv, *table);
 			if( result != CUL_SUCCESS )
 				return result;
+
+			/* parse next options */
+			continue;
 		}
 		else
 			return CUL_EARGUNK;
@@ -269,7 +275,7 @@ cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table) {
 			/* check if there is something after flag */
 			if( arg_option ) {
 				/* option is right after flag */
-				++arg_string;
+				arg_string = arg_option+1;
 				size = 1;
 			}
 			else {
