@@ -52,6 +52,7 @@ CulList *cul_list_find(CulList *l, cul_ptr data, cul_eq_f *eq);
 CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp);
 size_t cul_list_unique(CulList *l, cul_eq_f *eq);
 size_t cul_list_foreach(CulList *l, cul_foreach_f *foreach);
+size_t cul_list_foreach_data(CulList *l, cul_foreach_data_f *foreach, cul_ptr data);
 
 /* implementations */
 

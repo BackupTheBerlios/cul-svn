@@ -249,3 +249,13 @@ size_t cul_list_foreach(CulList *l, cul_foreach_f *foreach) {
 
 	return i_foreach;
 }
+
+size_t cul_list_foreach_data(CulList *l, cul_foreach_data_f *foreach, cul_ptr data) {
+	size_t i_foreach = 0;
+	for( ; l != NULL; l = cul_list_next(l), ++i_foreach )
+		if( foreach(l->data, data) )
+			break;
+
+	return i_foreach;
+}
+
