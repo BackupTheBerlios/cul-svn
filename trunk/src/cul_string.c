@@ -1,7 +1,7 @@
 #include <cul/cul_global.h>
+#include <cul/cul_iof.h>
 #include <cul/cul_string.h>
 #include <cul/cul_base_size.h>
-#include <stdarg.h>
 
 /* private functions */
 CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *format, va_list arg);
@@ -299,12 +299,8 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 	int strsize;
 
 	/* copy data to buffer */
-	if( (strsize = cul_vasprintf(&str, format, arg)) < 0 ) {
-		cul_free(str);
-		if( str == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+	if( (strsize = cul_vasprintf(&str, format, arg)) < 0 )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ESPRINTF);
-	}
 
 	/* insert buffer to string */
 	if( cul_string_insert_raw_size(s, cul_umin_pair(s->size, pos), str, strsize ) == NULL ) {

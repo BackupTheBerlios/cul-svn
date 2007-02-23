@@ -1,5 +1,5 @@
 #include <cul/cul_global.h>
-#include <cul/cul_stream.h>
+#include <cul/cul_iof.h>
 #include <time.h>
 
 #define CUL_LOG_MSG_SIZE 1024

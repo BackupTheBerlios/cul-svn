@@ -37,11 +37,12 @@ static inline char *cul_strchr(const char *str, int find);
 static inline char *cul_strrchr(const char *str, int find);
 static inline char *cul_strstr(const char *str, const char *find);
 
-/* I/O wrappers */
+/* printf string writing */
 
-/* defines to omit stdio include */
-#define cul_vasprintf(str, format, arg)                                         vasprintf(str, format, arg)
-#define cul_vsnprintf(str, size, format, arg)                                   vsnprintf(str, size, format, arg)
+int cul_sprintf(char *str, const char *format, ...);
+int cul_sprintf(char *str, const char *format, ...);
+int cul_snprintf(char *str, size_t size, const char *format, ...);
+int cul_asprintf(char **str, const char *format, ...);
 
 /* additional functions */
 

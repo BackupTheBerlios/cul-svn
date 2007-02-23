@@ -1,9 +1,9 @@
 #include <cul/cul_arg.h>
 
-#include <cul/cul_stream.h>
+#include <cul/cul_io.h>
+#include <cul/cul_str.h>
 #include <cul/cul_base_char.h>
 #include <cul/cul_base_ptr.h>
-#include <cul/cul_str.h>
 
 /* private functions */
 CulArg *_cul_arg_next(CulArg *t);
@@ -339,22 +339,14 @@ cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t) {
 			break;
 		case CUL_ARG_STRING:
 			if( *arg ) {
-				size_t length = cul_strlen(arg);
-
-				/* allocate string memory */
-				char *tmp = cul_cnew(length + 1);
-				if( tmp == NULL )
-					break;
-
-				/* copy string */
-				cul_strcpy(tmp, arg);
-
-				/* free previous string, only if already found */
-				if( t->value && (t->flags & CUL_ARG_FOUND) )
-					cul_free(*((char **)t->value));
-				*((char **)t->value) = tmp;
-
-				return CUL_TRUE;
+				char *tmp = cul_strdup(arg);
+				if( tmp != NULL ) {
+					/* free previous string, only if already found */
+					if( t->value && (t->flags & CUL_ARG_FOUND) )
+						cul_free(*((char **)t->value));
+					*((char **)t->value) = tmp;
+					return CUL_TRUE;
+				}
 			}
 			break;
 		case CUL_ARG_CALLBACK:

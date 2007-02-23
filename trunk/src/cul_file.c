@@ -1,4 +1,7 @@
 #include <cul/cul_file.h>
+
+#include <cul/cul_io.h>
+#include <cul/cul_str.h>
 #include <cul/cul_list.h>
 
 cul_bool cul_file_readable(const char *filename) {
@@ -111,9 +114,12 @@ cul_errno cul_file_write_lines(const char *filename, char **contents) {
 	/* write contents if present */
 	if( contents != NULL ) {
 		const size_t lines = cul_strv_size(contents);
-		for( size_t i=0; i<lines; ++i)
+		for( size_t i=0; i<lines; ++i) {
 			if( cul_fputs(contents[i], stream) < 0 )
 				CUL_ERROR_ERRNO_RET_VAL(CUL_EFIO, CUL_EFIO);
+			if( cul_fputc(CUL_STR_NEWLINE, stream) == EOF )
+				CUL_ERROR_ERRNO_RET_VAL(CUL_EFIO, CUL_EFIO);
+		}
 	}
 
 	cul_fclose(stream);

@@ -20,9 +20,6 @@
 /* #define CUL_MESSAGE_SYSTEM_CLOCK_OFF */
 /* #define CUL_RANGE_CHECK */
 
-/* use gnu extensions in libc */
-#if !defined(_GNU_SOURCE)
-	#define _GNU_SOURCE
-#endif
+#cmakedefine HAVE_ASPRINTF
 
 #endif

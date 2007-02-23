@@ -1,7 +1,25 @@
 PROJECT(CUL)
 
-# make verbose compiling
-SET(CMAKE_VERBOSE_MAKEFILE TRUE)
+###
+# Version information
+###
+
+SET(CUL_MAJOR_VERSION 0)
+SET(CUL_MINOR_VERSION 0)
+SET(CUL_PATCH_VERSION 16)
+SET(CUL_VERSION "${CUL_MAJOR_VERSION}.${CUL_MINOR_VERSION}.${CUL_PATCH_VERSION}")
+
+###
+# Platform checks
+###
+
+INCLUDE (CheckFunctionExists)
+
+CHECK_FUNCTION_EXISTS(asprintf HAVE_ASPRINTF)
+
+###
+# Configure build type
+###
 
 # possibilities: Debug RelWithDebInfo MinSizeRel Release
 SET(CMAKE_BUILD_TYPE Debug)
@@ -13,11 +31,10 @@ ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
 	SET(CMAKE_C_FLAGS "-std=c99")
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
-SET(CUL_MAJOR_VERSION 0)
-SET(CUL_MINOR_VERSION 0)
-SET(CUL_PATCH_VERSION 15)
 
-SET(CUL_VERSION "${CUL_MAJOR_VERSION}.${CUL_MINOR_VERSION}.${CUL_PATCH_VERSION}")
+###
+# Sources
+###
 
 SET(CUL_SOURCES
 	src/cul_arg.c
@@ -30,7 +47,8 @@ SET(CUL_SOURCES
 	src/cul_tree.c
 	src/cul_tree_bb.c
 	src/cul_vector.c
-	src/cul_stream.c
+	src/cul_io.c
+	src/cul_iof.c
 	src/cul_str.c
 	src/cul_str_type.c
 	src/cul_string.c
@@ -59,9 +77,8 @@ INCLUDE_DIRECTORIES(${CUL_HEADERS_CONFIG} ${CUL_HEADERS_DIR} ${CUL_HEADERS_PRIVA
 
 # add target
 ADD_LIBRARY(cul STATIC ${CUL_SOURCES})
-#ADD_LIBRARY(cul SHARED ${CUL_SOURCES})
 SET_TARGET_PROPERTIES(cul PROPERTIES
 	LINKER_LANGUAGE C
 	VERSION ${CUL_VERSION}
-	DEFINE_SYMBOL CUL_MODULE=\\"Cul\\"
+	DEFINE_SYMBOL CUL_MODULE=\\"cul\\"
 )

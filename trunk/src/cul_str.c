@@ -191,6 +191,7 @@ size_t cul_strv_size(char **strv) {
 		++size;
 	return size;
 }
+
 char **cul_strv_dup(char **strv) {
 	return cul_strv_dup_size(strv, cul_strv_size(strv));
 }

@@ -16,11 +16,6 @@ static inline void cul_free(void *ptr) {
 	free(ptr);
 }
 
-static inline void cul_free_null(void **ptr) {
-	cul_free(*ptr);
-	*ptr = NULL;
-}
-
 static inline void *cul_memset(void *data, int set, size_t size) {
 	return memset(data, set, size);
 }
