@@ -40,6 +40,7 @@ SET(CUL_SOURCES
 	src/cul_arg.c
 	src/cul_file.c
 	src/cul_error.c
+	src/cul_slist.c
 	src/cul_list.c
 	src/cul_log.c
 	src/cul_matrix.c
