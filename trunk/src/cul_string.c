@@ -229,6 +229,7 @@ CulString *cul_string_copy_raw_size(CulString *s, const char *copy, size_t size)
 	if( copy == NULL )
 		return cul_string_clean(s);
 
+	/* reserve new space if needed */
 	if( s->reserved < size + 1 ) {
 		if( cul_string_init_size(s, size) == NULL )
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
@@ -237,10 +238,11 @@ CulString *cul_string_copy_raw_size(CulString *s, const char *copy, size_t size)
 		if( d != NULL )
 			free(d);
 	}
-	else
-		/* we have enought space, reset size to new one */
-		s->size = size;
 
+	/* change string size */
+	s->size = size;
+
+	/* copy string */
 	cul_memcpy(s->str, copy, size*sizeof(char));
 	cul_strnull(s->str + size);
 	return s;
