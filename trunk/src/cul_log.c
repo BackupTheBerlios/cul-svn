@@ -1,5 +1,6 @@
 #include <cul/cul_global.h>
 #include <cul/cul_iof.h>
+#include <cul/cul_str.h>
 #include <time.h>
 
 #define CUL_LOG_MSG_SIZE 1024
@@ -25,17 +26,17 @@ void cul_log(const char *module, CulLogType type, const char *format, ...) {
 
 	/* prepare prefixes */
 	if( type == CUL_LOG_CLOCK )
-		snprintf(message, 15, "%10.5lf: ", (double)clock()/(double)CLOCKS_PER_SEC);
+		cul_snprintf(message, 15, "%10.5lf: ", (double)clock()/(double)CLOCKS_PER_SEC);
 
 	if( module != NULL ) {
-		strcat(message, module);
-		strcat(message, ": ");
+		cul_strcat(message, module);
+		cul_strcat(message, ": ");
 	}
 
-	length = strlen(message);
+	length = cul_strlen(message);
 
 	va_start(arg, format);
-	vsnprintf(message + length, CUL_LOG_MSG_SIZE - length, format, arg);
+	cul_vsnprintf(message + length, CUL_LOG_MSG_SIZE - length, format, arg);
 	va_end(arg);
 
 	if( cul_log_handler_get() == NULL )
