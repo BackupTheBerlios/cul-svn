@@ -106,7 +106,7 @@ CulList *cul_list_insert_prev(CulList *l, cul_ptr data) {
 	return n;
 }
 
-CulList *cul_list_remove(CulList *l, cul_free_f *free_item) {
+CulList *cul_list_remove(CulList *l, cul_free_f *free_data) {
 	if( l != NULL ) {
 		CulList *n = NULL;
 		if( cul_list_prev(l) != NULL ) {
@@ -117,7 +117,7 @@ CulList *cul_list_remove(CulList *l, cul_free_f *free_item) {
 			n = cul_list_next(l);
 			n->prev = cul_list_prev(l);
 		}
-		cul_list_free(l, free_item);
+		cul_list_free(l, free_data);
 		return n;
 	}
 	return l;
@@ -126,10 +126,8 @@ CulList *cul_list_remove(CulList *l, cul_free_f *free_item) {
 CulList *cul_list_copy(CulList *l) {
 	CulList *first = NULL, *n;
 	if( l != NULL ) {
-		if( (first = cul_list_insert_next(first, l->data)) == NULL ) {
-			cul_list_free_all(first, NULL);
+		if( (first = cul_list_insert_next(first, l->data)) == NULL )
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-		}
 		for( n = first, l = cul_list_next(l); l != NULL; l = cul_list_next(l))
 			if( (n = cul_list_insert_next(n, l->data)) == NULL ) {
 				cul_list_free_all(first, NULL);
