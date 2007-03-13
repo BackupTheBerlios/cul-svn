@@ -5,22 +5,27 @@
 
 typedef enum _CulArgFlag CulArgFlag;
 enum _CulArgFlag {
-	CUL_ARG_BOOL         = 1,       /* option is a switch, no additional parameter */
-	CUL_ARG_INT          = 2,       /* option has an integer number parameter (int) */
-	CUL_ARG_DOUBLE       = 3,       /* option has an floating point number parameter (double) */
-	CUL_ARG_STRING       = 4,       /* option has an string parameter */
-	CUL_ARG_CALLBACK     = 14,      /* option passed to callback as a string */
-	CUL_ARG_MASK         = 15,      /* mask for internal use */
-	CUL_ARG_END          = 1 << 4,  /* indicate last option in argument table */
-	CUL_ARG_JOIN         = 1 << 5,  /* indicate join with other argument table */
-	CUL_ARG_HELP         = 1 << 6,  /* indicate no option, entry contains only help message to print on screen */
-	CUL_ARG_REQUIRED     = 1 << 7,  /* option is required */
-	CUL_ARG_FOUND        = 1 << 8   /* option was found in application aguments */
+	/* type */
+	CUL_ARG_BOOL    = 1,  /* option is a switch, no additional parameter */
+	CUL_ARG_INT     = 2,  /* option has an integer number parameter (int) */
+	CUL_ARG_DOUBLE  = 3,  /* option has an floating point number parameter (double) */
+	CUL_ARG_STR     = 4,  /* option has an string parameter */
+	CUL_ARG_STRV    = 5,  /* option has a string array parameter, store all flag parameters */
+
+	/* flags */
+	CUL_ARG_END        = 1 << 4,  /* indicate last option in argument table */
+	CUL_ARG_JOIN       = 1 << 5,  /* indicate join of two tables */
+	CUL_ARG_FOUND      = 1 << 6,  /* option was found in application aguments */
+	CUL_ARG_HELP       = 1 << 7,  /* indicate no option, entry contains only help message to print on screen */
+	CUL_ARG_REQUIRED   = 1 << 8,  /* option is required */
+
+	/* masks */
+	CUL_ARG_TYPE_MASK  = 0x000f,       /* mask for argument type */
+	CUL_ARG_CONF_MASK  = 0xffff,       /* mask for argument configuration, flags and type */
+	CUL_ARG_POS_MASK   = 0xffff << 16  /* mask for argument position */
 };
 
 typedef struct _CulArg CulArg;
-typedef cul_bool cul_arg_callback_f(const char *arg, CulArg *t);
-
 struct _CulArg {
 	CulArgFlag flags;          /* option flags */
 	const char short_name;     /* short name for option */
