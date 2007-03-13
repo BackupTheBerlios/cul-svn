@@ -2,6 +2,7 @@
 #include <cul/cul_str_type.h>
 
 /* private functions */
+/* used in other cul modules */
 size_t _cul_strtrim_right_size(char *str, size_t size);
 size_t _cul_strtrim_left_size(char *str, size_t size);
 size_t _cul_strtrim_compress_size(char *str, size_t size);
@@ -137,7 +138,7 @@ char *cul_strchr_nonspace(const char *str) {
 	return (char *)str;
 }
 
-char **cul_strsplit_delimiter(const char *s, const char *delimiter) {
+char **cul_strsplit(const char *s, const char *delimiter) {
 	const size_t delimiter_size = cul_strlen(delimiter);
 	const char *string = s;
 

@@ -40,7 +40,6 @@ static inline char *cul_strstr(const char *str, const char *find);
 /* printf string writing */
 
 int cul_sprintf(char *str, const char *format, ...);
-int cul_sprintf(char *str, const char *format, ...);
 int cul_snprintf(char *str, size_t size, const char *format, ...);
 int cul_asprintf(char **str, const char *format, ...);
 
@@ -61,7 +60,7 @@ char *cul_strtoupper(char *str);
 char *cul_strchr_space(const char *str);
 char *cul_strchr_nonspace(const char *str);
 
-char **cul_strsplit_delimiter(const char *s, const char *delimiter);
+char **cul_strsplit(const char *s, const char *delimiter);
 
 /* strv functions */
 
