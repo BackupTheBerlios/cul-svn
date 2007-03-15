@@ -1,25 +1,20 @@
 #include <cul/cul_global.h>
 #include <cul/cul_iof.h>
 #include <cul/cul_string.h>
-#include <cul/cul_base_size.h>
 
 /* private functions */
 CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *format, va_list arg);
 
-/* privete raw functions */
+/* private raw functions */
 size_t _cul_strtrim_right_size(char *str, size_t size);
 size_t _cul_strtrim_left_size(char *str, size_t size);
-size_t _cul_strtrim_compress_size(char *strm, size_t size);
 
 CulString *cul_string_new(const CulString *string) {
-	CulString *s;
-	if( (s = cul_string_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( cul_string_init(s, string) == NULL ) {
-		cul_string_free_struct(s);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
-	return s;
+	return cul_string_new_raw_size(string->str, string->size);
+}
+
+CulString *cul_string_new_empty() {
+	return cul_string_new_raw_size(NULL, 0);
 }
 
 CulString *cul_string_new_printf(const char *format, ...) {
@@ -41,93 +36,48 @@ CulString *cul_string_new_printf(const char *format, ...) {
 }
 
 CulString *cul_string_new_raw(const char *string) {
+	return cul_string_new_raw_size(string, cul_strlen(string));
+}
+
+CulString *cul_string_new_raw_size(const char *string, size_t size) {
 	CulString *s;
-	if( (s = cul_string_new_struct()) == NULL )
+	char *str;
+
+	if( (s = cul_string_new_size(size)) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( cul_string_init_raw(s, string) == NULL ) {
-		cul_string_free_struct(s);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
+
+	if( size > 0 ) {
+		/* allocate string */
+		if( (str = (char *)cul_malloc((size+1)*sizeof(char))) == NULL ) {
+			cul_string_free_struct(s);
+			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		}
+
+		/* copy string if needed */
+		if( string == NULL ) {
+			cul_strnull(str);
+			cul_string_init_all(s, 0, size+1, str);
+		} else {
+			cul_memcpy(str, string, size*sizeof(char));
+			cul_strnull(str+size);
+			cul_string_init_all(s, size, size+1, str);
+		}
 	}
+	else
+		cul_string_init_all(s, 0, 0, NULL);
+
 	return s;
 }
 
 CulString *cul_string_new_size(size_t size) {
-	CulString *s;
-	if( (s = cul_string_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( cul_string_init_size(s, size) == NULL ) {
-		cul_string_free_struct(s);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
-	return s;
-}
-
-CulString *cul_string_init(CulString *s, const CulString *string) {
-	if( string != NULL && string->str != NULL ) {
-		if( cul_string_init_size(s, string->size) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-		/* copy string with terminator */
-		cul_memcpy(s->str, string->str, string->size + 1);
-		s->size = string->size;
-	}
-	else
-		cul_string_init_all(s, 0, 0, NULL);
-	return s;
-}
-
-CulString *cul_string_init_raw(CulString *s, const char *string) {
-	if( string != NULL ) {
-		const size_t size = cul_strlen(string);
-		if( cul_string_init_size(s, size) == NULL)
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-		/* copy string with terminator */
-		cul_memcpy(s->str, string, size + 1);
-		s->size = size;
-	}
-	else
-		cul_string_init_all(s, 0, 0, NULL);
-	return s;
-}
-
-CulString *cul_string_init_size(CulString *s, size_t size) {
-	char *d;
-
-	if( size > 0 ) {
-		if( (d = (char *)cul_malloc((size + 1)*sizeof(char))) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-		cul_strnull(d);
-		cul_string_init_all(s, 0, size + 1, d);
-	}
-	else
-		cul_string_init_all(s, 0, 0, NULL);
-	return s;
-}
-
-CulString *cul_string_init_attach_raw(CulString *s, char *string, size_t reserved) {
-	if( string != NULL ) {
-		size_t size = cul_strlen(string);
-
-		/* check reserved */
-		if( reserved == 0 )
-			reserved = size + 1;
-		else if( size >= reserved )
-			return NULL;
-
-		cul_string_init_all(s, size, reserved, string);
-	}
- else
-		cul_string_init_all(s, 0, 0, NULL);
-	return s;
+	return cul_string_new_raw_size(NULL, size);
 }
 
 void cul_string_free(CulString *s) {
-	cul_string_free_data(s);
-	cul_string_free_struct(s);
-}
-
-void cul_string_free_data(CulString *s) {
-	if( s != NULL )
+	if( s != NULL ) {
 		cul_free(s->str);
+		cul_string_free_struct(s);
+	}
 }
 
 CulString *cul_string_clean(CulString *s) {
@@ -137,80 +87,57 @@ CulString *cul_string_clean(CulString *s) {
 }
 
 CulString *cul_string_clear(CulString *s) {
-	cul_string_free_data(s);
+	cul_free(s->str);
 	cul_string_init_all(s, 0, 0, NULL);
 	return s;
 }
 
 CulString *cul_string_resize(CulString *s, size_t size) {
-	const size_t size_min = cul_umin_pair(s->size, size);
-	char *d = s->str;
+	const size_t copy_size = s->size > size? size: s->size;
+	char *str;
 
 	if( size > 0 ) {
-		if( (d = (char *)cul_malloc((size + 1) * sizeof(char))) == NULL )
+		if( (str = (char *)cul_malloc((size+1)*sizeof(char))) == NULL )
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	}
 	else
 		return cul_string_clear(s);
 
-	/* check if we should copy something (non-empty old string) */
-	if( size_min > 0 )
-		cul_memcpy(d, s->str, size_min*sizeof(char));
-	/* set tertmination character at size position */
-	cul_strnull(d + size);
+	/* copy old string */
+	cul_memcpy(str, s->str, copy_size*sizeof(char));
+	cul_strnull(str + copy_size);
+	cul_free(s->str);
 
-	/* free old string */
-	cul_string_free_data(s);
-
-	/* set all structure variables */
-	cul_string_init_all(s, size, size + 1, d);
-	return s;
+	return cul_string_init_all(s, copy_size, size+1, str);
 }
 
-CulString *cul_string_resize_char(CulString *s, size_t size, char character) {
-	const size_t size_string = s->size;
-
-	if( cul_string_resize(s, size) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
-
-	/* set memory if needed */
-	if( size > size_string )
-		cul_memset(s->str + size_string, character, (size - size_string)*sizeof(char));
-
-	return s;
-}
-
+/**
+ * Function reserves ir shrink additional storage space for a string.
+ * This function never trims the string content.
+ */
 CulString *cul_string_reserve(CulString *s, size_t size) {
-	const size_t size_min = cul_umin_pair(s->size, size);
-	char *d = s->str;
+	char *str;
 
-	if( size > 0 ) {
-		if( (d = (char *)cul_malloc((size + 1) * sizeof(char))) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	}
-	else
-		return cul_string_clear(s);
+	/* if size is smaller than current size then shirink maximaly */
+	if( size <= s->size )
+		size = s->size+1;
 
-	/* check if we should copy something (non-empty old string) */
-	if( size_min > 0 )
-		cul_memcpy(d, s->str, size_min*sizeof(char));
+	if( (str = (char *)cul_malloc((size)*sizeof(char))) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 
-	/* set tertmination character at size_min position */
-	cul_strnull(d + size_min);
+	/* we can safly copy null terminator */
+	cul_memcpy(str, s->str, (s->size+1)*sizeof(char));
+	cul_free(s->str);
 
-	/* free old string */
-	cul_string_free_data(s);
+	/* set new string contents */
+	s->reserved = size;
+	s->str = str;
 
-	/* set all structure variables */
-	cul_string_init_all(s, size_min, size + 1, d);
 	return s;
 }
 
 CulString *cul_string_shrink(CulString *s) {
-	/* check if we need to shrink */
-	if( s->reserved > s->size + 1 && cul_string_resize(s, s->size) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
-	return s;
+	return cul_string_reserve(s, s->size+1);
 }
 
 CulString *cul_string_copy(CulString *s, const CulString *copy) {
@@ -224,19 +151,20 @@ CulString *cul_string_copy_raw(CulString *s, const char *copy) {
 }
 
 CulString *cul_string_copy_raw_size(CulString *s, const char *copy, size_t size) {
-	char *const d = s->str;
+	char *str;
 
 	if( copy == NULL )
 		return cul_string_clean(s);
 
 	/* reserve new space if needed */
 	if( s->reserved < size + 1 ) {
-		if( cul_string_init_size(s, size) == NULL )
+		if( (str = (char *)cul_malloc( (size+1)*sizeof(char))) == NULL )
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		cul_free(s->str);
 
-		/* free old string if necesery */
-		if( d != NULL )
-			free(d);
+		/* init string */
+		s->reserved = size+1;
+		s->str = str;
 	}
 
 	/* change string size */
@@ -293,7 +221,7 @@ CulString *cul_string_prepend_raw(CulString *s, const char *prepend) {
 }
 
 CulString *cul_string_insert(CulString *s, size_t pos, const CulString *insert) {
-	return cul_string_insert_raw_size(s, cul_umin_pair(s->size, pos), insert->str, insert->size);
+	return cul_string_insert_raw_size(s, s->size > pos? pos: s->size, insert->str, insert->size);
 }
 
 CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *format, va_list arg) {
@@ -305,7 +233,7 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ESPRINTF);
 
 	/* insert buffer to string */
-	if( cul_string_insert_raw_size(s, cul_umin_pair(s->size, pos), str, strsize ) == NULL ) {
+	if( cul_string_insert_raw_size(s, s->size > pos? pos: s->size, str, strsize ) == NULL ) {
 		cul_free(str);
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
 	}
@@ -333,38 +261,37 @@ CulString *cul_string_insert_raw(CulString *s, size_t pos, const char *insert) {
 }
 
 CulString *cul_string_insert_raw_size(CulString *s, size_t pos, const char *insert, size_t size) {
-	const size_t size_d = s->size, pos_s = cul_umin_pair(s->size, pos);
-	char *d = s->str;
+	const size_t s_size = s->size, s_pos = s->size > pos? pos: s->size;
+	char *str;
 
 	/* check if append is empty */
 	if( !insert )
 		return s;
 
-	if( s->reserved < size_d + size + 1 ) {
-		if( cul_string_init_size(s, size_d + size) == NULL )
+	if( s->reserved < s_size + size + 1 ) {
+		if( (str = (char *)cul_malloc( (s_size+size+1)*sizeof(char))) == NULL )
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
-		/* ensure we don't have nul base string */
-		if( d != NULL ) {
-			/* set original size */
-			s->size = size_d;
 
+		if( s->str != NULL ) {
 			/* copy previous data, create gap for insert */
-			cul_memcpy(s->str, d, pos_s*sizeof(char));
-			cul_memcpy(s->str + pos_s + size, d + pos_s, (size_d - pos_s)*sizeof(char));
-
-			/* free previous string */
-			free(d);
+			cul_memcpy(str, s->str, s_pos*sizeof(char));
+			cul_memcpy(str + s_pos + size, s->str + s_pos, (s_size - s_pos)*sizeof(char));
 		}
-	}
-	else
+		cul_free(s->str);
+
+		/* init string */
+		s->reserved = s_size+size+1;
+		s->str = str;
+	}	else {
 		/* create gap for insert */
-		cul_memmove(s->str + pos_s + size, d + pos_s, (size_d - pos_s)*sizeof(char));
+		cul_memmove(s->str + s_pos + size, s->str + s_pos, (s_size - s_pos)*sizeof(char));
+	}
 
 	/* update string size */
 	s->size += size;
 
 	/* insert string and update length */
-	cul_memcpy(s->str + pos_s, insert, size*sizeof(char));
+	cul_memcpy(s->str + s_pos, insert, size*sizeof(char));
 	cul_strnull(s->str + s->size);
 	return s;
 }
@@ -510,10 +437,32 @@ CulString *cul_string_trim_right(CulString *s) {
 	return s;
 }
 
-CulString *cul_string_trim_compress(CulString *s) {
-	if( cul_string_isnull(s) )
-		return s;
+CulList *cul_string_split(const CulString *s, const char *delimiter) {
+	const size_t delimiter_size = cul_strlen(delimiter);
+	const char *str = cul_string_const_c_str(s);
+	CulList *split = NULL;
 
-	s->size = _cul_strtrim_compress_size(s->str, s->size);
-	return s;
+	CulString *item;
+	for(char *item_str; (item_str = cul_strstr(str, delimiter)) != NULL; split = cul_list_next(split)) {
+		/* allocate string and insert to list */
+		item = cul_string_new_raw_size(item_str, item_str - str);
+		if( cul_list_insert_next(split, item) == NULL || item == NULL) {
+			cul_list_free_all(cul_list_first(split), CUL_FREE_F(cul_string_free));
+			cul_string_free(item);
+			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		}
+
+		/* update current position */
+		str = item_str + delimiter_size;
+	}
+
+	/* add last item */
+	item = cul_string_new_raw(str);
+	if( cul_list_insert_next(split, item) == NULL || item == NULL) {
+		cul_list_free_all(cul_list_first(split), CUL_FREE_F(cul_string_free));
+		cul_string_free(item);
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+	}
+
+	return cul_list_first(split);
 }

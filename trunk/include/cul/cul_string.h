@@ -1,4 +1,4 @@
-#if !defined(CUL_STRING_H)
+#ifndef CUL_STRING_H
 #define CUL_STRING_H
 
 #include <cul/cul_global.h>
@@ -23,6 +23,16 @@ struct _CulString {
 
 static const CulString CulStringNULL = {NULL, 0, 0};
 
+/* Access and Checks */
+
+static inline size_t cul_string_size(const CulString *s);
+static inline size_t cul_string_reserved(const CulString *s);
+static inline char *cul_string_c_str(CulString *s);
+static inline const char *cul_string_const_c_str(const CulString *s);
+
+static inline cul_bool cul_string_isnull(const CulString *s);
+static inline cul_bool cul_string_isempty(const CulString *s);
+
 /* Allocation */
 
 static inline CulString *cul_string_new_struct(void);
@@ -30,23 +40,19 @@ static inline void cul_string_free_struct(CulString *s);
 static inline CulString *cul_string_init_all(CulString *s, size_t size, size_t reserved, char *str);
 
 CulString *cul_string_new(const CulString *string);
+CulString *cul_string_new_empty();
 CulString *cul_string_new_printf(const char *format, ...);
 CulString *cul_string_new_raw(const char *string);
+CulString *cul_string_new_raw_size(const char *string, size_t size);
 CulString *cul_string_new_size(size_t size);
-CulString *cul_string_init(CulString *s, const CulString *string);
-CulString *cul_string_init_raw(CulString *s, const char *string);
-CulString *cul_string_init_size(CulString *s, size_t size);
-CulString *cul_string_init_attach_raw(CulString *s, char *string, size_t reserved);
 
 void cul_string_free(CulString *s);
-void cul_string_free_data(CulString *s);
 
 /* Resize */
 
 CulString *cul_string_clean(CulString *s);
 CulString *cul_string_clear(CulString *s);
 CulString *cul_string_resize(CulString *s, size_t size);
-CulString *cul_string_resize_char(CulString *s, size_t size, char character);
 CulString *cul_string_reserve(CulString *s, size_t size);
 CulString *cul_string_shrink(CulString *s);
 
@@ -81,19 +87,40 @@ cul_bool cul_string_end_with(const CulString *s, const CulString *postfix);
 cul_bool cul_string_end_with_raw(const CulString *s, const char *postfix);
 cul_bool cul_string_equal(const CulString *s, const CulString *compare);
 cul_bool cul_string_equal_raw(const CulString *s, const char *compare);
-static inline cul_bool cul_string_isnull(const CulString *s);
-static inline cul_bool cul_string_isempty(const CulString *s);
 
 /* Misc */
 
 CulString *cul_string_trim(CulString *s);
 CulString *cul_string_trim_left(CulString *s);
 CulString *cul_string_trim_right(CulString *s);
-CulString *cul_string_trim_compress(CulString *s);
 
-CulList *cul_string_split_delimiter(CulString *s, const char *delimiter);
+CulList *cul_string_split(const CulString *s, const char *delimiter);
 
 /* implemenations */
+
+static inline size_t cul_string_size(const CulString *s) {
+	return s->size;
+}
+
+static inline size_t cul_string_reserved(const CulString *s) {
+	return s->reserved;
+}
+
+static inline char *cul_string_c_str(CulString *s) {
+	return s->str;
+}
+
+static inline const char *cul_string_const_c_str(const CulString *s) {
+	return s->str;
+}
+
+static inline cul_bool cul_string_isnull(const CulString *s) {
+	return s->str == NULL? CUL_TRUE: CUL_FALSE;
+}
+
+static inline cul_bool cul_string_isempty(const CulString *s) {
+	return s->size == 0? CUL_TRUE: CUL_FALSE;
+}
 
 static inline CulString *cul_string_new_struct(void) {
 	return cul_slab_new(sizeof(CulString));
@@ -110,12 +137,4 @@ static inline CulString *cul_string_init_all(CulString *s, size_t size, size_t r
 	return s;
 }
 
-static inline cul_bool cul_string_isnull(const CulString *s) {
-	return s->str == NULL? CUL_TRUE: CUL_FALSE;
-}
-
-static inline cul_bool cul_string_isempty(const CulString *s) {
-	return s->size == 0? CUL_TRUE: CUL_FALSE;
-}
-
-#endif
+#endif /* CUL_STRING_H */
