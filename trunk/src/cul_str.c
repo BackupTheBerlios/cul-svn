@@ -5,7 +5,6 @@
 /* used in other cul modules */
 size_t _cul_strtrim_right_size(char *str, size_t size);
 size_t _cul_strtrim_left_size(char *str, size_t size);
-size_t _cul_strtrim_compress_size(char *str, size_t size);
 
 size_t _cul_strtrim_right_size(char *str, size_t size) {
 	char *end = str + size - 1;
@@ -23,40 +22,6 @@ size_t _cul_strtrim_left_size(char *str, size_t size) {
 		cul_memmove(str - (size-copy_size) , str, copy_size + 1);
 
 	return copy_size;
-}
-
-size_t _cul_strtrim_compress_size(char *str, size_t size) {
-	char *cur = str, *end = str + size - 1;
-
-	/* omit start whitespaces */
-	for( ; str <= end && cul_isspace_ascii(*str); ++str);
-	/* omit end whitespaces */
-	for( ; str <= end && cul_isspace_ascii(*end); --end);
-
-	/* remember string beginning */
-	const char *begin = str;
-
-	/* copy internal parts */
-	for( ; str <= end; ++str, ++cur) {
-		/* check if character is space */
-		if( cul_isspace_ascii(*str) ) {
-			*cur = CUL_STR_SPACE;
-
-			/* omit next spaces if present */
-			/* NOTICE: we know that at the end of string is NON space character */
-			for( ++str; str <= end && cul_isspace_ascii(*str); ++str );
-			/* go back to non space character */
-			--str;
-		}
-		else {
-			/* copy character */
-			*cur = *str;
-		}
-	}
-	/* set ending null character */
-	*str = CUL_STR_NULL;
-
-	return end - begin;
 }
 
 char *cul_strdup(const char *str) {
@@ -106,11 +71,6 @@ char *cul_strtrim_right(char *str) {
 
 char *cul_strtrim_left(char *str) {
 	_cul_strtrim_left_size(str, cul_strlen(str));
-	return str;
-}
-
-char *cul_strtrim_compress(char *str) {
-	_cul_strtrim_compress_size(str, cul_strlen(str));
 	return str;
 }
 
