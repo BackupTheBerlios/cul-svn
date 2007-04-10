@@ -20,7 +20,7 @@ static inline void cul_list_free_struct(CulList *l);
 static inline void cul_list_init_struct(CulList *l, CulList *next, CulList *prev, cul_ptr data);
 
 CulList *cul_list_new(cul_ptr data);
-CulList *cul_list_init(CulList *l, cul_ptr data);
+CulList *cul_list_new_empty();
 void cul_list_free(CulList *l, cul_free_f *free_data);
 void cul_list_free_all(CulList *l, cul_free_f *free_data);
 
