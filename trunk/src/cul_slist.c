@@ -4,16 +4,12 @@ CulSList *cul_slist_new(cul_ptr data) {
 	CulSList *l;
 	if( (l = cul_slist_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( cul_slist_init(l, data) == NULL ) {
-		cul_slist_free_struct(l);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
+	cul_slist_init_struct(l, NULL, data);
 	return l;
 }
 
-CulSList *cul_slist_init(CulSList *l, cul_ptr data) {
-	cul_slist_init_struct(l, NULL, data);
-	return l;
+CulSList *cul_slist_new_empty() {
+	return cul_slist_new(NULL);
 }
 
 void cul_slist_free(CulSList *l, cul_free_f *free_data) {
