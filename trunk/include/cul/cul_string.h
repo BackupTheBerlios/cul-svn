@@ -23,12 +23,7 @@ struct _CulString {
 
 static const CulString CulStringNULL = {NULL, 0, 0};
 
-/* Access and Checks */
-
-static inline size_t cul_string_size(const CulString *s);
-static inline size_t cul_string_reserved(const CulString *s);
-static inline char *cul_string_c_str(CulString *s);
-static inline const char *cul_string_const_c_str(const CulString *s);
+/* Basic Checks */
 
 static inline cul_bool cul_string_isnull(const CulString *s);
 static inline cul_bool cul_string_isempty(const CulString *s);
@@ -97,22 +92,6 @@ CulString *cul_string_trim_right(CulString *s);
 CulList *cul_string_split(const CulString *s, const char *delimiter);
 
 /* implemenations */
-
-static inline size_t cul_string_size(const CulString *s) {
-	return s->size;
-}
-
-static inline size_t cul_string_reserved(const CulString *s) {
-	return s->reserved;
-}
-
-static inline char *cul_string_c_str(CulString *s) {
-	return s->str;
-}
-
-static inline const char *cul_string_const_c_str(const CulString *s) {
-	return s->str;
-}
 
 static inline cul_bool cul_string_isnull(const CulString *s) {
 	return s->str == NULL? CUL_TRUE: CUL_FALSE;
