@@ -318,7 +318,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 			break;
 		case CUL_ARG_INT:
 			if( *arg ) {
-				long tmp = cul_strtol(arg, &end, 0);
+				long tmp = cul_strtol(arg, &end, 10);
 				if( !*end && tmp == (int)tmp ) {
 					*((int *)t->value) = (int)tmp;
 					break;
@@ -393,7 +393,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 
 	/* clear and set position */
 	t->flags &= ~CUL_ARG_POS_MASK;
-	t->flags |= pos << 16;
+	t->flags |= pos << 12;
 
 	return CUL_TRUE;
 }

@@ -21,8 +21,9 @@ enum _CulArgFlag {
 
 	/* masks */
 	CUL_ARG_TYPE_MASK  = 0x000f,       /* mask for argument type */
-	CUL_ARG_CONF_MASK  = 0xffff,       /* mask for argument configuration, flags and type */
-	CUL_ARG_POS_MASK   = 0xffff << 16  /* mask for argument position */
+	CUL_ARG_CONF_MASK  = 0xfff,        /* mask for argument configuration, flags and type */
+	CUL_ARG_POS_MASK   = 0xffff << 12, /* mask for argument position */
+	CUL_ARG_MASK       = 0xfffffff     /* maximal possible value for flag */
 };
 
 typedef struct _CulArg CulArg;
