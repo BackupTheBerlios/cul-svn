@@ -147,12 +147,8 @@ CulArg *cul_arg_search_long(CulArg *t, const char *arg) {
 
 /* Find and return next valid argument description, from argument table */
 static CulArg *_cul_arg_next(CulArg *t) {
-	if( (++t)->flags & CUL_ARG_END ) {
-		if( t->flags & CUL_ARG_JOIN )
-			t = t->value;
-		else
-			return NULL;
-	}
+	if( (++t)->flags & CUL_ARG_END )
+		return NULL;
 	return t;
 }
 
@@ -162,10 +158,6 @@ static CulArg *_cul_arg_next_option(CulArg *t) {
 		switch( (++t)->flags & ~CUL_ARG_TYPE_MASK ) {
 			case CUL_ARG_END:
 				return NULL;
-			case CUL_ARG_JOIN:
-			case CUL_ARG_END|CUL_ARG_JOIN:
-				t = t->value;
-				continue;
 			case CUL_ARG_HELP:
 				continue;
 			default:
