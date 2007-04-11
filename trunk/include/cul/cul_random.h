@@ -1,25 +1,31 @@
-#if !defined(CUL_RANDOM_H)
+#ifndef CUL_RANDOM_H
 #define CUL_RANDOM_H
 
-#include <stdlib.h>
-#include <time.h>
+#include <cul/cul_global.h>
+#include <cul/cul_rng.h>
 
-static inline void cul_random_init();
-static inline double cul_drandom();
-static inline size_t cul_urandom();
+/* basic wrappers for standard functions */
 
-/* FIXME temporary implementations */
+static inline int cul_rand();
+static inline double cul_rand_real();
+static inline void cul_srand(unsigned int seed);
 
-static inline void cul_random_init() {
-	srand( (size_t)time(NULL) );
-}
+/* various distributions */
 
-static inline double cul_drandom() {
-	return (double)rand()/RAND_MAX;
-}
+double cul_random_uniform(const CulRng *rng, double min, double max);
 
-static inline size_t cul_urandom() {
+/* implementations */
+
+static inline int cul_rand() {
 	return rand();
 }
 
-#endif
+static inline void cul_srand(unsigned int seed) {
+	srand(seed);
+}
+
+static inline double cul_rand_real() {
+	return (double)cul_rand()/(double)((unsigned int)RAND_MAX+1);
+}
+
+#endif /* CUL_RANDOM_H */
