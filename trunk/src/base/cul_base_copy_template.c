@@ -126,13 +126,12 @@ void FUNCTION(reverse_stride)(ATOM *data, size_t size, size_t stride) {
 
 void FUNCTION(permutation)(ATOM *data, size_t size) {
 	for( size_t i=size-1; i>0; --i)
-		FUNCTION(swap_pos)(data, i, cul_urandom() % (i+1));
+		FUNCTION(swap_pos)(data, i, cul_rand() % (i+1));
 }
 
 void FUNCTION(permutation_stride)(ATOM *data, size_t size, size_t stride) {
 	for( size_t i=size-stride; i>0; i -= stride) {
-		size_t pos = cul_urandom() % (i+1);
-		size_t pos_stride = pos % stride;
-		FUNCTION(swap_pos)(data, i, pos - pos_stride);
+		size_t pos = cul_rand() % (i+1);
+		FUNCTION(swap_pos)(data, i, pos - (pos % stride));
 	}
 }
