@@ -1,5 +1,5 @@
-#if !defined(CUL_STREAM_H)
-#define CUL_STREAM_H
+#ifndef CUL_IO_H
+#define CUL_IO_H
 
 #include <cul/cul_global.h>
 #include <stdio.h>
@@ -21,6 +21,9 @@ static inline char *cul_fgets(char *str, int size, FILE *stream);
 static inline int cul_fgetc(FILE *stream);
 static inline int cul_fputs(char *str, FILE *stream);
 static inline int cul_fputc(int character, FILE *stream);
+
+static inline size_t cul_fread(void *ptr, size_t size, size_t count, FILE *stream);
+static inline size_t cul_fwrite(const void *ptr, size_t size, size_t count, FILE *stream);
 
 /* implementations */
 
@@ -56,4 +59,12 @@ static inline int cul_fputc(int character, FILE *stream) {
 	return fputc(character, stream);
 }
 
-#endif
+static inline size_t cul_fread(void *ptr, size_t size, size_t count, FILE *stream) {
+	return fread(ptr, size, count, stream);
+}
+
+static inline size_t cul_fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
+	return fwrite(ptr, size, count, stream);
+}
+
+#endif /* CUL_IO_H */
