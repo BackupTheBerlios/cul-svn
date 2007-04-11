@@ -34,7 +34,7 @@ static inline cul_bool cul_string_isempty(const CulString *s);
 
 static inline CulString *cul_string_new_struct(void);
 static inline void cul_string_free_struct(CulString *s);
-static inline CulString *cul_string_init_all(CulString *s, size_t size, size_t reserved, char *str);
+static inline CulString *cul_string_init_struct(CulString *s, size_t size, size_t reserved, char *str);
 
 CulString *cul_string_new(const CulString *string);
 CulString *cul_string_new_empty();
@@ -101,7 +101,7 @@ static inline void cul_string_free_struct(CulString *s) {
 	cul_slab_free(sizeof(CulString), s);
 }
 
-static inline CulString *cul_string_init_all(CulString *s, size_t size, size_t reserved, char *str) {
+static inline CulString *cul_string_init_struct(CulString *s, size_t size, size_t reserved, char *str) {
 	s->str = str;
 	s->size = size;
 	s->reserved = reserved;

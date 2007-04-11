@@ -23,7 +23,7 @@ CulString *cul_string_new_printf(const char *format, ...) {
 
 	if( (s = cul_string_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	cul_string_init_all(s, 0, 0, NULL);
+	cul_string_init_struct(s, 0, 0, NULL);
 
 	va_start(arg, format);
 	if( _cul_string_insert_vprintf(s, 0, format, arg) == NULL ) {
@@ -56,15 +56,15 @@ CulString *cul_string_new_raw_size(const char *string, size_t size) {
 		/* copy string if needed */
 		if( string == NULL ) {
 			cul_strnull(str);
-			cul_string_init_all(s, 0, size+1, str);
+			cul_string_init_struct(s, 0, size+1, str);
 		} else {
 			cul_memcpy(str, string, size*sizeof(char));
 			cul_strnull(str+size);
-			cul_string_init_all(s, size, size+1, str);
+			cul_string_init_struct(s, size, size+1, str);
 		}
 	}
 	else
-		cul_string_init_all(s, 0, 0, NULL);
+		cul_string_init_struct(s, 0, 0, NULL);
 
 	return s;
 }
@@ -88,8 +88,7 @@ CulString *cul_string_clean(CulString *s) {
 
 CulString *cul_string_clear(CulString *s) {
 	cul_free(s->str);
-	cul_string_init_all(s, 0, 0, NULL);
-	return s;
+	return cul_string_init_struct(s, 0, 0, NULL);
 }
 
 CulString *cul_string_resize(CulString *s, size_t size) {
@@ -108,7 +107,7 @@ CulString *cul_string_resize(CulString *s, size_t size) {
 	cul_strnull(str + copy_size);
 	cul_free(s->str);
 
-	return cul_string_init_all(s, copy_size, size+1, str);
+	return cul_string_init_struct(s, copy_size, size+1, str);
 }
 
 /**
@@ -233,12 +232,17 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ESPRINTF);
 
 	/* insert buffer to string */
-	if( cul_string_insert_raw_size(s, s->size > pos? pos: s->size, str, strsize ) == NULL ) {
+	if( cul_string_isnull(s) )
+		/* we don't know exactly size of reserved space, use minial possible value */
+		cul_string_init_struct(s, strsize, strsize+1, str);
+	else {
+		if( cul_string_insert_raw_size(s, s->size > pos? pos: s->size, str, strsize ) == NULL ) {
+			cul_free(str);
+			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		}
 		cul_free(str);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
 	}
 
-	cul_free(str);
 	return s;
 }
 
@@ -439,7 +443,7 @@ CulString *cul_string_trim_right(CulString *s) {
 
 CulList *cul_string_split(const CulString *s, const char *delimiter) {
 	const size_t delimiter_size = cul_strlen(delimiter);
-	const char *str = cul_string_const_c_str(s);
+	const char *str = s->str;
 	CulList *split = NULL;
 
 	CulString *item;

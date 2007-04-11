@@ -1,11 +1,20 @@
 TYPE(Vector) *FUNCTION(vector_new)(size_t size) {
 	TYPE(Vector) *v;
+	ATOM *data;
+
 	if( (v = FUNCTION(vector_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( FUNCTION(vector_init)(v, size) == NULL ) {
-		FUNCTION(vector_free_struct)(v);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
+
+	if( size == 0 )
+		FUNCTION(vector_init_struct)(v, 0, 0, NULL);
+	else {
+		if( (data = FUNCTION(new)(size)) == NULL ) {
+			FUNCTION(vector_free_struct)(v);
+			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		}
+		FUNCTION(vector_init_struct)(v, size, size, data);
 	}
+
 	return v;
 }
 
@@ -13,64 +22,36 @@ TYPE(Vector) *FUNCTION(vector_new_empty)(void) {
 	return FUNCTION(vector_new)(0);
 }
 
-TYPE(Vector) *FUNCTION(vector_init)(TYPE(Vector) *v, size_t size) {
-	ATOM *d;
-
-	if( size == 0 )
-		FUNCTION(vector_init_struct)(v, 0, 0, NULL);
-	else {
-		if( (d = FUNCTION(new)(size)) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-		FUNCTION(vector_init_struct)(v, size, size, d);
+void FUNCTION(vector_free)(TYPE(Vector) *v) {
+	if( v != NULL ) {
+		FUNCTION(free)(v->data);
+		FUNCTION(vector_free_struct)(v);
 	}
-	return v;
-}
-
-TYPE(Vector) *FUNCTION(vector_init_empty)(TYPE(Vector) *v) {
-	return FUNCTION(vector_init)(v, 0);
 }
 
 VIEW(Vector) *FUNCTION(vectorview_new)(void) {
 	VIEW(Vector) *vv;
 	if( (vv = FUNCTION(vectorview_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( FUNCTION(vectorview_init)(vv) == NULL ) {
-		FUNCTION(vectorview_free_struct)(vv);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
-	return vv;
-}
-
-VIEW(Vector) *FUNCTION(vectorview_init)(VIEW(Vector) *vv) {
 	return FUNCTION(vectorview_init_struct)(vv, 0, 0, NULL);
 }
 
-VIEW(Vector) *FUNCTION(vector_view_vector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v) {
+void FUNCTION(vectorview_free)(VIEW(Vector) *vv) {
+	FUNCTION(vectorview_free_struct)(vv);
+}
+
+VIEW(Vector) *FUNCTION(vectorview_vector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v) {
 	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_v->size, 1, base_v->data);
 }
 
-VIEW(Vector) *FUNCTION(vector_view_subvector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v, size_t base_offset, size_t base_size, size_t base_stride) {
+VIEW(Vector) *FUNCTION(vectorview_subvector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v, size_t base_offset, size_t base_size, size_t base_stride) {
 	if( base_offset + base_size > base_v->size )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
 	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_size, base_stride, base_v->data + base_offset);
-}
-
-void FUNCTION(vector_free)(TYPE(Vector) *v) {
-	FUNCTION(vector_free_data)(v);
-	FUNCTION(vector_free_struct)(v);
-}
-
-void FUNCTION(vector_free_data)(TYPE(Vector) *v) {
-	if( v != NULL )
-		cul_free(v->data);
-}
-
-void FUNCTION(vectorview_free)(VIEW(Vector) *vv) {
-	FUNCTION(vectorview_free_struct)(vv);
 }
 
 void FUNCTION(vector_set_all)(TYPE(Vector) *v, ATOM val) {
@@ -177,9 +158,8 @@ TYPE(Vector) *FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
 
 	if( size == 0 ) {
-		FUNCTION(vector_free_data)(v);
-		FUNCTION(vector_init_struct)(v, 0, 0, NULL);
-		return v;
+		FUNCTION(free)(v->data);
+		return FUNCTION(vector_init_struct)(v, 0, 0, NULL);
 	}
 	else if( size >= v->size && size <= v->reserved ) {
 		v->size = size;
@@ -196,9 +176,8 @@ TYPE(Vector) *FUNCTION(vector_reserve)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
 
 	if( size == 0 ) {
-		FUNCTION(vector_free_data)(v);
-		FUNCTION(vector_init)(v, size);
-		return v;
+		FUNCTION(free)(v->data);
+		return FUNCTION(vector_init_struct)(v, 0, 0, NULL);
 	}
 	else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);

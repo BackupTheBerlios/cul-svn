@@ -1,4 +1,4 @@
-#if !defined(CUL_VECTOR_CHAR_H)
+#ifndef CUL_VECTOR_CHAR_H
 #define CUL_VECTOR_CHAR_H
 
 #include <cul/cul_global.h>
@@ -22,8 +22,6 @@ struct _CulCVectorView {
 	size_t stride;
 };
 
-/* Allocation */
-
 static inline CulCVector *cul_cvector_new_struct(void);
 static inline void cul_cvector_free_struct(CulCVector *v);
 static inline CulCVector *cul_cvector_init_struct(CulCVector *v, size_t reserved, size_t size, char *data);
@@ -32,26 +30,15 @@ static inline CulCVectorView *cul_cvectorview_new_struct(void);
 static inline void cul_cvectorview_free_struct(CulCVectorView *vv);
 static inline CulCVectorView *cul_cvectorview_init_struct(CulCVectorView *vv, size_t size, size_t stride, char *data);
 
-/* Uninitialized data elements */
 CulCVector *cul_cvector_new(size_t size);
 CulCVector *cul_cvector_new_empty(void);
-CulCVector *cul_cvector_init(CulCVector *v, size_t size);
-CulCVector *cul_cvector_init_empty(CulCVector *v);
+void cul_cvector_free(CulCVector *v);
 
 CulCVectorView *cul_cvectorview_new(void);
-CulCVectorView *cul_cvectorview_init(CulCVectorView *vv);
-
-/* Assign views */
-CulCVectorView *cul_cvector_view_vector(CulCVectorView *vv, const CulCVector *base_v);
-CulCVectorView *cul_cvector_view_subvector(CulCVectorView *vv, const CulCVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
-
-/* Free */
-
-void cul_cvector_free(CulCVector *v);
-void cul_cvector_free_data(CulCVector *v);
 void cul_cvectorview_free(CulCVectorView *vv);
 
-/* Initialization */
+CulCVectorView *cul_cvectorview_vector(CulCVectorView *vv, const CulCVector *base_v);
+CulCVectorView *cul_cvectorview_subvector(CulCVectorView *vv, const CulCVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
 
 void cul_cvector_set_all(CulCVector *v, char val);
 void cul_cvector_set_zero(CulCVector *v);
@@ -60,8 +47,6 @@ void cul_cvector_set_basis(CulCVector *v, size_t index);
 void cul_cvectorview_set_all(CulCVectorView *vv, char val);
 void cul_cvectorview_set_zero(CulCVectorView *vv);
 void cul_cvectorview_set_basis(CulCVectorView *vv, size_t index);
-
-/* Data Access */
 
 static inline char cul_cvector_get(const CulCVector *v, size_t x);
 static inline void cul_cvector_set(CulCVector *v, size_t x, char val);
@@ -74,8 +59,6 @@ static inline char *cul_cvectorview_ptr(CulCVectorView *vv, size_t x);
 static inline const char *cul_cvectorview_const_ptr(const CulCVectorView *vv, size_t x);
 static inline char *cul_cvectorview_next(CulCVectorView *vv, char *ptr);
 static inline const char *cul_cvectorview_const_next(const CulCVectorView *vv, const char *ptr);
-
-/* Data Copy */
 
 cul_errno cul_cvector_copy(CulCVector *v, const CulCVector *base_v);
 cul_errno cul_cvector_copy_offset(CulCVector *v, const CulCVector *base_v, size_t offset);
@@ -90,14 +73,10 @@ void cul_cvectorview_reverse(CulCVectorView *vv);
 void cul_cvector_permutation(CulCVector *v);
 void cul_cvectorview_permutation(CulCVectorView *vv);
 
-/* Data Resize */
-
 CulCVector *cul_cvector_resize(CulCVector *v, size_t size);
 CulCVector *cul_cvector_reserve(CulCVector *v, size_t size);
 CulCVector *cul_cvector_push_back(CulCVector *v, char val);
 CulCVector *cul_cvector_pop_back(CulCVector *v);
-
-/* Min/Max */
 
 char cul_cvector_min(const CulCVector *v);
 size_t cul_cvector_min_index(const CulCVector *v);
@@ -113,8 +92,6 @@ size_t cul_cvectorview_max_index(const CulCVectorView *vv);
 void cul_cvectorview_minmax(const CulCVectorView *vv, char *min, char *max);
 void cul_cvectorview_minmax_index(const CulCVectorView *vv, size_t *min_i, size_t *max_i);
 
-/* Statistics */
-
 double cul_cvector_sum(const CulCVector *v);
 double cul_cvector_mean(const CulCVector *v);
 double cul_cvector_variance(const CulCVector *v, double mean);
@@ -122,8 +99,6 @@ double cul_cvector_variance(const CulCVector *v, double mean);
 double cul_cvectorview_sum(const CulCVectorView *vv);
 double cul_cvectorview_mean(const CulCVectorView *vv);
 double cul_cvectorview_variance(const CulCVectorView *vv, double mean);
-
-/* Basic Algorithms */
 
 void cul_cvector_sort(CulCVector *v, cul_cmp_f *cmp);
 void cul_cvector_sort_asc(CulCVector *v);
@@ -139,8 +114,6 @@ size_t cul_cvector_unique_eq(CulCVector *v);
 size_t cul_cvectorview_unique(CulCVectorView *vv, cul_eq_f *eq);
 size_t cul_cvectorview_unique_eq(CulCVectorView *vv);
 
-/* Operations */
-
 void cul_cvector_add_scalar(CulCVector *v, char val);
 void cul_cvector_mul_scalar(CulCVector *v, char val);
 cul_errno cul_cvector_add(CulCVector *a, const CulCVector *b);
@@ -155,15 +128,13 @@ cul_errno cul_cvectorview_sub(CulCVectorView *va, const CulCVectorView *vb);
 cul_errno cul_cvectorview_mul(CulCVectorView *va, const CulCVectorView *vb);
 cul_errno cul_cvectorview_div(CulCVectorView *va, const CulCVectorView *vb);
 
-/* Input/Output */
-
 cul_errno cul_cvector_printf_stream(const CulCVector *v, const char *format, const char *separator);
-cul_errno cul_cvector_fprintf(FILE *id, const CulCVector *v, const char *format, const char *separator);
-cul_errno cul_cvector_fscanf(FILE *id, CulCVector *v, const char *format, const char *separator);
+cul_errno cul_cvector_fprintf(FILE *stream, const CulCVector *v, const char *format, const char *separator);
+cul_errno cul_cvector_fscanf(FILE *stream, CulCVector *v, const char *format, const char *separator);
 
 cul_errno cul_cvectorview_printf_stream(const CulCVectorView *vv, const char *format, const char *separator);
-cul_errno cul_cvectorview_fprintf(FILE *id, const CulCVectorView *vv, const char *format, const char *separator);
-cul_errno cul_cvectorview_fscanf(FILE *id, CulCVectorView *vv, const char *format, const char *separator);
+cul_errno cul_cvectorview_fprintf(FILE *stream, const CulCVectorView *vv, const char *format, const char *separator);
+cul_errno cul_cvectorview_fscanf(FILE *stream, CulCVectorView *vv, const char *format, const char *separator);
 
 /* implementations */
 
@@ -267,4 +238,4 @@ static inline const char *cul_cvectorview_const_next(const CulCVectorView *vv, c
 	return (ptr + vv->stride);
 }
 
-#endif
+#endif /* CUL_VECTOR_CHAR_H */
