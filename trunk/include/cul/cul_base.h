@@ -1,10 +1,10 @@
-#if !defined(CUL_BASE_H)
+#ifndef CUL_BASE_H
 #define CUL_BASE_H
 
-#include <cul/cul_base_char.h>
-#include <cul/cul_base_double.h>
-#include <cul/cul_base_int.h>
-#include <cul/cul_base_ptr.h>
-#include <cul/cul_base_size.h>
+#include <cul/cul_cbase.h>
+#include <cul/cul_dbase.h>
+#include <cul/cul_ibase.h>
+#include <cul/cul_pbase.h>
+#include <cul/cul_ubase.h>
 
 #endif

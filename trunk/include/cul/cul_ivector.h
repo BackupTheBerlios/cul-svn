@@ -68,8 +68,6 @@ cul_errno cul_ivector_swap(CulIVector *a, CulIVector *b);
 cul_errno cul_ivectorview_swap(CulIVectorView *va, CulIVectorView *vb);
 void cul_ivector_reverse(CulIVector *v);
 void cul_ivectorview_reverse(CulIVectorView *vv);
-void cul_ivector_permutation(CulIVector *v);
-void cul_ivectorview_permutation(CulIVectorView *vv);
 
 CulIVector *cul_ivector_resize(CulIVector *v, size_t size);
 CulIVector *cul_ivector_reserve(CulIVector *v, size_t size);

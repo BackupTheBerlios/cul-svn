@@ -1,8 +1,7 @@
-#if !defined(CUL_LOG_H)
+#ifndef CUL_LOG_H
 #define CUL_LOG_H
 
-#include <cul/cul_global_base.h>
-#include <cul/cul_error.h>
+#include <cul/cul_base_global.h>
 
 typedef enum _CulLogType CulLogType;
 typedef void cul_log_t(const char *module, CulLogType type, const char *msg);

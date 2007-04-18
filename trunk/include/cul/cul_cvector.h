@@ -70,8 +70,6 @@ cul_errno cul_cvector_swap(CulCVector *a, CulCVector *b);
 cul_errno cul_cvectorview_swap(CulCVectorView *va, CulCVectorView *vb);
 void cul_cvector_reverse(CulCVector *v);
 void cul_cvectorview_reverse(CulCVectorView *vv);
-void cul_cvector_permutation(CulCVector *v);
-void cul_cvectorview_permutation(CulCVectorView *vv);
 
 CulCVector *cul_cvector_resize(CulCVector *v, size_t size);
 CulCVector *cul_cvector_reserve(CulCVector *v, size_t size);

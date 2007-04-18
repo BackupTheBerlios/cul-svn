@@ -146,14 +146,6 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *vv) {
 	FUNCTION(reverse_stride)(vv->data, vv->size, vv->stride);
 }
 
-void FUNCTION(vector_permutation)(TYPE(Vector) *v) {
-	FUNCTION(permutation)(v->data, v->size);
-}
-
-void FUNCTION(vectorview_permutation)(VIEW(Vector) *vv) {
-	FUNCTION(permutation_stride)(vv->data, vv->size, vv->stride);
-}
-
 TYPE(Vector) *FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
 

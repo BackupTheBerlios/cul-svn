@@ -1,7 +1,9 @@
-#if !defined(CUL_GLOBAL_H)
+#ifndef CUL_GLOBAL_H
 #define CUL_GLOBAL_H
 
-#include <cul/cul_global_base.h>
+/* basic include for config and base typedefs and defines */
+#include <cul/cul_base_global.h>
+
 #include <cul/cul_error.h>
 #include <cul/cul_log.h>
 #include <cul/cul_macro.h>
@@ -21,4 +23,4 @@ static inline cul_bool cul_isnan(double val) {
 	return !(val == val);
 }
 
-#endif
+#endif /* CUL_GLOBAL_H */

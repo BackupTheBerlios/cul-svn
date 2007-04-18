@@ -1,10 +1,9 @@
-#if !defined(CUL_ERROR_H)
+#ifndef CUL_ERROR_H
 #define CUL_ERROR_H
 
-#include <cul/cul_global_base.h>
+#include <cul/cul_base_global.h>
 
 typedef enum _CulErrno CulErrno;
-
 enum _CulErrno {
 	CUL_FAILURE  = -1,
 	CUL_SUCCESS  =  0,
@@ -31,4 +30,4 @@ const char *cul_error_string(CulErrno eid);
 cul_bool cul_error_fatal_get(void);
 cul_bool cul_error_fatal_set(cul_bool val);
 
-#endif
+#endif /* CUL_ERROR_H */
