@@ -3,6 +3,7 @@
 
 #include <cul/cul_global.h>
 #include <cul/cul_rng.h>
+#include <stdlib.h>
 
 /* basic wrappers for standard functions */
 

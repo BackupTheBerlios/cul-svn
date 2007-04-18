@@ -1,4 +1,4 @@
-#include <cul/cul_io.h>
+#include <cul/cul_stream.h>
 
 FILE *cul_stream = NULL;
 

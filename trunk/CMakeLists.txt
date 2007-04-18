@@ -48,18 +48,16 @@ SET(CUL_SOURCES
 	src/cul_random.c
 	src/cul_rng.c
 	src/cul_tree.c
-	src/cul_tree_bb.c
+	src/cul_bbtree.c
 	src/cul_vector.c
-	src/cul_io.c
-	src/cul_iof.c
 	src/cul_str.c
 	src/cul_str_type.c
+	src/cul_stream.c
 	src/cul_string.c
 
 	src/base/cul_base_balg_search.c
 	src/base/cul_base_balg_sort.c
 	src/base/cul_base_balg_unique.c
-	src/base/cul_base_common.c
 	src/base/cul_base_copy.c
 	src/base/cul_base_io.c
 	src/base/cul_base_minmax.c

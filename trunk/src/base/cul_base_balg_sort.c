@@ -1,6 +1,5 @@
 #include <cul/cul_global.h>
 #include <cul/cul_base.h>
-#include <cul/cul_math.h>
 
 #define TEMPLATE_CUL_CHAR
 #include "templates_on.h"

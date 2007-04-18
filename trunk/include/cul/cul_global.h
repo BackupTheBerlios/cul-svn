@@ -11,11 +11,6 @@
 
 typedef CulErrno cul_errno;
 
-/* global functions */
-
-int cul_printf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
-int cul_printf_stream(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
-
 #define CUL_NAN (0.0/0.0)
 
 static inline double cul_nan() {

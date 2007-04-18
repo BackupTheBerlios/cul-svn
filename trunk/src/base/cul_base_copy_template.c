@@ -1,10 +1,10 @@
-#if !defined(TEMPLATE_CUL_PTR)
+#ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size) {
-		cul_memcpy(data_a, data_b, size*sizeof(ATOM));
+		memcpy(data_a, data_b, size*sizeof(ATOM));
 	}
 
 	void FUNCTION(copy_overlap)(ATOM *data_a, const ATOM *data_b, size_t size) {
-		cul_memmove(data_a, data_b, size*sizeof(ATOM));
+		memmove(data_a, data_b, size*sizeof(ATOM));
 	}
 
 	void FUNCTION(copy_stride)(ATOM *data_a, const ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
@@ -27,7 +27,7 @@
 			data_b += tda_stride_b;
 		}
 	}
-#else
+#else /* TEMPLATE_CUL_PTR */
 	void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size, cul_cpy_f *cpy_item) {
 		const ATOM *const end = data_b + size;
 		for( ; data_b < end; ++data_a, ++data_b)
@@ -67,7 +67,7 @@
 			data_b += tda_stride_b;
 		}
 	}
-#endif /* !defined(TEMPLATE_CUL_PTR) */
+#endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(swap)(ATOM *data_a, ATOM *data_b, size_t size) {
 	ATOM tmp, *const end = data_a + size;

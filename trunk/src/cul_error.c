@@ -8,13 +8,11 @@ const char *cul_error_string(CulErrno eid) {
 		case CUL_FAILURE:   return "failure";
 		case CUL_ESTUB:     return "missing implementation";
 		case CUL_EINVAL:    return "invalid argument";
-		case CUL_EINIT:     return "initialization failed";
 		case CUL_EFAILED:   return "operation failed";
 		case CUL_ENOMEM:    return "memory allocation failed";
 		case CUL_EBADLEN:   return "invalid size, sizes do not match";
 		case CUL_EBADPOS:   return "position out of range";
-		case CUL_EPRINTF:   return "print data error";
-		case CUL_ESPRINTF:  return "print data to string error";
+		case CUL_EPRINTF:   return "write data error";
 		case CUL_ESCANF:    return "read data error";
 		case CUL_EARGMISS:  return "missing required argument";
 		case CUL_EARGUNK:   return "unknown argument";

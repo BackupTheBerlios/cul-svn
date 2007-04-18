@@ -4,14 +4,6 @@ CulTree *cul_tree_new(void) {
 	CulTree *t;
 	if( (t = cul_tree_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( cul_tree_init(t) == NULL ) {
-		cul_tree_free_struct(t);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
-	return t;
-}
-
-CulTree *cul_tree_init(CulTree *t) {
 	return cul_tree_init_struct(t, NULL, NULL, NULL, NULL, NULL);
 }
 

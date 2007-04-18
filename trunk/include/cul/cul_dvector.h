@@ -1,13 +1,13 @@
-#ifndef CUL_VECTOR_DOUBLE_H
-#define CUL_VECTOR_DOUBLE_H
+#ifndef CUL_DVECTOR_H
+#define CUL_DVECTOR_H
 
 #include <cul/cul_global.h>
 #include <stdio.h>
 
-#define CUL_DVECTOR(ptr) ((CulDVector *)(ptr))
+#define CUL_DVECTOR(ptr)     ((CulDVector *)(ptr))
 #define CUL_DVECTORVIEW(ptr) ((CulDVectorView *)(ptr))
 
-typedef struct _CulDVector CulDVector;
+typedef struct _CulDVector     CulDVector;
 typedef struct _CulDVectorView CulDVectorView;
 
 struct _CulDVector {
@@ -24,11 +24,11 @@ struct _CulDVectorView {
 
 static inline CulDVector *cul_dvector_new_struct(void);
 static inline void cul_dvector_free_struct(CulDVector *v);
-static inline CulDVector *cul_dvector_init_struct(CulDVector *v, size_t reserved, size_t size, double *data);
+static inline CulDVector *cul_dvector_init_struct(CulDVector *v, double *data, size_t reserved, size_t size);
 
 static inline CulDVectorView *cul_dvectorview_new_struct(void);
 static inline void cul_dvectorview_free_struct(CulDVectorView *vv);
-static inline CulDVectorView *cul_dvectorview_init_struct(CulDVectorView *vv, size_t size, size_t stride, double *data);
+static inline CulDVectorView *cul_dvectorview_init_struct(CulDVectorView *vv, double *data, size_t size, size_t stride);
 
 CulDVector *cul_dvector_new(size_t size);
 CulDVector *cul_dvector_new_empty(void);
@@ -100,19 +100,13 @@ double cul_dvectorview_sum(const CulDVectorView *vv);
 double cul_dvectorview_mean(const CulDVectorView *vv);
 double cul_dvectorview_variance(const CulDVectorView *vv, double mean);
 
-void cul_dvector_sort(CulDVector *v, cul_cmp_f *cmp);
 void cul_dvector_sort_asc(CulDVector *v);
 void cul_dvector_sort_desc(CulDVector *v);
-
-void cul_dvectorview_sort(CulDVectorView *vv, cul_cmp_f *cmp);
 void cul_dvectorview_sort_asc(CulDVectorView *vv);
 void cul_dvectorview_sort_desc(CulDVectorView *vv);
 
-size_t cul_dvector_unique(CulDVector *v, cul_eq_f *eq);
-size_t cul_dvector_unique_eq(CulDVector *v);
-
-size_t cul_dvectorview_unique(CulDVectorView *vv, cul_eq_f *eq);
-size_t cul_dvectorview_unique_eq(CulDVectorView *vv);
+size_t cul_dvector_unique(CulDVector *v);
+size_t cul_dvectorview_unique(CulDVectorView *vv);
 
 void cul_dvector_add_scalar(CulDVector *v, double val);
 void cul_dvector_mul_scalar(CulDVector *v, double val);
@@ -128,11 +122,8 @@ cul_errno cul_dvectorview_sub(CulDVectorView *va, const CulDVectorView *vb);
 cul_errno cul_dvectorview_mul(CulDVectorView *va, const CulDVectorView *vb);
 cul_errno cul_dvectorview_div(CulDVectorView *va, const CulDVectorView *vb);
 
-cul_errno cul_dvector_printf_stream(const CulDVector *v, const char *format, const char *separator);
 cul_errno cul_dvector_fprintf(FILE *stream, const CulDVector *v, const char *format, const char *separator);
 cul_errno cul_dvector_fscanf(FILE *stream, CulDVector *v, const char *format, const char *separator);
-
-cul_errno cul_dvectorview_printf_stream(const CulDVectorView *vv, const char *format, const char *separator);
 cul_errno cul_dvectorview_fprintf(FILE *stream, const CulDVectorView *vv, const char *format, const char *separator);
 cul_errno cul_dvectorview_fscanf(FILE *stream, CulDVectorView *vv, const char *format, const char *separator);
 
@@ -146,7 +137,7 @@ static inline void cul_dvector_free_struct(CulDVector *v) {
 	cul_slab_free(sizeof(CulDVector), v);
 }
 
-static inline CulDVector *cul_dvector_init_struct(CulDVector *v, size_t reserved, size_t size, double *data) {
+static inline CulDVector *cul_dvector_init_struct(CulDVector *v, double *data, size_t reserved, size_t size) {
 	v->reserved = reserved;
 	v->size = size;
 	v->data = data;
@@ -161,7 +152,7 @@ static inline void cul_dvectorview_free_struct(CulDVectorView *vv) {
 	cul_slab_free(sizeof(CulDVectorView), vv);
 }
 
-static inline CulDVectorView *cul_dvectorview_init_struct(CulDVectorView *vv, size_t size, size_t stride, double *data) {
+static inline CulDVectorView *cul_dvectorview_init_struct(CulDVectorView *vv, double *data, size_t size, size_t stride) {
 	vv->size = size;
 	vv->stride = stride;
 	vv->data = data;
@@ -238,4 +229,4 @@ static inline const double *cul_dvectorview_const_next(const CulDVectorView *vv,
 	return (ptr + vv->stride);
 }
 
-#endif /* CUL_VECTOR_DOUBLE_H */
+#endif /* CUL_DVECTOR_H */

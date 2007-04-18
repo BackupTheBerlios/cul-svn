@@ -2,6 +2,8 @@
 #include <cul/cul_base.h>
 #include <cul/cul_random.h>
 
+#include <string.h>
+
 #define TEMPLATE_CUL_DOUBLE
 #include "templates_on.h"
 #include "cul_base_copy_template.c"

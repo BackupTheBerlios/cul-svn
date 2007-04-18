@@ -1,4 +1,4 @@
-#include <cul/cul_tree_bb.h>
+#include <cul/cul_bbtree.h>
 
 struct _CulBBTree {
 	CulBBTreeNode *root;
@@ -19,7 +19,7 @@ struct _CulBBTreeNode {
 
 static inline CulBBTree *cul_bbtree_new_struct(void);
 static inline void cul_bbtree_free_struct(CulBBTree *t);
-static inline void cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth, cul_bool is_unique);
+static inline CulBBTree *cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth, cul_bool is_unique);
 
 static inline CulBBTreeNode *cul_bbtree_node_new_struct(void);
 static inline void cul_bbtree_node_free_struct(CulBBTreeNode *tn);
@@ -32,12 +32,13 @@ static inline void cul_bbtree_free_struct(CulBBTree *t) {
 	cul_slab_free(sizeof(CulBBTree), t);
 }
 
-static inline void cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth, cul_bool is_unique) {
+static inline CulBBTree *cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth, cul_bool is_unique) {
 	t->root = root;
 	t->cmp = cmp;
 	t->nodes = nodes;
 	t->depth = depth;
 	t->is_unique = is_unique;
+	return t;
 }
 
 static inline CulBBTreeNode *cul_bbtree_node_new_struct(void) {
@@ -52,16 +53,7 @@ CulBBTree *cul_bbtree_new(cul_cmp_f *cmp) {
 	CulBBTree *t;
 	if( (t = cul_bbtree_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
-	if( cul_bbtree_init(t, cmp) == NULL ) {
-		cul_bbtree_free_struct(t);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EINIT);
-	}
-	return t;
-}
-
-CulBBTree *cul_bbtree_init(CulBBTree *t, cul_cmp_f *cmp) {
-	cul_bbtree_init_struct(t, NULL, cmp, 0, 0, CUL_TRUE);
-	return t;
+	return cul_bbtree_init_struct(t, NULL, cmp, 0, 0, CUL_TRUE);
 }
 
 void cul_bbtree_free(CulBBTree *t, cul_free_f *free_data) {

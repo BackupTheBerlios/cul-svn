@@ -4,7 +4,6 @@
 #include <cul/cul_global_base.h>
 
 typedef enum _CulErrno CulErrno;
-typedef enum _CulErrnoMsg CulErrnoMsg;
 
 enum _CulErrno {
 	CUL_FAILURE  = -1,
@@ -12,13 +11,11 @@ enum _CulErrno {
 
 	CUL_ESTUB,
 	CUL_EINVAL,
-	CUL_EINIT,
 	CUL_EFAILED,
 	CUL_ENOMEM,
 	CUL_EBADLEN,
 	CUL_EBADPOS,
 	CUL_EPRINTF,
-	CUL_ESPRINTF,
 	CUL_ESCANF,
 	CUL_EARGMISS,
 	CUL_EARGUNK,

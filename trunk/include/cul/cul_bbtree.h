@@ -1,13 +1,15 @@
-#if !defined(CUL_TREE_BB_H)
-#define CUL_TREE_BB_H
+#ifndef CUL_BBTREE_H
+#define CUL_BBTREE_H
 
 #include <cul/cul_global.h>
 
-typedef struct _CulBBTree CulBBTree;
+#define CUL_BBTREE(ptr)     ((CulBBTree *)(ptr))
+#define CUL_BBTREENODE(ptr) ((CulBBTreeNode *)(ptr))
+
+typedef struct _CulBBTree     CulBBTree;
 typedef struct _CulBBTreeNode CulBBTreeNode;
 
 CulBBTree *cul_bbtree_new(cul_cmp_f *cmp);
-CulBBTree *cul_bbtree_init(CulBBTree *t, cul_cmp_f *cmp);
 void cul_bbtree_free(CulBBTree *t, cul_free_f *free_node);
 
 size_t cul_bbtree_nodes(const CulBBTree *t);
@@ -26,4 +28,4 @@ CulBBTreeNode *cul_bbtree_node_next(CulBBTreeNode *tn);
 CulBBTreeNode *cul_bbtree_node_prev(CulBBTreeNode *tn);
 cul_ptr *cul_bbtree_node_data(CulBBTreeNode *tn);
 
-#endif
+#endif /* CUL_BBTREE_H */

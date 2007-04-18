@@ -1,9 +1,10 @@
 #include <cul/cul_arg.h>
-
-#include <cul/cul_io.h>
+#include <cul/cul_stream.h>
+#include <cul/cul_base.h>
 #include <cul/cul_str.h>
-#include <cul/cul_base_char.h>
-#include <cul/cul_base_ptr.h>
+
+#include <stdlib.h>
+#include <string.h>
 
 /* private functions */
 static CulArg *_cul_arg_next(CulArg *t);
@@ -27,7 +28,7 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 
 		if( *arg == '-' ) {
 			if( *(++arg) == '-' ) {
-				if( cul_strisnull(++arg) )
+				if( *(++arg) == CUL_STR_NULL )
 					/* finish parsing */
 					break;
 
@@ -41,7 +42,7 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 				/* parse next options */
 				continue;
 			}
-			if( cul_strisnull(arg) )
+			if( *arg == CUL_STR_NULL )
 				return CUL_EARGUNK;
 
 			/* short option */
@@ -72,17 +73,17 @@ void cul_arg_print_help(CulArg *table) {
 	while( t ) {
 		switch( t->flags & ~CUL_ARG_TYPE_MASK ) {
 			case CUL_ARG_HELP:
-				cul_printf_stream("%s\n", t->desciption);
+				fprintf(cul_stream_get(), "%s\n", t->desciption);
 				break;
 			default:
 				if( t->short_name ) {
 					if( t->long_name )
-						cul_printf_stream("  -%c, --%-16s  %s\n", t->short_name, t->long_name, t->desciption);
+						fprintf(cul_stream_get(),"  -%c, --%-16s  %s\n", t->short_name, t->long_name, t->desciption);
 					else
-						cul_printf_stream("  -%-21c  %s\n", t->short_name, t->desciption);
+						fprintf(cul_stream_get(),"  -%-21c  %s\n", t->short_name, t->desciption);
 				}
 				else if( t->long_name )
-					cul_printf_stream(  "  --%-20s  %s\n", t->long_name, t->desciption);
+					fprintf(cul_stream_get(),  "  --%-20s  %s\n", t->long_name, t->desciption);
 				break;
 		}
 		t = _cul_arg_next(t);
@@ -97,7 +98,7 @@ void cul_arg_free(CulArg *table) {
 			flag &= CUL_ARG_TYPE_MASK;
 
 			if( flag == CUL_ARG_STR )
-				cul_free(*((char **)table->value));
+				free(*((char **)table->value));
 			else if( flag == CUL_ARG_STRV )
 				cul_strv_free(*((char ***)table->value));
 		}
@@ -130,15 +131,15 @@ CulArg *cul_arg_search_long(CulArg *t, const char *arg) {
 	const char *pos;
 	size_t length;
 
-	if( (pos = cul_strchr(arg,'=')) )
+	if( (pos = strchr(arg,'=')) )
 		length = pos - arg;
 	else
-		length = cul_strlen(arg);
+		length = strlen(arg);
 
 	while( t != NULL ) {
 		if( t->long_name != NULL &&
-				( !cul_strncmp(arg, t->long_name, length) &&
-				cul_strisnull(t->long_name + length)) )
+				( !strncmp(arg, t->long_name, length) &&
+				t->long_name[length] == CUL_STR_NULL) )
 			break;
 		t = _cul_arg_next_option(t);
 	}
@@ -196,7 +197,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 				return CUL_EARGCONV;
 
 			/* end of multiple bool short flags */
-			if( cul_strisnull(++arg_string) ) {
+			if( *(++arg_string) == CUL_STR_NULL ) {
 				_cul_arg_cmd_next(argc, argv);
 				return CUL_SUCCESS;
 			}
@@ -207,7 +208,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 			/* if not bool we have to move to flag option */
 			if( !is_option_bool ) {
 				/* check if there is something after flag */
-				if( !cul_strisnull(arg_string+1) ) {
+				if( *(arg_string+1) != CUL_STR_NULL ) {
 					/* option is right after flag */
 					++arg_string;
 					size = 1;
@@ -225,7 +226,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 				/* this is first of possible multiple bool options */
 
 				/* check if we have more flags */
-				if( !cul_strisnull(++arg_string) ) {
+				if( *(++arg_string) != CUL_STR_NULL ) {
 					is_multi_flag = CUL_TRUE;
 					size = 0;
 				} else
@@ -250,7 +251,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 
 static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table, size_t pos) {
 	const char *arg_string = **argv + 2;
-	const char *arg_option = cul_strchr(arg_string, '=');
+	const char *arg_option = strchr(arg_string, '=');
 	CulArg *t;
 
 	/* check if we have option */
@@ -310,7 +311,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 			break;
 		case CUL_ARG_INT:
 			if( *arg ) {
-				long tmp = cul_strtol(arg, &end, 10);
+				long tmp = strtol(arg, &end, 10);
 				if( !*end && tmp == (int)tmp ) {
 					*((int *)t->value) = (int)tmp;
 					break;
@@ -319,7 +320,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 			return CUL_FALSE;
 		case CUL_ARG_DOUBLE:
 			if( *arg ) {
-				double tmp = cul_strtod(arg, &end);
+				double tmp = strtod(arg, &end);
 				if( !*end ) {
 					*((double *)t->value) = tmp;
 					break;
@@ -332,7 +333,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 				if( tmp != NULL ) {
 					/* free old string, only if already found */
 					if( t->value && (t->flags & CUL_ARG_FOUND) )
-						cul_free(*((char **)t->value));
+						free(*((char **)t->value));
 					*((char **)t->value) = tmp;
 					break;
 				}
@@ -343,7 +344,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 				char **strv = *((char ***)t->value);
 				size_t size = strv == NULL? 0: cul_strv_size(strv);
 
-				char **tmpv = cul_malloc( (size+2)*sizeof(char *) );
+				char **tmpv = malloc( (size+2)*sizeof(char *) );
 				if( tmpv != NULL ) {
 					char *tmp = cul_strdup(arg);
 					if( tmp != NULL ) {
@@ -351,15 +352,15 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 						/* copy old strv and free previous content if needed */
 						if( strv != NULL ) {
 							if( t->flags & CUL_ARG_FOUND ) {
-								cul_memcpy(tmpv, strv, size*sizeof(char **));
-								cul_free(strv);
+								memcpy(tmpv, strv, size*sizeof(char **));
+								free(strv);
 							}	else {
 								/* we have to duplicate default values */
 								/* consitency requirement for free routine */
 								for( size_t i=0; i<size; ++i)
 									if( (tmpv[i] = cul_strdup(strv[i])) == NULL ) {
 										cul_strv_free(tmpv);
-										cul_free(tmp);
+										free(tmp);
 										return CUL_FALSE;
 									}
 							}
@@ -372,7 +373,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 						*((char ***)t->value) = tmpv;
 						break;
 					} else
-						cul_free(tmpv);
+						free(tmpv);
 				}
 			}
 			return CUL_FALSE;
