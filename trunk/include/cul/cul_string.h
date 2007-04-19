@@ -12,8 +12,9 @@ typedef struct _CulString CulString;
  *  
  * CulString is similar to standard C string, except that it automatically
  * changes its size during various operations like text insert, cut or trim.
- * All operation are invatiant to nul bytes so it can be used to hold binary
- * data. On other hand it can also be used as standard C string.
+ * All operation are invatiant to null bytes so it can be used to hold binary
+ * data . On other hand it can also be used as standard C string as it end 
+ * always with null character.
  */
 struct _CulString {
 	char *str;       /**< points to actual character data */
@@ -40,7 +41,6 @@ CulString *cul_string_new_empty();
 CulString *cul_string_new_printf(const char *format, ...);
 CulString *cul_string_new_str(const char *str);
 CulString *cul_string_new_block(const char *block, size_t size);
-CulString *cul_string_new_size(size_t size);
 
 void cul_string_free(CulString *s);
 
@@ -71,17 +71,19 @@ CulString *cul_string_cut_begin(CulString *s, size_t size);
 CulString *cul_string_cut_end(CulString *s, size_t size);
 
 int cul_string_compare(const CulString *s, const CulString *compare);
-int cul_string_compare_raw(const CulString *s, const char *compare);
-int cul_string_compare_pos(const CulString *s, size_t pos, const CulString *compare);
-int cul_string_compare_pos_raw(const CulString *s, size_t pos, const char *compare);
-int cul_string_compare_pos_raw_size(const CulString *s, size_t pos, const char *compare, size_t size);
+int cul_string_compare_str(const CulString *s, const char *compare);
+int cul_string_compare_block(const CulString *s, const char *compare, size_t size);
+
+int cul_string_subcompare(const CulString *s, size_t pos, const CulString *compare);
+int cul_string_subcompare_str(const CulString *s, size_t pos, const char *compare);
+int cul_string_subcompare_block(const CulString *s, size_t pos, const char *compare, size_t size);
 
 cul_bool cul_string_equal(const CulString *s, const CulString *compare);
-cul_bool cul_string_equal_raw(const CulString *s, const char *compare);
+cul_bool cul_string_equal_str(const CulString *s, const char *compare);
 cul_bool cul_string_start_with(const CulString *s, const CulString *prefix);
-cul_bool cul_string_start_with_raw(const CulString *s, const char *prefix);
+cul_bool cul_string_start_with_str(const CulString *s, const char *prefix);
 cul_bool cul_string_end_with(const CulString *s, const CulString *postfix);
-cul_bool cul_string_end_with_raw(const CulString *s, const char *postfix);
+cul_bool cul_string_end_with_str(const CulString *s, const char *postfix);
 
 CulString *cul_string_trim(CulString *s);
 CulString *cul_string_trim_left(CulString *s);

@@ -66,24 +66,15 @@ CulString *cul_string_new_block(const char *block, size_t size) {
 			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 		}
 
-		/* copy string if needed */
-		if( block == NULL ) {
-			str[0] = CUL_STR_NULL;
-			cul_string_init_struct(s, 0, size+1, str);
-		} else {
-			memcpy(str, block, size*sizeof(char));
-			str[size] = CUL_STR_NULL;
-			cul_string_init_struct(s, size, size+1, str);
-		}
+		/* copy string */
+		memcpy(str, block, size*sizeof(char));
+		str[size] = CUL_STR_NULL;
+		cul_string_init_struct(s, size, size+1, str);
 	}
 	else
 		cul_string_init_struct(s, 0, 0, NULL);
 
 	return s;
-}
-
-CulString *cul_string_new_size(size_t size) {
-	return cul_string_new_block(NULL, size);
 }
 
 void cul_string_free(CulString *s) {
@@ -178,13 +169,9 @@ CulString *cul_string_copy_block(CulString *s, const char *copy, size_t size) {
 	/* set new string size */
 	s->size = size;
 
-	/* copy block if needed */
-	if( copy == NULL )
-		s->str[0] = CUL_STR_NULL;
-	else {
-		memcpy(s->str, copy, size*sizeof(char));
-		s->str[size] = CUL_STR_NULL;
-	}
+	/* copy block */
+	memcpy(s->str, copy, size*sizeof(char));
+	s->str[size] = CUL_STR_NULL;
 
 	return s;
 }
@@ -279,7 +266,7 @@ CulString *cul_string_insert_printf(CulString *s, size_t pos, const char *format
 }
 
 CulString *cul_string_insert_str(CulString *s, size_t pos, const char *insert) {
-	return ( insert == NULL )? s: cul_string_insert_block(s, pos, insert, strlen(insert));
+	return (insert == NULL)? s: cul_string_insert_block(s, pos, insert, strlen(insert));
 }
 
 CulString *cul_string_insert_block(CulString *s, size_t pos, const char *insert, size_t size) {
@@ -348,125 +335,81 @@ CulString *cul_string_cut_end(CulString *s, size_t size) {
 }
 
 int cul_string_compare(const CulString *s, const CulString *compare) {
-	return cul_string_compare_pos_raw_size(s, 0, compare->str, compare->size);
+	return memcmp(s->str, compare->str, s->size > compare->size? compare->size+1: s->size+1);
 }
 
-int cul_string_compare_raw(const CulString *s, const char *compare) {
-	return (compare == NULL)? 0: cul_string_compare_pos_raw_size(s, 0, compare, strlen(compare));
-}
-
-int cul_string_compare_pos(const CulString *s, size_t pos, const CulString *compare) {
-	return cul_string_compare_pos_raw_size(s, pos, compare->str, compare->size);
-}
-
-int cul_string_compare_pos_raw(const CulString *s, size_t pos, const char *compare) {
-	return ( compare == NULL )? 0: cul_string_compare_pos_raw_size(s, pos, compare, strlen(compare));
-}
-
-int cul_string_compare_pos_raw_size(const CulString *s, size_t pos, const char *compare, size_t size) {
-	if( size == 0 )
+int cul_string_compare_str(const CulString *s, const char *compare) {
+	if( compare == NULL )
 		return 0;
 
-	/* assume pos = s->size */
-	if( pos > s->size )
-		return compare[0];
+	const size_t size = strlen(compare);
+	return memcmp(s->str, compare, s->size > size? size+1: s->size+1);
+}
 
+int cul_string_subcompare(const CulString *s, size_t pos, const CulString *compare) {
+	return cul_string_subcompare_block(s, pos, compare->str, compare->size);
+}
+
+int cul_string_subcompare_str(const CulString *s, size_t pos, const char *compare) {
+	return (compare == NULL)? 0: 	cul_string_subcompare_block(s, pos, compare, strlen(compare));
+}
+
+int cul_string_subcompare_block(const CulString *s, size_t pos, const char *compare, size_t size) {
+	/* we have to include string nul terminator to return correct result
+		 possible similarity on all characters, but s is shorter that block */
+	pos = pos > s->size? s->size: pos;
+	size = s->size - pos > size? size: s->size - pos + 1;
 	return memcmp(s->str + pos, compare, size);
 }
 
-cul_bool cul_string_equal(const CulString *s, const CulString *compare);
-cul_bool cul_string_equal_raw(const CulString *s, const char *compare);
-cul_bool cul_string_start_with(const CulString *s, const CulString *prefix);
-cul_bool cul_string_start_with_raw(const CulString *s, const char *prefix);
-cul_bool cul_string_end_with(const CulString *s, const CulString *postfix);
-cul_bool cul_string_end_with_raw(const CulString *s, const char *postfix);
-
-
-cul_bool cul_string_start_with(const CulString *s, const CulString *prefix) {
-	if( s->size >= prefix->size ) {
-		if( cul_string_isempty(prefix) )
-			return CUL_TRUE;
-
-		const char *str = s->str;
-		const char *str_prefix = prefix->str;
-		const size_t size_prefix = prefix->size;
-		for( size_t i=0; i<size_prefix; ++i, ++str_prefix, ++str)
-			if( *str_prefix != *str )
-				return CUL_FALSE;
+cul_bool cul_string_equal(const CulString *s, const CulString *compare) {
+	if( cul_string_compare(s, compare) == 0 )
 		return CUL_TRUE;
-	}
 	return CUL_FALSE;
 }
 
-cul_bool cul_string_start_with_raw(const CulString *s, const char *prefix) {
+cul_bool cul_string_equal_str(const CulString *s, const char *compare) {
+	if( cul_string_compare_str(s, compare) == 0 )
+		return CUL_TRUE;
+	return CUL_FALSE;
+}
+
+cul_bool cul_string_start_with(const CulString *s, const CulString *prefix) {
+	if( cul_string_subcompare_block(s, 0, prefix->str, prefix->size) == 0 )
+		return CUL_TRUE;
+	return CUL_FALSE;
+}
+
+cul_bool cul_string_start_with_str(const CulString *s, const char *prefix) {
 	if( prefix == NULL )
 		return CUL_TRUE;
-
-	if( cul_string_isempty(s) && !(*prefix) )
-		return CUL_FALSE;
-
-	const char *str = s->str;
-	while( *prefix )
-		if( *prefix++ != *str++)
-			return CUL_FALSE;
-	return CUL_TRUE;
+	if( cul_string_subcompare_block(s, 0, prefix, strlen(prefix)) == 0 )
+		return CUL_TRUE;
+	return CUL_FALSE;
 }
 
 cul_bool cul_string_end_with(const CulString *s, const CulString *postfix) {
-	if( s->size >= postfix->size ) {
-		if( cul_string_isempty(postfix) )
-			return CUL_TRUE;
+	/* we have to check size -> possible unsigned variables substraction error */
+	if( postfix->size > s->size )
+		return CUL_FALSE;
 
-		const char *str = s->str + s->size - 1;
-		const char *str_postfix = postfix->str + postfix->size - 1;
-		const size_t size_postfix = postfix->size;
-		for( size_t i=0; i<size_postfix; ++i, --str_postfix, --str)
-			if( *str_postfix != *str )
-				return CUL_FALSE;
+	if( cul_string_subcompare_block(s, s->size - postfix->size, postfix->str, postfix->size) == 0 )
 		return CUL_TRUE;
-
-	}
 	return CUL_FALSE;
 }
 
-cul_bool cul_string_end_with_raw(const CulString *s, const char *postfix) {
+cul_bool cul_string_end_with_str(const CulString *s, const char *postfix) {
 	if( postfix == NULL )
 		return CUL_TRUE;
 
-	if( cul_string_isempty(s) && !(*postfix) )
+	const size_t size = strlen(postfix);
+	/* we have to check size -> possible unsigned variables substraction error */
+	if( size > s->size )
 		return CUL_FALSE;
 
-	/* go to the end of string */
-	size_t size_postfix;
-	for( size_postfix=0; *postfix; ++postfix)
-		++size_postfix;
-	--postfix;
-
-	const char *str = s->str + s->size - 1;
-	for( size_t i=0; i<size_postfix; ++i, --postfix, --str)
-		if( *postfix != *str )
-			return CUL_FALSE;
-	return CUL_TRUE;
-}
-
-cul_bool cul_string_equal(const CulString *s, const CulString *compare) {
-	if( s->size == compare->size ) {
-
-		const char *str = s->str;
-		const char *str_compare = compare->str;
-		const size_t size_compare = compare->size;
-		for( size_t i=0; i<size_compare; ++i, ++str_compare, ++str)
-			if( *str_compare != *str )
-				return CUL_FALSE;
+	if( cul_string_subcompare_block(s, s->size - size, postfix, size) == 0 )
 		return CUL_TRUE;
-	}
 	return CUL_FALSE;
-}
-
-cul_bool cul_string_equal_raw(const CulString *s, const char *compare) {
-	if( compare == NULL )
-		return cul_string_isnull(s)? CUL_TRUE: CUL_FALSE;
-	return (strcmp(s->str, compare) == 0);
 }
 
 CulString *cul_string_trim(CulString *s) {
