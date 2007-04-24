@@ -45,6 +45,7 @@ SET(CUL_SOURCES
 	src/cul_log.c
 	src/cul_matrix.c
 	src/cul_mem.c
+	src/cul_permutation.c
 	src/cul_random.c
 	src/cul_rng.c
 	src/cul_tree.c
@@ -65,14 +66,14 @@ SET(CUL_SOURCES
 	src/base/cul_base_stat.c
 )
 
-# headers directories
-SET(CUL_HEADERS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
-SET(CUL_HEADERS_PRIVATE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/private")
-SET(CUL_CONFIG_DIR "${PROJECT_BINARY_DIR}")
+# set output directories
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-# more directories
-SET(CUL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}")
-SET(CUL_EXECUTABLE_DIR "${EXECUTABLE_OUTPUT_PATH}")
+# headers directories
+SET(CUL_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+SET(CUL_HEADERS_PRIVATE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/private)
+SET(CUL_CONFIG_DIR ${PROJECT_BINARY_DIR})
 
 # create configuration
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cul_config.h.in "${CUL_CONFIG_DIR}/cul/cul_config.h" ESCAPE_QUOTES)
@@ -96,4 +97,4 @@ ENDIF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 
 # testing
 ENABLE_TESTING()
-ADD_SUBDIRECTORY(tests)
+INCLUDE(CMakeTests.txt)
