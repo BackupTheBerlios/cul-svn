@@ -30,24 +30,6 @@ static inline CulIVectorView *cul_ivectorview_new_struct(void);
 static inline void cul_ivectorview_free_struct(CulIVectorView *vv);
 static inline CulIVectorView *cul_ivectorview_init_struct(CulIVectorView *vv, int *data, size_t size, size_t stride);
 
-CulIVector *cul_ivector_new(size_t size);
-CulIVector *cul_ivector_new_empty(void);
-void cul_ivector_free(CulIVector *v);
-
-CulIVectorView *cul_ivectorview_new(void);
-void cul_ivectorview_free(CulIVectorView *vv);
-
-CulIVectorView *cul_ivectorview_vector(CulIVectorView *vv, const CulIVector *base_v);
-CulIVectorView *cul_ivectorview_subvector(CulIVectorView *vv, const CulIVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
-
-void cul_ivector_set_all(CulIVector *v, int val);
-void cul_ivector_set_zero(CulIVector *v);
-void cul_ivector_set_basis(CulIVector *v, size_t index);
-
-void cul_ivectorview_set_all(CulIVectorView *vv, int val);
-void cul_ivectorview_set_zero(CulIVectorView *vv);
-void cul_ivectorview_set_basis(CulIVectorView *vv, size_t index);
-
 static inline int cul_ivector_get(const CulIVector *v, size_t x);
 static inline void cul_ivector_set(CulIVector *v, size_t x, int val);
 static inline int *cul_ivector_ptr(CulIVector *v, size_t x);
@@ -58,6 +40,22 @@ static inline void cul_ivectorview_set(CulIVectorView *vv, size_t x, int val);
 static inline int *cul_ivectorview_ptr(CulIVectorView *vv, size_t x);
 static inline int *cul_ivectorview_next(CulIVectorView *vv, int *ptr);
 
+CulIVector     *cul_ivector_new(size_t size);
+CulIVector     *cul_ivector_new_empty(void);
+void            cul_ivector_free(CulIVector *v);
+CulIVectorView *cul_ivectorview_new(void);
+void            cul_ivectorview_free(CulIVectorView *vv);
+
+CulIVectorView *cul_ivectorview_vector(CulIVectorView *vv, const CulIVector *base_v);
+CulIVectorView *cul_ivectorview_subvector(CulIVectorView *vv, const CulIVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
+
+void      cul_ivector_set_all(CulIVector *v, int val);
+void      cul_ivector_set_zero(CulIVector *v);
+void      cul_ivector_set_basis(CulIVector *v, size_t index);
+void      cul_ivectorview_set_all(CulIVectorView *vv, int val);
+void      cul_ivectorview_set_zero(CulIVectorView *vv);
+void      cul_ivectorview_set_basis(CulIVectorView *vv, size_t index);
+
 cul_errno cul_ivector_copy(CulIVector *v, const CulIVector *base_v);
 cul_errno cul_ivector_copy_offset(CulIVector *v, const CulIVector *base_v, size_t offset);
 cul_errno cul_ivector_copy_subvector(CulIVector *v, const CulIVector *base_v, size_t base_offset);
@@ -66,53 +64,49 @@ cul_errno cul_ivectorview_copy(CulIVectorView *vv, const CulIVectorView *base_vv
 
 cul_errno cul_ivector_swap(CulIVector *a, CulIVector *b);
 cul_errno cul_ivectorview_swap(CulIVectorView *va, CulIVectorView *vb);
-void cul_ivector_reverse(CulIVector *v);
-void cul_ivectorview_reverse(CulIVectorView *vv);
+void      cul_ivector_reverse(CulIVector *v);
+void      cul_ivectorview_reverse(CulIVectorView *vv);
 
-CulIVector *cul_ivector_resize(CulIVector *v, size_t size);
-CulIVector *cul_ivector_reserve(CulIVector *v, size_t size);
-CulIVector *cul_ivector_push_back(CulIVector *v, int val);
-CulIVector *cul_ivector_pop_back(CulIVector *v);
+cul_errno cul_ivector_resize(CulIVector *v, size_t size);
+cul_errno cul_ivector_reserve(CulIVector *v, size_t size);
+cul_errno cul_ivector_push_back(CulIVector *v, int val);
+cul_errno cul_ivector_pop_back(CulIVector *v);
 
-int cul_ivector_min(const CulIVector *v);
-size_t cul_ivector_min_index(const CulIVector *v);
-int cul_ivector_max(const CulIVector *v);
-size_t cul_ivector_max_index(const CulIVector *v);
-void cul_ivector_minmax(const CulIVector *v, int *min, int *max);
-void cul_ivector_minmax_index(const CulIVector *v, size_t *min_i, size_t *max_i);
+int       cul_ivector_min(const CulIVector *v);
+size_t    cul_ivector_min_index(const CulIVector *v);
+int       cul_ivector_max(const CulIVector *v);
+size_t    cul_ivector_max_index(const CulIVector *v);
+void      cul_ivector_minmax(const CulIVector *v, int *min, int *max);
+void      cul_ivector_minmax_index(const CulIVector *v, size_t *min_i, size_t *max_i);
+int       cul_ivectorview_min(const CulIVectorView *vv);
+size_t    cul_ivectorview_min_index(const CulIVectorView *vv);
+int       cul_ivectorview_max(const CulIVectorView *vv);
+size_t    cul_ivectorview_max_index(const CulIVectorView *vv);
+void      cul_ivectorview_minmax(const CulIVectorView *vv, int *min, int *max);
+void      cul_ivectorview_minmax_index(const CulIVectorView *vv, size_t *min_i, size_t *max_i);
 
-int cul_ivectorview_min(const CulIVectorView *vv);
-size_t cul_ivectorview_min_index(const CulIVectorView *vv);
-int cul_ivectorview_max(const CulIVectorView *vv);
-size_t cul_ivectorview_max_index(const CulIVectorView *vv);
-void cul_ivectorview_minmax(const CulIVectorView *vv, int *min, int *max);
-void cul_ivectorview_minmax_index(const CulIVectorView *vv, size_t *min_i, size_t *max_i);
+double    cul_ivector_sum(const CulIVector *v);
+double    cul_ivector_mean(const CulIVector *v);
+double    cul_ivector_variance(const CulIVector *v, double mean);
+double    cul_ivectorview_sum(const CulIVectorView *vv);
+double    cul_ivectorview_mean(const CulIVectorView *vv);
+double    cul_ivectorview_variance(const CulIVectorView *vv, double mean);
 
-double cul_ivector_sum(const CulIVector *v);
-double cul_ivector_mean(const CulIVector *v);
-double cul_ivector_variance(const CulIVector *v, double mean);
+void      cul_ivector_sort_asc(CulIVector *v);
+void      cul_ivector_sort_desc(CulIVector *v);
+size_t    cul_ivector_unique(CulIVector *v);
+void      cul_ivectorview_sort_asc(CulIVectorView *vv);
+void      cul_ivectorview_sort_desc(CulIVectorView *vv);
+size_t    cul_ivectorview_unique(CulIVectorView *vv);
 
-double cul_ivectorview_sum(const CulIVectorView *vv);
-double cul_ivectorview_mean(const CulIVectorView *vv);
-double cul_ivectorview_variance(const CulIVectorView *vv, double mean);
-
-void cul_ivector_sort_asc(CulIVector *v);
-void cul_ivector_sort_desc(CulIVector *v);
-void cul_ivectorview_sort_asc(CulIVectorView *vv);
-void cul_ivectorview_sort_desc(CulIVectorView *vv);
-
-size_t cul_ivector_unique(CulIVector *v);
-size_t cul_ivectorview_unique(CulIVectorView *vv);
-
-void cul_ivector_add_scalar(CulIVector *v, int val);
-void cul_ivector_mul_scalar(CulIVector *v, int val);
+void      cul_ivector_add_scalar(CulIVector *v, int val);
+void      cul_ivector_mul_scalar(CulIVector *v, int val);
 cul_errno cul_ivector_add(CulIVector *a, const CulIVector *b);
 cul_errno cul_ivector_sub(CulIVector *a, const CulIVector *b);
 cul_errno cul_ivector_mul(CulIVector *a, const CulIVector *b);
 cul_errno cul_ivector_div(CulIVector *a, const CulIVector *b);
-
-void cul_ivectorview_add_scalar(CulIVectorView *vv, int val);
-void cul_ivectorview_mul_scalar(CulIVectorView *vv, int val);
+void      cul_ivectorview_add_scalar(CulIVectorView *vv, int val);
+void      cul_ivectorview_mul_scalar(CulIVectorView *vv, int val);
 cul_errno cul_ivectorview_add(CulIVectorView *va, const CulIVectorView *vb);
 cul_errno cul_ivectorview_sub(CulIVectorView *va, const CulIVectorView *vb);
 cul_errno cul_ivectorview_mul(CulIVectorView *va, const CulIVectorView *vb);
