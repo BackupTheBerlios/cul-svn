@@ -71,20 +71,14 @@
 
 void FUNCTION(swap)(ATOM *data_a, ATOM *data_b, size_t size) {
 	ATOM tmp, *const end = data_a + size;
-	for( ; data_a < end; ++data_a, ++data_b) {
-		tmp = *data_a;
-		*data_a = *data_b;
-		*data_b = tmp;
-	}
+	for( ; data_a < end; ++data_a, ++data_b)
+		CUL_SWAP(*data_a, *data_b, tmp);
 }
 
 void FUNCTION(swap_stride)(ATOM *data_a, ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
 	ATOM tmp, *const end = data_a + size * stride_a;
-	for( ; data_a < end; data_a += stride_a, data_b += stride_b) {
-		tmp = *data_a;
-		*data_a = *data_b;
-		*data_b = tmp;
-	}
+	for( ; data_a < end; data_a += stride_a, data_b += stride_b)
+		CUL_SWAP(*data_a, *data_b, tmp);
 }
 
 void FUNCTION(swap_tda)(ATOM *data_a, ATOM *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b) {
@@ -95,31 +89,57 @@ void FUNCTION(swap_tda)(ATOM *data_a, ATOM *data_b, size_t size, size_t tda_size
 	/* move through all rows */
 	for( tda_end = data_b + tda_size; data_b < end; tda_end += tda_b) {
 		/* copy one row */
-		for( ; data_b < tda_end; ++data_a, ++data_b) {
-			tmp = *data_a;
-			*data_a = *data_b;
-			*data_b = tmp;
-		}
+		for( ; data_b < tda_end; ++data_a, ++data_b)
+			CUL_SWAP(*data_a, *data_b, tmp);
 		/* adjust size, tda_stride empty space */
 		data_a += tda_stride_a;
 		data_b += tda_stride_b;
 	}
 }
 
+void FUNCTION(permute)(ATOM *data, size_t *permutation, size_t size) {
+	ATOM tmp;
+
+	for( size_t k=0; k<size; ++k) {
+		size_t k0, kn = permutation[k];
+
+		for( k0 = kn; kn<k; k0 = kn)
+			kn = permutation[ k0 ];
+
+		if( kn == k )
+			continue;
+
+		CUL_SWAP(data[kn], data[k], tmp);
+	}
+}
+
+void FUNCTION(permute_stride)(ATOM *data, size_t *permutation, size_t size, size_t stride) {
+	ATOM tmp;
+
+	/* adjust size to actual number of items */
+	size /= stride;
+
+	for( size_t k=0; k<size; ++k) {
+		size_t k0, kn = permutation[k];
+
+		for( k0 = kn; kn<k; k0 = kn)
+			kn = permutation[ k0 ];
+
+		if( kn == k )
+			continue;
+
+		CUL_SWAP(data[kn*stride], data[k*stride], tmp);
+	}
+}
+
 void FUNCTION(reverse)(ATOM *data, size_t size) {
 	ATOM tmp, *end;
-	for( end = data + size - 1; data < end; ++data, --end) {
-		tmp = *data;
-		*data = *end;
-		*end = tmp;
-	}
+	for( end = data + size - 1; data < end; ++data, --end)
+		CUL_SWAP(*data, *end, tmp);
 }
 
 void FUNCTION(reverse_stride)(ATOM *data, size_t size, size_t stride) {
 	ATOM tmp, *end;
-	for( end = data + (size - 1) * stride; data < end; data += stride, end -= stride) {
-		tmp = *data;
-		*data = *end;
-		*end = tmp;
-	}
+	for( end = data + (size - 1) * stride; data < end; data += stride, end -= stride)
+		CUL_SWAP(*data, *end, tmp);
 }
