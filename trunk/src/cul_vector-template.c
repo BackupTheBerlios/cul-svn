@@ -146,56 +146,56 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *vv) {
 	FUNCTION(reverse_stride)(vv->data, vv->size, vv->stride);
 }
 
-TYPE(Vector) *FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
+cul_errno FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
 
 	if( size == 0 ) {
 		free(v->data);
 		FUNCTION(vector_init_struct)(v, NULL, 0, 0);
-		return v;
+		return CUL_SUCCESS;
 	}
 	else if( size >= v->size && size <= v->reserved ) {
 		v->size = size;
-		return v;
+		return CUL_SUCCESS;
 	}
 	else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
 
 	FUNCTION(vector_init_struct)(v, d, size, size);
-	return v;
+	return CUL_SUCCESS;
 }
 
-TYPE(Vector) *FUNCTION(vector_reserve)(TYPE(Vector) *v, size_t size) {
+cul_errno FUNCTION(vector_reserve)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
 
 	if( size == 0 ) {
 		free(v->data);
 		FUNCTION(vector_init_struct)(v, NULL,  0, 0);
-		return v;
+		return CUL_SUCCESS;
 	}
 	else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
 
 	if( size < v->size )
 		FUNCTION(vector_init_struct)(v, d, size, size);
 	else
 		FUNCTION(vector_init_struct)(v, d, size, v->size);
-	return v;
+	return CUL_SUCCESS;
 }
 
-TYPE(Vector) *FUNCTION(vector_push_back)(TYPE(Vector) *v, ATOM val) {
+cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *v, ATOM val) {
 	if( v->size >= v->reserved )
-		if( FUNCTION(vector_reserve)(v, (v->size + 1)*CUL_EFACTOR_MUL + CUL_EFACTOR_SUM) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		if( FUNCTION(vector_reserve)(v, (v->size + 1)*CUL_EFACTOR_MUL + CUL_EFACTOR_SUM) )
+			CUL_ERROR_ERRNO_RET_VAL(CUL_EFAILED, CUL_EFAILED);
 
 	v->size += 1;
 	FUNCTION(vector_set)(v, v->size - 1, val);
-	return v;
+	return CUL_SUCCESS;
 }
 
-TYPE(Vector) *FUNCTION(vector_pop_back)(TYPE(Vector) *v) {
+cul_errno FUNCTION(vector_pop_back)(TYPE(Vector) *v) {
 	v->size -= 1;
-	return v;
+	return CUL_SUCCESS;
 }
 
 ATOM FUNCTION(vector_min)(const TYPE(Vector) *v) {
