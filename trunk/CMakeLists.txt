@@ -68,7 +68,6 @@ SET(CUL_SOURCES
 
 # set output directories
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 # headers directories
 SET(CUL_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -98,3 +97,6 @@ ENDIF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 # testing
 ENABLE_TESTING()
 INCLUDE(CMakeTests.txt)
+
+# auto build test cases
+ADD_SUBDIRECTORY(tests)

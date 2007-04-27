@@ -97,7 +97,7 @@ void FUNCTION(swap_tda)(ATOM *data_a, ATOM *data_b, size_t size, size_t tda_size
 	}
 }
 
-void FUNCTION(permute)(ATOM *data, size_t *permutation, size_t size) {
+void FUNCTION(permute)(ATOM *data, const size_t *permutation, size_t size) {
 	ATOM tmp;
 
 	for( size_t k=0; k<size; ++k) {
@@ -113,7 +113,7 @@ void FUNCTION(permute)(ATOM *data, size_t *permutation, size_t size) {
 	}
 }
 
-void FUNCTION(permute_stride)(ATOM *data, size_t *permutation, size_t size, size_t stride) {
+void FUNCTION(permute_stride)(ATOM *data, const size_t *permutation, size_t size, size_t stride) {
 	ATOM tmp;
 
 	/* adjust size to actual number of items */

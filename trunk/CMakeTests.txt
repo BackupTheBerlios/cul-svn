@@ -1,7 +1,7 @@
 ADD_TEST(cul_base-test ${CMAKE_CTEST_COMMAND}
 	--build-and-test
 	${CMAKE_CURRENT_SOURCE_DIR}/test
-	${CMAKE_CURRENT_BINARY_DIR}/test
+	${CMAKE_CURRENT_BINARY_DIR}
 	--build-two-config
 	--build-generator ${CMAKE_GENERATOR}
 	--build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -12,7 +12,7 @@ ADD_TEST(cul_base-test ${CMAKE_CTEST_COMMAND}
 ADD_TEST(cul_rng-test ${CMAKE_CTEST_COMMAND}
 	--build-and-test
 	${CMAKE_CURRENT_SOURCE_DIR}/test
-	${CMAKE_CURRENT_BINARY_DIR}/test
+	${CMAKE_CURRENT_BINARY_DIR}
 	--build-two-config
 	--build-generator ${CMAKE_GENERATOR}
 	--build-makeprogram ${CMAKE_MAKE_PROGRAM}

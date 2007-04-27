@@ -13,8 +13,8 @@ void cul_dswap(double *data_a, double *data_b, size_t size);
 void cul_dswap_stride(double *data_a, double *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_dswap_tda(double *data_a, double *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
 static inline void cul_dswap_pos(double *data, size_t i, size_t j);
-void cul_dpermute(double *data, size_t *permutation, size_t size);
-void cul_dpermute_stride(double *data, size_t *permutation, size_t size, size_t stride);
+void cul_dpermute(double *data, const size_t *permutation, size_t size);
+void cul_dpermute_stride(double *data, const size_t *permutation, size_t size, size_t stride);
 void cul_dreverse(double *data, size_t size);
 void cul_dreverse_stride(double *data, size_t size, size_t stride);
 
