@@ -20,7 +20,7 @@ if [ "$destination" == "$source" ]; then
 	exit -1
 fi
 
-sourceLib="$source/.cmake"
+sourceLib="$source/.cmake/lib"
 sourceConfig="$source/.cmake/cul"
 sourceInclude="$source/include/cul"
 
