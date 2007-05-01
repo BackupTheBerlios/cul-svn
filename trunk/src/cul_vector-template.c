@@ -153,14 +153,30 @@ cul_errno FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
 		free(v->data);
 		FUNCTION(vector_init_struct)(v, NULL, 0, 0);
 		return CUL_SUCCESS;
-	}
-	else if( size >= v->size && size <= v->reserved ) {
+	}	else if( size >= v->size && size <= v->reserved ) {
 		v->size = size;
 		return CUL_SUCCESS;
-	}
-	else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
+	} else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
 
+	FUNCTION(vector_init_struct)(v, d, size, size);
+	return CUL_SUCCESS;
+}
+
+cul_errno FUNCTION(vector_resize_empty)(TYPE(Vector) *v, size_t size) {
+	ATOM *d;
+
+	if( size == 0 ) {
+		free(v->data);
+		FUNCTION(vector_init_struct)(v, NULL, 0, 0);
+		return CUL_SUCCESS;
+	} else if( size >= v->size && size <= v->reserved ) {
+		v->size = size;
+		return CUL_SUCCESS;
+	} else if( (d = (ATOM *)malloc(size * sizeof(ATOM))) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+
+	free(v->data);
 	FUNCTION(vector_init_struct)(v, d, size, size);
 	return CUL_SUCCESS;
 }

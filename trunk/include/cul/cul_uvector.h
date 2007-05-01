@@ -70,6 +70,7 @@ void      cul_uvector_reverse(CulUVector *v);
 void      cul_uvectorview_reverse(CulUVectorView *vv);
 
 cul_errno cul_uvector_resize(CulUVector *v, size_t size);
+cul_errno cul_uvector_resize_empty(CulUVector *v, size_t size);
 cul_errno cul_uvector_reserve(CulUVector *v, size_t size);
 cul_errno cul_uvector_push_back(CulUVector *v, size_t val);
 cul_errno cul_uvector_pop_back(CulUVector *v);
@@ -152,42 +153,42 @@ static inline CulUVectorView *cul_uvectorview_init_struct(CulUVectorView *vv, si
 }
 
 static inline size_t cul_uvector_get(const CulUVector *v, size_t x) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x >= v->size ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
 #endif
 	return v->data[x];
 }
 
 static inline void cul_uvector_set(CulUVector *v, size_t x, size_t val) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x >= v->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
 #endif
 	v->data[x] = val;
 }
 
 static inline size_t *cul_uvector_ptr(CulUVector *v, size_t x) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x > v->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
 #endif
 	return (v->data + x);
 }
 
 static inline const size_t *cul_uvector_const_ptr(const CulUVector *v, size_t x) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x > v->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
 #endif
 	return (v->data + x);
 }
 
 static inline size_t cul_uvectorview_get(const CulUVectorView *vv, size_t x) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x >= vv->size ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
 #endif
 	return vv->data[x * vv->stride];
 }
 
 static inline void cul_uvectorview_set(CulUVectorView *vv, size_t x, size_t val) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x >= vv->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
 #endif
 	vv->data[x * vv->stride] = val;
@@ -195,28 +196,28 @@ static inline void cul_uvectorview_set(CulUVectorView *vv, size_t x, size_t val)
 }
 
 static inline size_t *cul_uvectorview_ptr(CulUVectorView *vv, size_t x) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x > v->size ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
 #endif
 	return (vv->data + x * vv->stride);
 }
 
 static inline const size_t *cul_uvectorview_const_ptr(const CulUVectorView *vv, size_t x) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( x > v->size ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
 #endif
 	return (vv->data + x * vv->stride);
 }
 
 static inline size_t *cul_uvectorview_next(CulUVectorView *vv, size_t *ptr) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( ptr > vv->data + vv->size * vv->stride ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
 #endif
 	return (ptr + vv->stride);
 }
 
 static inline const size_t *cul_uvectorview_const_next(const CulUVectorView *vv, const size_t *ptr) {
-#if defined(CUL_RANGE_CHECK)
+#ifdef CUL_RANGE_CHECK
 	if( ptr > vv->data + vv->size * vv->stride ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
 #endif
 	return (ptr + vv->stride);
