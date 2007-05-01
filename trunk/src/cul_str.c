@@ -11,14 +11,14 @@ size_t _cul_strtrim_left_size(char *str, size_t size);
 
 size_t _cul_strtrim_right_size(char *str, size_t size) {
 	char *end = str + size - 1;
-	for( ; str <= end && cul_isspace_ascii(*end); --end );
+	for( ; str <= end && cul_isspace(*end); --end );
 	*(++end) = CUL_STR_NULL;
 	return end - str;
 }
 
 size_t _cul_strtrim_left_size(char *str, size_t size) {
 	char *end = str + size - 1;
-	for( ; str <= end && cul_isspace_ascii(*str); ++str );
+	for( ; str <= end && cul_isspace(*str); ++str );
 
 	const size_t copy_size = end - str + 1;
 	if( copy_size != size )
@@ -67,24 +67,24 @@ char *cul_strtrim_left(char *str) {
 char *cul_strtolower(char *str) {
 	char *begin = str;
 	for( ; *str; ++str)
-		*str = cul_tolower_ascii(*str);
+		*str = cul_tolower(*str);
 	return begin;
 }
 
 char *cul_strtoupper(char *str) {
 	char *begin = str;
 	for( ; *str; ++str)
-		*str = cul_toupper_ascii(*str);
+		*str = cul_toupper(*str);
 	return begin;
 }
 
 char *cul_strchr_space(const char *str) {
-	for( ; *str && !cul_isspace_ascii(*str); ++str) ;
+	for( ; *str && !cul_isspace(*str); ++str) ;
 	return (char *)str;
 }
 
 char *cul_strchr_nonspace(const char *str) {
-	for( ; *str && cul_isspace_ascii(*str); ++str) ;
+	for( ; *str && cul_isspace(*str); ++str) ;
 	return (char *)str;
 }
 
