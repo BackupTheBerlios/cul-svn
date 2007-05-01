@@ -86,14 +86,14 @@ cul_errno FUNCTION(matrix_copy)(TYPE(Matrix) *m, const TYPE(Matrix) *base_m) {
 cul_errno FUNCTION(matrix_copy_offset)(TYPE(Matrix) *m, const TYPE(Matrix) *base_m, size_t offset_x, size_t offset_y) {
 	if( m->size_x - offset_x < base_m->size_x || m->size_y - offset_y < base_m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(m->data + offset_x + m->size_x * offset_y, base_m->data, base_m->size_x * base_m->size_y, base_m->size_x, m->size_x - offset_x, 0);
+	FUNCTION(copy_tda)(m->data + offset_x + m->size_x * offset_y, base_m->data, base_m->size_x * base_m->size_y, base_m->size_x, m->size_x, base_m->size_x);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_copy_submatrix)(TYPE(Matrix) *m, const TYPE(Matrix) *base_m, size_t base_offset_x, size_t base_offset_y) {
 	if( base_m->size_x - base_offset_x < m->size_x || base_m->size_y - base_offset_y < m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(m->data, base_m->data + base_offset_x + base_m->size_x * base_offset_y, m->size_x * m->size_y, m->size_x, 0, base_m->size_x - base_offset_x);
+	FUNCTION(copy_tda)(m->data, base_m->data + base_offset_x + base_m->size_x * base_offset_y, base_m->size_x * (m->size_y-1) + m->size_x, m->size_x, m->size_x, base_m->size_x);
 	return CUL_SUCCESS;
 }
 
@@ -103,14 +103,14 @@ cul_errno FUNCTION(matrix_copy_view)(TYPE(Matrix) *m, const VIEW(Matrix) *base_m
 	if( base_mv->tda == base_mv->size_x )
 		FUNCTION(copy)(m->data, base_mv->data, base_mv->size_x * base_mv->size_y);
 	else
-		FUNCTION(copy_tda)(m->data, base_mv->data, base_mv->size_x * base_mv->size_y, base_mv->size_x, 0, base_mv->tda - base_mv->size_x);
+		FUNCTION(copy_tda)(m->data, base_mv->data, base_mv->tda * base_mv->size_y, base_mv->size_x, m->size_x, base_mv->tda);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrixview_copy)(VIEW(Matrix) *mv, const VIEW(Matrix) *base_mv) {
 	if( mv->size_x != base_mv->size_x || mv->size_y == base_mv->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy_tda)(mv->data, base_mv->data, base_mv->size_x * base_mv->size_y, base_mv->size_x, mv->tda - mv->size_x, base_mv->tda - base_mv->size_x);
+	FUNCTION(copy_tda)(mv->data, base_mv->data, base_mv->tda * base_mv->size_y, base_mv->size_x, mv->tda, base_mv->tda);
 	return CUL_SUCCESS;
 }
 
@@ -154,6 +154,44 @@ cul_errno FUNCTION(matrix_swap_col)(TYPE(Matrix) *ma, TYPE(Matrix) *mb, size_t c
 	if( ma->size_y != mb->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(swap_stride)(ma->data + col_a, mb->data + col_b, ma->size_y, ma->size_x, mb->size_x);
+	return CUL_SUCCESS;
+}
+
+cul_errno FUNCTION(matrix_resize)(TYPE(Matrix) *m, size_t x, size_t y) {
+	ATOM *d;
+
+	if( x*y == 0 ) {
+		free(m->data);
+		FUNCTION(matrix_init_struct)(m, NULL, 0, 0);
+		return CUL_SUCCESS;
+	}	else if( (d = (ATOM *)malloc((x*y) * sizeof(ATOM))) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+
+	const size_t copy_x = x > m->size_x? m->size_x: x;
+	const size_t copy_y = y > m->size_y? m->size_y: y;
+
+	if( x == copy_x )
+		FUNCTION(copy)(d, m->data, copy_x * copy_y);
+	else
+		FUNCTION(copy_tda)(d, m->data, m->size_x * copy_y, copy_x, x, m->size_x);
+
+	free(m->data);
+	FUNCTION(matrix_init_struct)(m, d, x, y);
+	return CUL_SUCCESS;
+}
+
+cul_errno FUNCTION(matrix_resize_empty)(TYPE(Matrix) *m, size_t x, size_t y) {
+	ATOM *d;
+
+	if( x*y == 0 ) {
+		free(m->data);
+		FUNCTION(matrix_init_struct)(m, NULL, 0, 0);
+		return CUL_SUCCESS;
+	}	else if( (d = (ATOM *)malloc((x*y) * sizeof(ATOM))) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+
+	free(m->data);
+	FUNCTION(matrix_init_struct)(m, d, x, y);
 	return CUL_SUCCESS;
 }
 
