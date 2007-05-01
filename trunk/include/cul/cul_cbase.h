@@ -7,7 +7,7 @@
 void cul_ccopy(char *data_a, const char *data_b, size_t size);
 void cul_ccopy_overlap(char *data_a, const char *data_b, size_t size);
 void cul_ccopy_stride(char *data_a, const char *data_b, size_t size, size_t stride_a, size_t stride_b);
-void cul_ccopy_tda(char *data_a, const char *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
+void cul_ccopy_tda(char *data_a, const char *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b);
 
 void cul_cswap(char *data_a, char *data_b, size_t size);
 void cul_cswap_stride(char *data_a, char *data_b, size_t size, size_t stride_a, size_t stride_b);
