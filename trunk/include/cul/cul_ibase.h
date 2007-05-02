@@ -22,23 +22,6 @@ void cul_ipermute_stride(int *data, const size_t *permutation, size_t size, size
 void cul_ireverse(int *data, size_t size);
 void cul_ireverse_stride(int *data, size_t size, size_t stride);
 
-int cul_imin(const int *data, size_t size);
-int cul_imin_stride(const int *data, size_t size, size_t stride);
-static inline int cul_imin_pair(int a, int b);
-size_t cul_imin_index(const int *data, size_t size);
-size_t cul_imin_index_stride(const int *data, size_t size, size_t stride);
-
-int cul_imax(const int *data, size_t size);
-int cul_imax_stride(const int *data, size_t size, size_t stride);
-static inline int cul_imax_pair(int a, int b);
-size_t cul_imax_index(const int *data, size_t size);
-size_t cul_imax_index_stride(const int *data, size_t size, size_t stride);
-
-void cul_iminmax(const int *data, size_t size, int *min, int *max);
-void cul_iminmax_stride(const int *data, size_t size, size_t stride, int *min, int *max);
-void cul_iminmax_index(const int *data, size_t size, size_t *min_index, size_t *max_index);
-void cul_iminmax_index_stride(const int *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
-
 void cul_iset_all(int *data, size_t size, int value);
 void cul_iset_all_stride(int *data, size_t size, size_t stride, int value);
 void cul_iadd_scalar(int *data, size_t size, int value);
@@ -61,6 +44,23 @@ double cul_imean(const int *data, size_t size);
 double cul_imean_stride(const int *data, size_t size, size_t stride);
 double cul_ivariance(const int *data, size_t size, double mean);
 double cul_ivariance_stride(const int *data, size_t size, size_t stride, double mean);
+
+int cul_imin(const int *data, size_t size);
+int cul_imin_stride(const int *data, size_t size, size_t stride);
+static inline int cul_imin_pair(int a, int b);
+size_t cul_imin_index(const int *data, size_t size);
+size_t cul_imin_index_stride(const int *data, size_t size, size_t stride);
+
+int cul_imax(const int *data, size_t size);
+int cul_imax_stride(const int *data, size_t size, size_t stride);
+static inline int cul_imax_pair(int a, int b);
+size_t cul_imax_index(const int *data, size_t size);
+size_t cul_imax_index_stride(const int *data, size_t size, size_t stride);
+
+void cul_iminmax(const int *data, size_t size, int *min, int *max);
+void cul_iminmax_stride(const int *data, size_t size, size_t stride, int *min, int *max);
+void cul_iminmax_index(const int *data, size_t size, size_t *min_index, size_t *max_index);
+void cul_iminmax_index_stride(const int *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
 
 int *cul_ilfind(int key, int *data, size_t size);
 int *cul_ilfind_stride(int key, int *data, size_t size, size_t stride);

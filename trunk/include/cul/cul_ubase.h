@@ -22,23 +22,6 @@ void cul_upermute_stride(size_t *data, const size_t *permutation, size_t size, s
 void cul_ureverse(size_t *data, size_t size);
 void cul_ureverse_stride(size_t *data, size_t size, size_t stride);
 
-size_t cul_umin(const size_t *data, size_t size);
-size_t cul_umin_stride(const size_t *data, size_t size, size_t stride);
-static inline size_t cul_umin_pair(size_t a, size_t b);
-size_t cul_umin_index(const size_t *data, size_t size);
-size_t cul_umin_index_stride(const size_t *data, size_t size, size_t stride);
-
-size_t cul_umax(const size_t *data, size_t size);
-size_t cul_umax_stride(const size_t *data, size_t size, size_t stride);
-static inline size_t cul_umax_pair(size_t a, size_t b);
-size_t cul_umax_index(const size_t *data, size_t size);
-size_t cul_umax_index_stride(const size_t *data, size_t size, size_t stride);
-
-void cul_uminmax(const size_t *data, size_t size, size_t *min, size_t *max);
-void cul_uminmax_stride(const size_t *data, size_t size, size_t stride, size_t *min, size_t *max);
-void cul_uminmax_index(const size_t *data, size_t size, size_t *min_index, size_t *max_index);
-void cul_uminmax_index_stride(const size_t *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
-
 void cul_uset_all(size_t *data, size_t size, size_t value);
 void cul_uset_all_stride(size_t *data, size_t size, size_t stride, size_t value);
 void cul_uadd_scalar(size_t *data, size_t size, size_t value);
@@ -61,6 +44,23 @@ double cul_umean(const size_t *data, size_t size);
 double cul_umean_stride(const size_t *data, size_t size, size_t stride);
 double cul_uvariance(const size_t *data, size_t size, double mean);
 double cul_uvariance_stride(const size_t *data, size_t size, size_t stride, double mean);
+
+size_t cul_umin(const size_t *data, size_t size);
+size_t cul_umin_stride(const size_t *data, size_t size, size_t stride);
+static inline size_t cul_umin_pair(size_t a, size_t b);
+size_t cul_umin_index(const size_t *data, size_t size);
+size_t cul_umin_index_stride(const size_t *data, size_t size, size_t stride);
+
+size_t cul_umax(const size_t *data, size_t size);
+size_t cul_umax_stride(const size_t *data, size_t size, size_t stride);
+static inline size_t cul_umax_pair(size_t a, size_t b);
+size_t cul_umax_index(const size_t *data, size_t size);
+size_t cul_umax_index_stride(const size_t *data, size_t size, size_t stride);
+
+void cul_uminmax(const size_t *data, size_t size, size_t *min, size_t *max);
+void cul_uminmax_stride(const size_t *data, size_t size, size_t stride, size_t *min, size_t *max);
+void cul_uminmax_index(const size_t *data, size_t size, size_t *min_index, size_t *max_index);
+void cul_uminmax_index_stride(const size_t *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
 
 size_t *cul_ulfind(size_t key, size_t *data, size_t size);
 size_t *cul_ulfind_stride(size_t key, size_t *data, size_t size, size_t stride);

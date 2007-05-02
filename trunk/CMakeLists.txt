@@ -56,14 +56,9 @@ SET(CUL_SOURCES
 	src/cul_stream.c
 	src/cul_string.c
 
-	src/base/cul_base_balg_search.c
-	src/base/cul_base_balg_sort.c
-	src/base/cul_base_balg_unique.c
-	src/base/cul_base_copy.c
+	src/base/cul_base_basic.c
+	src/base/cul_base_alg.c
 	src/base/cul_base_io.c
-	src/base/cul_base_minmax.c
-	src/base/cul_base_oper.c
-	src/base/cul_base_stat.c
 )
 
 # set output directories

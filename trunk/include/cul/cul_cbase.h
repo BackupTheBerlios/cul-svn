@@ -22,23 +22,6 @@ void cul_cpermute_stride(char *data, const size_t *permutation, size_t size, siz
 void cul_creverse(char *data, size_t size);
 void cul_creverse_stride(char *data, size_t size, size_t stride);
 
-char cul_cmin(const char *data, size_t size);
-char cul_cmin_stride(const char *data, size_t size, size_t stride);
-static inline char cul_cmin_pair(char a, char b);
-size_t cul_cmin_index(const char *data, size_t size);
-size_t cul_cmin_index_stride(const char *data, size_t size, size_t stride);
-
-char cul_cmax(const char *data, size_t size);
-char cul_cmax_stride(const char *data, size_t size, size_t stride);
-static inline char cul_cmax_pair(char a, char b);
-size_t cul_cmax_index(const char *data, size_t size);
-size_t cul_cmax_index_stride(const char *data, size_t size, size_t stride);
-
-void cul_cminmax(const char *data, size_t size, char *min, char *max);
-void cul_cminmax_stride(const char *data, size_t size, size_t stride, char *min, char *max);
-void cul_cminmax_index(const char *data, size_t size, size_t *min_index, size_t *max_index);
-void cul_cminmax_index_stride(const char *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
-
 void cul_cset_all(char *data, size_t size, char value);
 void cul_cset_all_stride(char *data, size_t size, size_t stride, char value);
 void cul_cadd_scalar(char *data, size_t size, char value);
@@ -61,6 +44,23 @@ double cul_cmean(const char *data, size_t size);
 double cul_cmean_stride(const char *data, size_t size, size_t stride);
 double cul_cvariance(const char *data, size_t size, double mean);
 double cul_cvariance_stride(const char *data, size_t size, size_t stride, double mean);
+
+char cul_cmin(const char *data, size_t size);
+char cul_cmin_stride(const char *data, size_t size, size_t stride);
+static inline char cul_cmin_pair(char a, char b);
+size_t cul_cmin_index(const char *data, size_t size);
+size_t cul_cmin_index_stride(const char *data, size_t size, size_t stride);
+
+char cul_cmax(const char *data, size_t size);
+char cul_cmax_stride(const char *data, size_t size, size_t stride);
+static inline char cul_cmax_pair(char a, char b);
+size_t cul_cmax_index(const char *data, size_t size);
+size_t cul_cmax_index_stride(const char *data, size_t size, size_t stride);
+
+void cul_cminmax(const char *data, size_t size, char *min, char *max);
+void cul_cminmax_stride(const char *data, size_t size, size_t stride, char *min, char *max);
+void cul_cminmax_index(const char *data, size_t size, size_t *min_index, size_t *max_index);
+void cul_cminmax_index_stride(const char *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
 
 char *cul_clfind(char key, char *data, size_t size);
 char *cul_clfind_stride(char key, char *data, size_t size, size_t stride);

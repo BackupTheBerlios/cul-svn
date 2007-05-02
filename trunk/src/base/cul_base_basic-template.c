@@ -172,3 +172,155 @@ void FUNCTION(reverse_stride)(ATOM *data, size_t size, size_t stride) {
 	for( end = data + (size - 1) * stride; data < end; data += stride, end -= stride)
 		CUL_SWAP(*data, *end, tmp);
 }
+
+#ifndef TEMPLATE_CUL_PTR
+	void FUNCTION(set_all)(ATOM *data, size_t size, ATOM value) {
+		const ATOM *end = data + size;
+		for( ; data < end; ++data)
+			*data = value;
+		return;
+	}
+
+	void FUNCTION(set_all_stride)(ATOM *data, size_t size, size_t stride, ATOM value) {
+		const ATOM *end = data + size * stride;
+		for( ; data < end; data += stride)
+			*data = value;
+		return;
+	}
+
+	void FUNCTION(add_scalar)(ATOM *data, size_t size, ATOM value) {
+		const ATOM *end = data + size;
+		for( ; data < end; ++data)
+			*data += value;
+		return;
+	}
+
+	void FUNCTION(add_scalar_stride)(ATOM *data, size_t size, size_t stride, ATOM value) {
+		const ATOM *end = data + size * stride;
+		for( ; data < end; data += stride)
+			*data += value;
+		return;
+	}
+
+	void FUNCTION(mul_scalar)(ATOM *data, size_t size, ATOM value) {
+		const ATOM *end = data + size;
+		for( ; data < end; ++data)
+			*data *= value;
+		return;
+	}
+
+	void FUNCTION(mul_scalar_stride)(ATOM *data, size_t size, size_t stride, ATOM value) {
+		const ATOM *end = data + size * stride;
+		for( ; data < end; data += stride)
+			*data *= value;
+		return;
+	}
+
+	void FUNCTION(add)(ATOM *data_out, const ATOM *data, size_t size) {
+		const ATOM *end = data + size;
+		for( ; data < end; ++data, ++data_out)
+			*data_out += *data;
+		return;
+	}
+
+	void FUNCTION(add_stride)(ATOM *data_out, const ATOM *data, size_t size, size_t stride_out, size_t stride) {
+		const ATOM *end = data + size * stride;
+		for( ; data < end; data += stride, data += stride_out)
+			*data_out += *data;
+		return;
+	}
+
+	void FUNCTION(sub)(ATOM *data_out, const ATOM *data, size_t size) {
+		const ATOM *end = data + size;
+		for( ; data < end; ++data, ++data_out)
+			*data_out -= *data;
+		return;
+	}
+
+	void FUNCTION(sub_stride)(ATOM *data_out, const ATOM *data, size_t size, size_t stride_out, size_t stride) {
+		const ATOM *end = data + size * stride;
+		for(end = data + size; data < end; data += stride, data += stride_out)
+			*data_out -= *data;
+		return;
+	}
+
+	void FUNCTION(mul)(ATOM *data_out, const ATOM *data, size_t size) {
+		const ATOM *end = data + size;
+		for( ; data < end; ++data, ++data_out)
+			*data_out *= *data;
+		return;
+	}
+
+	void FUNCTION(mul_stride)(ATOM *data_out, const ATOM *data, size_t size, size_t stride_out, size_t stride) {
+		const ATOM *end = data + size * stride;
+		for( ; data < end; data += stride, data += stride_out)
+			*data_out *= *data;
+		return;
+	}
+
+	void FUNCTION(div)(ATOM *data_out, const ATOM *data, size_t size) {
+		const ATOM *end = data + size;
+		for( ; data < end; ++data, ++data_out)
+			*data_out /= *data;
+		return;
+	}
+
+	void FUNCTION(div_stride)(ATOM *data_out, const ATOM *data, size_t size, size_t stride_out, size_t stride) {
+		const ATOM *end = data + size * stride;
+		for( ; data < end; data += stride, data += stride_out)
+			*data_out /= *data;
+		return;
+	}
+#else /* TEMPLATE_CUL_PTR */
+#endif /* TEMPLATE_CUL_PTR */
+
+#ifndef TEMPLATE_CUL_PTR
+	double FUNCTION(sum)(const ATOM *data, size_t size) {
+		const ATOM *end = data + size;
+		double sum = 0.0;
+		for(; data < end; ++data)
+			sum += *data;
+		return sum;
+	}
+
+	double FUNCTION(sum_stride)(const ATOM *data, size_t size, size_t stride) {
+		const ATOM *end = data + size * stride;
+		double sum = 0.0;
+		for(; data < end; data += stride)
+			sum += *data;
+		return sum;
+	}
+
+	double FUNCTION(mean)(const ATOM *data, size_t size) {
+		const ATOM *end = data + size;
+		double mean = 0.0;
+		for(; data < end; ++data)
+			mean += *data;
+		return mean /= size;
+	}
+
+	double FUNCTION(mean_stride)(const ATOM *data, size_t size, size_t stride) {
+		const ATOM *end = data + size * stride;
+		double mean = 0.0;
+		for(; data < end; data += stride)
+			mean += *data;
+		return mean /= size;
+	}
+
+	double FUNCTION(variance)(const ATOM *data, size_t size, double mean) {
+		const ATOM *end = data + size;
+		double variance = 0.0;
+		for(; data < end; ++data)
+			variance += (*data - mean)*(*data - mean);
+		return variance /= size;
+	}
+
+	double FUNCTION(variance_stride)(const ATOM *data, size_t size, size_t stride, double mean) {
+		const ATOM *end = data + size * stride;
+		double variance = 0.0;
+		for(; data < end; data += stride)
+			variance += (*data - mean)*(*data - mean);
+		return variance /= size;
+	}
+#else /* TEMPLATE_CUL_PTR */
+#endif /* TEMPLATE_CUL_PTR */
