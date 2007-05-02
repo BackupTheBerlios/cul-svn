@@ -9,6 +9,10 @@ void cul_dcopy_overlap(double *data_a, const double *data_b, size_t size);
 void cul_dcopy_stride(double *data_a, const double *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_dcopy_tda(double *data_a, const double *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b);
 
+int cul_dcompare(double *data_a, double *data_b, size_t size);
+int cul_dcompare_stride(double *data_a, double *data_b, size_t size, size_t stride_a, size_t stride_b);
+int cul_dcompare_tda(double *data_a, double *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b);
+
 void cul_dswap(double *data_a, double *data_b, size_t size);
 void cul_dswap_stride(double *data_a, double *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_dswap_tda(double *data_a, double *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);

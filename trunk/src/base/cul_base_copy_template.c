@@ -21,6 +21,7 @@
 			/* copy single row */
 			memcpy(data_a, data_b, tda_size*sizeof(ATOM));
 	}
+
 #else /* TEMPLATE_CUL_PTR */
 	void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size, cul_cpy_f *cpy_item) {
 		const ATOM *const end = data_b + size;
@@ -65,6 +66,36 @@
 			data_b += tda_b;
 		}
 	}
+#endif /* TEMPLATE_CUL_PTR */
+
+#ifndef TEMPLATE_CUL_PTR
+	int FUNCTION(compare)(ATOM *data_a, ATOM *data_b, size_t size) {
+		return memcmp(data_a, data_b, size*sizeof(ATOM));
+	}
+
+	int FUNCTION(compare_stride)(ATOM *data_a, ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
+		const ATOM *const end = data_b + size * stride_b;
+		for( ; data_b < end; data_a += stride_a, data_b += stride_b)
+			if( *data_a != *data_b ) {
+				if( *data_a > *data_b )
+					return 1;
+				return -1;
+			}
+		return 0;
+	}
+
+	int FUNCTION(compare_tda)(ATOM *data_a, ATOM *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b) {
+		const ATOM *const end = data_b + size;
+
+		/* move through all rows */
+		for(int cmp; data_b < end; data_a += tda_a, data_b += tda_b) {
+			/* check single row */
+			if( (cmp = memcmp(data_a, data_b, tda_size*sizeof(ATOM)) ) != 0 )
+				return cmp;
+		}
+		return 0;
+	}
+#else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(swap)(ATOM *data_a, ATOM *data_b, size_t size) {
