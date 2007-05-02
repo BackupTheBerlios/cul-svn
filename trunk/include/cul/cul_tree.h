@@ -22,8 +22,8 @@ static inline void cul_tree_free_struct(CulTree *t);
 static inline CulTree *cul_tree_init_struct(CulTree *t, CulTree *parent, CulTree *next, CulTree *prev, CulTree *child, cul_ptr data);
 
 CulTree *cul_tree_new(void);
-void cul_tree_free(CulTree *t, cul_free_f *free_item);
-void cul_tree_free_all(CulTree *t, cul_free_f *free_item);
+void cul_tree_free(CulTree *t, cul_free_f *free_f);
+void cul_tree_free_all(CulTree *t, cul_free_f *free_f);
 
 /* Basic Tree Operators */
 

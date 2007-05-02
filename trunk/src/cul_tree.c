@@ -7,22 +7,22 @@ CulTree *cul_tree_new(void) {
 	return cul_tree_init_struct(t, NULL, NULL, NULL, NULL, NULL);
 }
 
-void cul_tree_free(CulTree *t, cul_free_f *free_item) {
-	if( t != NULL && free_item != NULL )
-		free_item(t->data);
+void cul_tree_free(CulTree *t, cul_free_f *free_f) {
+	if( t != NULL && free_f != NULL )
+		free_f(t->data);
 	cul_tree_free_struct(t);
 }
 
-void cul_tree_free_all(CulTree *t, cul_free_f *free_item) {
+void cul_tree_free_all(CulTree *t, cul_free_f *free_f) {
 	for( CulTree *n; t != NULL; t = n) {
 		n = cul_tree_next(t);
 
 		/* free childs */
-		cul_tree_free_all(cul_tree_child(t), free_item);
+		cul_tree_free_all(cul_tree_child(t), free_f);
 
 		/* free itself */
-		if( free_item != NULL )
-			free_item(t->data);
+		if( free_f != NULL )
+			free_f(t->data);
 		cul_tree_free_struct(t);
 	}
 }

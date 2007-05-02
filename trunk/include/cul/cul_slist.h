@@ -20,8 +20,8 @@ static inline void cul_slist_init_struct(CulSList *l, CulSList *next, cul_ptr da
 
 CulSList *cul_slist_new(cul_ptr data);
 CulSList *cul_slist_new_empty();
-void cul_slist_free(CulSList *l, cul_free_f *free_data);
-void cul_slist_free_all(CulSList *l, cul_free_f *free_data);
+void cul_slist_free(CulSList *l, cul_free_f *free_f);
+void cul_slist_free_all(CulSList *l, cul_free_f *free_f);
 
 /* Basic List Operators */
 
@@ -34,21 +34,21 @@ size_t cul_slist_size(CulSList *l);
 /* Resize */
 
 CulSList *cul_slist_insert_next(CulSList *l, cul_ptr data);
-CulSList *cul_slist_remove(CulSList *l, cul_free_f *free_data);
-CulSList *cul_slist_remove_next(CulSList *l, cul_free_f *free_data);
+CulSList *cul_slist_remove(CulSList *l, cul_free_f *free_f);
+CulSList *cul_slist_remove_next(CulSList *l, cul_free_f *free_f);
 
 /* Copy */
 
 CulSList *cul_slist_copy(CulSList *l);
-CulSList *cul_slist_detach(CulSList *l, cul_cpy_f *cpy);
+CulSList *cul_slist_detach(CulSList *l, cul_cpy_f *cpy_f);
 CulSList *cul_slist_reverse(CulSList *l);
 
 /* Basic Algorithms */
 
-CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_eq_f *eq);
-CulSList *cul_slist_sort(CulSList *l, cul_cmp_f *cmp);
-size_t cul_slist_unique(CulSList *l, cul_eq_f *eq);
-CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_eq_f *eq);
+CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_cmp_f *cmp_f);
+CulSList *cul_slist_sort(CulSList *l, cul_cmp_f *cmp_f);
+size_t cul_slist_unique(CulSList *l, cul_cmp_f *cmp_f);
+CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_cmp_f *cmp_f);
 size_t cul_slist_foreach(CulSList *l, cul_foreach_f *foreach);
 size_t cul_slist_foreach_data(CulSList *l, cul_foreach_data_f *foreach, cul_ptr data);
 

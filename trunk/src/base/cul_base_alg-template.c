@@ -222,18 +222,18 @@
 		return NULL;
 	}
 #else /* TEMPLATE_CUL_PTR */
-	ATOM *FUNCTION(lfind)(ATOM key, ATOM *data, size_t size, cul_eq_f *eq) {
+	ATOM *FUNCTION(lfind)(ATOM key, ATOM *data, size_t size, cul_cmp_f *cmp_f) {
 		ATOM *const end = data + size;
 		for( ; data < end; ++data)
-			if( eq(data, &key) )
+			if( !cmp_f(data, &key) )
 				return data;
 		return NULL;
 	}
 
-	ATOM *FUNCTION(lfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride, cul_eq_f *eq) {
+	ATOM *FUNCTION(lfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp_f) {
 		ATOM *const end = data + size * stride;
 		for( ; data < end; data += stride)
-			if( eq(data, &key) )
+			if( !cmp_f(data, &key) )
 				return data;
 		return NULL;
 	}
@@ -274,10 +274,10 @@
 		return NULL;
 	}
 #else /* TEMPLATE_CUL_PTR */
-	ATOM *FUNCTION(bfind)(ATOM key, ATOM *data, size_t size, cul_cmp_f *cmp) {
+	ATOM *FUNCTION(bfind)(ATOM key, ATOM *data, size_t size, cul_cmp_f *cmp_f) {
 		ATOM *end = data + size;
 		for( size >>= 1; size > 0; size >>= 1) {
-			int cmp_res = cmp(*(data + size), &key);
+			int cmp_res = cmp_f(*(data + size), &key);
 			if( cmp_res < 0 ) {
 				data += size + 1;
 				size = end - data;
@@ -287,15 +287,15 @@
 			else
 				return data + size;
 		}
-		if( cmp(*data, key) == 0 )
+		if( cmp_f(*data, key) == 0 )
 			return data;
 		return NULL;
 	}
 
-	ATOM *FUNCTION(bfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp) {
+	ATOM *FUNCTION(bfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp_f) {
 		ATOM *end = data + size * stride;
 		for( size >>= 1; size > 0 ; size >>= 1) {
-			int cmp_res = cmp(*(data + size * stride), &key);
+			int cmp_res = cmp_f(*(data + size * stride), &key);
 			if( cmp_res < 0 ) {
 				data += (size + 1) * stride;
 				size = (end - data) / stride;
@@ -305,7 +305,7 @@
 			else
 				return data + size * stride;
 		}
-		if( cmp(*data, key) == 0 )
+		if( cmp_f(*data, key) == 0 )
 			return data;
 		return NULL;
 	}
@@ -506,55 +506,55 @@
 		PFUNCTION(qsort_desc_stride)(data, data + (size - 1) * stride, stride);
 	}
 #else /* TEMPLATE_CUL_PTR */
-	void PFUNCTION(isort)(ATOM *l, ATOM *r, cul_cmp_f *cmp);
-	void PFUNCTION(isort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp);
-	void PFUNCTION(qsort)(ATOM *l, ATOM *r, cul_cmp_f *cmp);
-	void PFUNCTION(qsort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp);
+	void PFUNCTION(isort)(ATOM *l, ATOM *r, cul_cmp_f *cmp_f);
+	void PFUNCTION(isort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp_f);
+	void PFUNCTION(qsort)(ATOM *l, ATOM *r, cul_cmp_f *cmp_f);
+	void PFUNCTION(qsort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp_f);
 
-	void FUNCTION(sort)(ATOM *data, size_t size, cul_cmp_f *cmp) {
-		PFUNCTION(qsort)(data, data + size - 1, cmp);
+	void FUNCTION(sort)(ATOM *data, size_t size, cul_cmp_f *cmp_f) {
+		PFUNCTION(qsort)(data, data + size - 1, cmp_f);
 	}
 
-	void FUNCTION(sort_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp) {
-		PFUNCTION(qsort_stride)(data, data + (size - 1) * stride, stride, cmp);
+	void FUNCTION(sort_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp_f) {
+		PFUNCTION(qsort_stride)(data, data + (size - 1) * stride, stride, cmp_f);
 	}
 
-	void PFUNCTION(isort)(ATOM *l, ATOM *r, cul_cmp_f *cmp) {
+	void PFUNCTION(isort)(ATOM *l, ATOM *r, cul_cmp_f *cmp_f) {
 		ATOM *const begin = l, *i, l_val;
 		for( ++l; l <= r; ++l) {
 			l_val = *l;
-			for( i = l - 1; i >= begin && cmp(l_val, *i) < 0; --i)
+			for( i = l - 1; i >= begin && cmp_f(l_val, *i) < 0; --i)
 				*(i + 1) = *i;
 			*(i + 1) = l_val;
 		}
 	}
 
-	void PFUNCTION(isort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp) {
+	void PFUNCTION(isort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp_f) {
 		ATOM *const begin = l, *i, l_val;
 		for( l += stride; l <= r; l += stride) {
 			l_val = *l;
-			for( i = l - stride; i >= begin && cmp(l_val, *i) < 0; i -= stride)
+			for( i = l - stride; i >= begin && cmp_f(l_val, *i) < 0; i -= stride)
 				*(i + stride) = *i;
 			*(i + stride) = l_val;
 		}
 	}
 
-	void PFUNCTION(qsort)(ATOM *l, ATOM *r, cul_cmp_f *cmp) {
+	void PFUNCTION(qsort)(ATOM *l, ATOM *r, cul_cmp_f *cmp_f) {
 		ATOM *const begin = l, *const end = r;
 		ATOM *pivot = l, val;
 		if( r < l + 8 )
-			PFUNCTION(isort)(l, r, cmp);
+			PFUNCTION(isort)(l, r, cmp_f);
 		else {
 			pivot += (r - l) >> 1;
-			if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
-			if( cmp(*r, *pivot) < 0 ) {
+			if( cmp_f(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
+			if( cmp_f(*r, *pivot) < 0 ) {
 				CUL_SWAP(*pivot, *r, val);
-				if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
+				if( cmp_f(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
 			}
 			++l; --r;
 			do {
-				while( cmp(*l, *pivot) < 0 ) ++l;
-				while( cmp(*pivot, *r) < 0 ) --r;
+				while( cmp_f(*l, *pivot) < 0 ) ++l;
+				while( cmp_f(*pivot, *r) < 0 ) --r;
 				if( l < r ) {
 					CUL_SWAP(*l, *r, val);
 					if( pivot == l )      pivot = r;
@@ -566,27 +566,27 @@
 					break;
 				}
 			} while( l <= r );
-			PFUNCTION(qsort)(begin, r, cmp);
-			PFUNCTION(qsort)(l, end, cmp);
+			PFUNCTION(qsort)(begin, r, cmp_f);
+			PFUNCTION(qsort)(l, end, cmp_f);
 		}
 	}
 
-	void PFUNCTION(qsort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp) {
+	void PFUNCTION(qsort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp_f) {
 		ATOM *const begin = l, *const end = r;
 		ATOM *pivot = l, val;
 		if( r < l + (stride << 3) )
-			PFUNCTION(isort_stride)(l, r, stride, cmp);
+			PFUNCTION(isort_stride)(l, r, stride, cmp_f);
 		else {
 			pivot += (r - l)/stride >> 1;
-			if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
-			if( cmp(*r, *pivot) < 0 ) {
+			if( cmp_f(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
+			if( cmp_f(*r, *pivot) < 0 ) {
 				CUL_SWAP(*pivot, *r, val);
-				if( cmp(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
+				if( cmp_f(*pivot, *l) < 0 ) CUL_SWAP(*pivot, *l, val);
 			};
 			l += stride; r -= stride;
 			do {
-				while( cmp(*l, *pivot) < 0 ) l += stride;
-				while( cmp(*pivot, *r) < 0 ) r -= stride;
+				while( cmp_f(*l, *pivot) < 0 ) l += stride;
+				while( cmp_f(*pivot, *r) < 0 ) r -= stride;
 				if( l < r ) {
 					CUL_SWAP(*l, *r, val);
 					if( pivot == l )      pivot = r;
@@ -598,8 +598,8 @@
 					break;
 				}
 			} while( l <= r );
-			PFUNCTION(qsort_stride)(begin, r, stride, cmp);
-			PFUNCTION(qsort_stride)(l, end, stride, cmp);
+			PFUNCTION(qsort_stride)(begin, r, stride, cmp_f);
+			PFUNCTION(qsort_stride)(l, end, stride, cmp_f);
 		}
 	}
 #endif /* TEMPLATE_CUL_PTR */
@@ -627,10 +627,10 @@
 		return cur;
 	}
 #else /* TEMPLATE_CUL_PTR */
-	ATOM * FUNCTION(unique)(ATOM *data, size_t size, cul_eq_f *eq) {
+	ATOM * FUNCTION(unique)(ATOM *data, size_t size, cul_cmp_f *cmp_f) {
 		ATOM *cur = data + 1, *const end = data + size;
 		for(++data; data < end; ++data) {
-			if( eq(data - 1, data) )
+			if( !cmp_f(data - 1, data) )
 				continue;
 			*cur = *data;
 			++cur;
@@ -638,10 +638,10 @@
 		return cur;
 	}
 
-	ATOM * FUNCTION(unique_stride)(ATOM *data, size_t size, size_t stride, cul_eq_f *eq) {
+	ATOM * FUNCTION(unique_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp_f) {
 		ATOM *cur = data + stride, *const end = data + size * stride;
 		for( data += stride; data < end; data += stride) {
-			if( eq(data - stride, data) )
+			if( !cmp_f(data - stride, data) )
 				continue;
 			*cur = *data;
 			cur += stride;

@@ -12,17 +12,17 @@ CulList *cul_list_new_empty() {
 	return cul_list_new(NULL);
 }
 
-void cul_list_free(CulList *l, cul_free_f *free_data) {
-	if( l != NULL && free_data != NULL )
-		free_data(l->data);
+void cul_list_free(CulList *l, cul_free_f *free_f) {
+	if( l != NULL && free_f != NULL )
+		free_f(l->data);
 	cul_list_free_struct(l);
 }
 
-void cul_list_free_all(CulList *l, cul_free_f *free_data) {
+void cul_list_free_all(CulList *l, cul_free_f *free_f) {
 	for( CulList *n; l != NULL; l = n) {
 		n = cul_list_next(l);
-		if( free_data != NULL )
-			free_data(l->data);
+		if( free_f != NULL )
+			free_f(l->data);
 		cul_list_free_struct(l);
 	}
 }
@@ -102,7 +102,7 @@ CulList *cul_list_insert_prev(CulList *l, cul_ptr data) {
 	return n;
 }
 
-CulList *cul_list_remove(CulList *l, cul_free_f *free_data) {
+CulList *cul_list_remove(CulList *l, cul_free_f *free_f) {
 	if( l != NULL ) {
 		CulList *n = NULL;
 		if( cul_list_prev(l) != NULL ) {
@@ -113,7 +113,7 @@ CulList *cul_list_remove(CulList *l, cul_free_f *free_data) {
 			n = cul_list_next(l);
 			n->prev = cul_list_prev(l);
 		}
-		cul_list_free(l, free_data);
+		cul_list_free(l, free_f);
 		return n;
 	}
 	return l;
@@ -133,10 +133,10 @@ CulList *cul_list_copy(CulList *l) {
 	return first;
 }
 
-CulList *cul_list_detach(CulList *l, cul_cpy_f *cpy) {
+CulList *cul_list_detach(CulList *l, cul_cpy_f *cpy_f) {
 	CulList *first = l;
 	for( ; l != NULL; l = cul_list_next(l)) {
-		if( (l->data = cpy(l->data)) == NULL ) {
+		if( (l->data = cpy_f(l->data)) == NULL ) {
 			/* erase rest of undetached pointers */
 			for( l = cul_list_next(l); l != NULL; l = cul_list_next(l))
 				l->data = NULL;
@@ -156,26 +156,26 @@ CulList *cul_list_reverse(CulList *l) {
 	return last;
 }
 
-CulList *cul_list_find(CulList *l, cul_ptr data, cul_eq_f *eq) {
-	if( eq == NULL )
+CulList *cul_list_find(CulList *l, cul_ptr data, cul_cmp_f *cmp_f) {
+	if( cmp_f == NULL )
 		for( ; l != NULL; l = cul_list_next(l))
 			if( l->data == data )
 				return l;
 	else
 		for( ; l != NULL; l = cul_list_next(l))
-			if( eq(l->data, data) )
+			if( !cmp_f(l->data, data) )
 				return l;
 	return NULL;
 }
 
 CulList *_cul_list_sort(CulList *l, cul_cmp_f *cmp, size_t size);
-CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp);
+CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp_f);
 
-CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp) {
+CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp_f) {
 	CulList *l_prev, *l, *result;
 
 	/* initialise result (head of return list) */
-	if( cmp(l1->data, l2->data) <= 0 ) {
+	if( cmp_f(l1->data, l2->data) <= 0 ) {
 		result = l1;
 		l1 = cul_list_next(l1);
 	}
@@ -190,7 +190,7 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp) {
 
 	/* process rest */
 	while( l1 != NULL && l2 != NULL ) {
-		if( cmp(l1->data, l2->data) <= 0 ) {
+		if( cmp_f(l1->data, l2->data) <= 0 ) {
 			l->next = l1;
 			l1 = cul_list_next(l1);
 		}
@@ -209,7 +209,7 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp) {
 	return result;
 }
 
-CulList *_cul_list_sort(CulList *l, cul_cmp_f *cmp, size_t size) {
+CulList *_cul_list_sort(CulList *l, cul_cmp_f *cmp_f, size_t size) {
 	const size_t i_half = size >> 1;
 	CulList *l_half;
 
@@ -219,20 +219,20 @@ CulList *_cul_list_sort(CulList *l, cul_cmp_f *cmp, size_t size) {
 	l_half = cul_list_nth(l, i_half);
 	cul_list_prev(l_half)->next = NULL;
 
-	return _cul_list_merge(_cul_list_sort(l, cmp, i_half), _cul_list_sort(l_half, cmp, size - i_half), cmp);
+	return _cul_list_merge(_cul_list_sort(l, cmp_f, i_half), _cul_list_sort(l_half, cmp_f, size - i_half), cmp_f);
 }
 
-CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp) {
+CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp_f) {
 	if( l == NULL )
 		return NULL;
 
-	return _cul_list_sort(l, cmp, cul_list_size(l));
+	return _cul_list_sort(l, cmp_f, cul_list_size(l));
 }
 
-size_t cul_list_unique(CulList *l, cul_eq_f *eq) {
+size_t cul_list_unique(CulList *l, cul_cmp_f *cmp_f) {
 	CUL_UNUSED(l);
-	CUL_UNUSED(eq);
-	return 0;
+	CUL_UNUSED(cmp_f);
+	CUL_ERROR_ERRNO_RET_VAL(0, CUL_ESTUB);
 }
 
 size_t cul_list_foreach(CulList *l, cul_foreach_f *foreach) {
