@@ -28,40 +28,54 @@ VIEW(Matrix) *FUNCTION(matrixview_new)(void) {
 }
 
 VIEW(Matrix) *FUNCTION(matrixview_matrix)(VIEW(Matrix) *mv, TYPE(Matrix) *base_m) {
+	if( mv == NULL && (mv = FUNCTION(matrixview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(matrixview_init_struct)(mv, base_m->data, base_m->size_x, base_m->size_y, base_m->size_x);
 }
 
 VIEW(Matrix) *FUNCTION(matrixview_submatrix)(VIEW(Matrix) *mv, TYPE(Matrix) *base_m, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y) {
 	if( base_offset_x + base_size_x > base_m->size_x || base_offset_y + base_size_y > base_m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( mv == NULL && (mv = FUNCTION(matrixview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(matrixview_init_struct)(mv, base_m->data + base_offset_x + base_m->size_x * base_offset_y, base_size_x, base_size_y, base_m->size_x);
 }
 
 VIEW(Vector) *FUNCTION(matrixview_row)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_row) {
 	if( base_row >= base_m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_m->data + base_m->size_x * base_row, base_m->size_x, 1);
 }
 
 VIEW(Vector) *FUNCTION(matrixview_col)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_col) {
 	if( base_col >= base_m->size_x )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_m->data + base_col, base_m->size_y, base_m->size_x);
 }
 
 VIEW(Vector) *FUNCTION(matrixview_diag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m) {
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_m->data, cul_umin_pair(base_m->size_x, base_m->size_y), base_m->size_x + 1);
 }
 
 VIEW(Vector) *FUNCTION(matrixview_subdiag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_k) {
 	if( base_k >= base_m->size_y )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_m->data + base_m->size_x * base_k, cul_umin_pair(base_m->size_x - base_k, base_m->size_y), base_m->size_x + 1);
 }
 
 VIEW(Vector) *FUNCTION(matrixview_superdiag)(VIEW(Vector) *vv, const TYPE(Matrix) *base_m, size_t base_k) {
 	if( base_k >= base_m->size_x )
 		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
+		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_m->data + base_k, cul_umin_pair(base_m->size_x, base_m->size_y - base_k), base_m->size_x + 1);
 }
 

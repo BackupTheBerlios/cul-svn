@@ -146,30 +146,6 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *vv) {
 	FUNCTION(reverse_stride)(vv->data, vv->size, vv->stride);
 }
 
-int FUNCTION(vector_compare)(const TYPE(Vector) *a, const TYPE(Vector) *b) {
-	const size_t size = a->size > b->size? b->size: a->size;
-	const int cmp = FUNCTION(compare)(a->data, b->data, size);
-
-	if( cmp || a->size == b->size )
-		return cmp;
-
-	if( a->size < b->size )
-		return -FUNCTION(vector_get)(b, size);
-	return FUNCTION(vector_get)(a, size);
-}
-
-int FUNCTION(vectorview_compare)(const VIEW(Vector) *va, const VIEW(Vector) *vb) {
-	const size_t size = va->size > vb->size? vb->size: va->size;
-	const int cmp = FUNCTION(compare_stride)(va->data, vb->data, size, va->stride, vb->stride);
-
-	if( cmp || va->size == vb->size )
-		return cmp;
-
-	if( va->size < vb->size )
-		return -FUNCTION(vectorview_get)(vb, size);
-	return FUNCTION(vectorview_get)(va, size);
-}
-
 cul_errno FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
 

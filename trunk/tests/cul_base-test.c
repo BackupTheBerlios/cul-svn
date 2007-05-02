@@ -11,6 +11,8 @@ cul_bool test_permute(size_t *data, const size_t *permutation, size_t size);
 int main(int argc, char* argv[]) {
 	/* initialize standard random number generator */
 	srand(time(NULL));
+	/* get more verbose error messages */
+	cul_error_fatal_set(CUL_FALSE);
 
 	/* test permute */
 	size_t *permutation = malloc(size*sizeof(size_t));
@@ -29,22 +31,19 @@ int main(int argc, char* argv[]) {
 		data_rand[i] = (size_t)(((double)rand()/(double)RAND_MAX)*size);
 	}
 
-	if( !test_permute(data_identity, permutation, size) ||
-			!test_permute(data_rand, permutation, size)) {
-		CUL_MESSAGE("Failed identity permutation test!");
-		return -1;
-	}
+	CUL_MESSAGE("Identity permutation test...\n");
+	CUL_ASSERT( test_permute(data_identity, permutation, size) );
+	CUL_ASSERT( test_permute(data_rand, permutation, size) );
 
 	/* shuffle identitity permutation */
 	for( size_t i=size-1; i>0; i--)
 		cul_uswap_pos(permutation, i, (rand()/RAND_MAX) * (i+1));
 
-	if( !test_permute(data_identity, permutation, size) ||
-			!test_permute(data_rand, permutation, size)) {
-		CUL_MESSAGE("Failed shuffled permutation test!");
-		return -1;
-	}
+	CUL_MESSAGE("Shuffled permutation test...\n");
+	CUL_ASSERT( test_permute(data_identity, permutation, size) );
+	CUL_ASSERT( test_permute(data_rand, permutation, size) );
 
+	/* free all data */
 	free(data_identity);
 	free(data_rand);
 

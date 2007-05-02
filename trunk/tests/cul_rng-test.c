@@ -2,5 +2,5 @@
 #include <cul/cul_rng.h>
 
 int main(int argc, char* argv[]) {
-	return 1;
+	return 0;
 }

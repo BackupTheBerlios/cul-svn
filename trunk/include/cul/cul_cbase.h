@@ -18,10 +18,6 @@ void cul_cpermute_stride(char *data, const size_t *permutation, size_t size, siz
 void cul_creverse(char *data, size_t size);
 void cul_creverse_stride(char *data, size_t size, size_t stride);
 
-int cul_ccompare(const char *data_a, const char *data_b, size_t size);
-int cul_ccompare_stride(const char *data_a, const char *data_b, size_t size, size_t stride_a, size_t stride_b);
-int cul_ccompare_tda(const char *data_a, const char *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b);
-
 void cul_cset_all(char *data, size_t size, char value);
 void cul_cset_all_stride(char *data, size_t size, size_t stride, char value);
 void cul_cadd_scalar(char *data, size_t size, char value);
