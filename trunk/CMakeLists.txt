@@ -90,8 +90,8 @@ IF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 ENDIF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 
 # testing
-ENABLE_TESTING()
+#ENABLE_TESTING()
 INCLUDE(CMakeTests.txt)
 
-# auto build test cases
+# auto build test cases, this brake "make" "make test" "make" chain
 ADD_SUBDIRECTORY(tests)
