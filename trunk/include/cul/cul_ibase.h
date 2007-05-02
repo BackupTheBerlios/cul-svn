@@ -9,10 +9,6 @@ void cul_icopy_overlap(int *data_a, const int *data_b, size_t size);
 void cul_icopy_stride(int *data_a, const int *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_icopy_tda(int *data_a, const int *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b);
 
-int cul_icompare(int *data_a, int *data_b, size_t size);
-int cul_icompare_stride(int *data_a, int *data_b, size_t size, size_t stride_a, size_t stride_b);
-int cul_icompare_tda(int *data_a, int *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b);
-
 void cul_iswap(int *data_a, int *data_b, size_t size);
 void cul_iswap_stride(int *data_a, int *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_iswap_tda(int *data_a, int *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
@@ -21,6 +17,10 @@ void cul_ipermute(int *data, const size_t *permutation, size_t size);
 void cul_ipermute_stride(int *data, const size_t *permutation, size_t size, size_t stride);
 void cul_ireverse(int *data, size_t size);
 void cul_ireverse_stride(int *data, size_t size, size_t stride);
+
+int cul_icompare(const int *data_a, const int *data_b, size_t size);
+int cul_icompare_stride(const int *data_a, const int *data_b, size_t size, size_t stride_a, size_t stride_b);
+int cul_icompare_tda(const int *data_a, const int *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b);
 
 void cul_iset_all(int *data, size_t size, int value);
 void cul_iset_all_stride(int *data, size_t size, size_t stride, int value);

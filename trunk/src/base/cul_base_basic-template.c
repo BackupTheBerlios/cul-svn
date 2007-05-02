@@ -69,11 +69,11 @@
 #endif /* TEMPLATE_CUL_PTR */
 
 #ifndef TEMPLATE_CUL_PTR
-	int FUNCTION(compare)(ATOM *data_a, ATOM *data_b, size_t size) {
+	int FUNCTION(compare)(const ATOM *data_a, const ATOM *data_b, size_t size) {
 		return memcmp(data_a, data_b, size*sizeof(ATOM));
 	}
 
-	int FUNCTION(compare_stride)(ATOM *data_a, ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
+	int FUNCTION(compare_stride)(const ATOM *data_a, const ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
 		const ATOM *const end = data_b + size * stride_b;
 		for( ; data_b < end; data_a += stride_a, data_b += stride_b)
 			if( *data_a != *data_b ) {
@@ -84,18 +84,53 @@
 		return 0;
 	}
 
-	int FUNCTION(compare_tda)(ATOM *data_a, ATOM *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b) {
+	int FUNCTION(compare_tda)(const ATOM *data_a, const ATOM *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b) {
 		const ATOM *const end = data_b + size;
 
 		/* move through all rows */
-		for(int cmp; data_b < end; data_a += tda_a, data_b += tda_b) {
+		for(int cmp; data_b < end; data_a += tda_a, data_b += tda_b)
 			/* check single row */
-			if( (cmp = memcmp(data_a, data_b, tda_size*sizeof(ATOM)) ) != 0 )
+			if( (cmp = memcmp(data_a, data_b, tda_size*sizeof(ATOM)) ) )
 				return cmp;
-		}
 		return 0;
 	}
 #else /* TEMPLATE_CUL_PTR */
+	int FUNCTION(compare)(const ATOM *data_a, const ATOM *data_b, size_t size, cul_cmp_f *cmp_f) {
+		const ATOM *const end = data_b + size;
+		for(int cmp; data_b < end; ++data_a, ++data_b)
+			if( (cmp = cmp_f(data_a, data_b)) )
+				return cmp > 0? 1: -1;
+		return 0;
+	}
+
+	int FUNCTION(compare_stride)(const ATOM *data_a, const ATOM *data_b, size_t size, size_t stride_a, size_t stride_b, cul_cmp_f *cmp_f) {
+		const ATOM *const end = data_b + size * stride_b;
+		for(int cmp; data_b < end; data_a += stride_a, data_b += stride_b)
+			if( (cmp = cmp_f(data_a, data_b)) )
+				return cmp > 0? 1: -1;
+		return 0;
+	}
+
+	int FUNCTION(compare_tda)(const ATOM *data_a, const ATOM *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b, cul_cmp_f *cmp_f) {
+		const ATOM *const end = data_b + size, *tda_end;
+		const size_t tda_size_b = tda_b;
+
+		/* adjust tda jumps */
+		tda_a -= tda_size;
+		tda_b -= tda_size;
+
+		/* move through all rows */
+		for( tda_end = data_b + tda_size; data_b < end; tda_end += tda_size_b) {
+			/* copy one row */
+			for(int cmp; data_b < tda_end; ++data_a, ++data_b)
+				if( (cmp = cmp_f(data_a, data_b)) )
+					return cmp > 0? 1: -1;
+			/* adjust size, possible empty space */
+			data_a += tda_a;
+			data_b += tda_b;
+		}
+		return 0;
+	}
 #endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(swap)(ATOM *data_a, ATOM *data_b, size_t size) {

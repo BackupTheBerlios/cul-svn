@@ -4,10 +4,10 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
-void cul_pcopy(cul_ptr *data_a, const cul_ptr *data_b, size_t size, cul_cpy_f *cpy_item);
-void cul_pcopy_overlap(cul_ptr *data_a, const cul_ptr *data_b, size_t size, cul_cpy_f *cpy_item);
-void cul_pcopy_stride(cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t stride_a, size_t stride_b, cul_cpy_f *cpy_item);
-void cul_pcopy_tda(cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b, cul_cpy_f *cpy_item);
+void cul_pcopy(cul_ptr *data_a, const cul_ptr *data_b, size_t size, cul_cpy_f *cpy_f);
+void cul_pcopy_overlap(cul_ptr *data_a, const cul_ptr *data_b, size_t size, cul_cpy_f *cpy_f);
+void cul_pcopy_stride(cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t stride_a, size_t stride_b, cul_cpy_f *cpy_f);
+void cul_pcopy_tda(cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b, cul_cpy_f *cpy_f);
 
 void cul_pswap(cul_ptr *data_a, cul_ptr *data_b, size_t size);
 void cul_pswap_stride(cul_ptr *data_a, cul_ptr *data_b, size_t size, size_t stride_a, size_t stride_b);
@@ -18,14 +18,18 @@ void cul_ppermute_stride(cul_ptr *data, const size_t *permutation, size_t size, 
 void cul_preverse(cul_ptr *data, size_t size);
 void cul_preverse_stride(cul_ptr *data, size_t size, size_t stride);
 
-cul_ptr *cul_plfind(cul_ptr key, cul_ptr *data, size_t size, cul_eq_f *eq);
-cul_ptr *cul_plfind_stride(cul_ptr key, cul_ptr *data, size_t size, size_t stride, cul_eq_f *eq);
-cul_ptr *cul_pbfind(cul_ptr key, cul_ptr *data, size_t size, cul_cmp_f *cmp);
-cul_ptr *cul_pbfind_stride(cul_ptr key, cul_ptr *data, size_t size, size_t stride, cul_cmp_f *cmp);
-void cul_psort(cul_ptr *data, size_t size, cul_cmp_f *cmp);
-void cul_psort_stride(cul_ptr *data, size_t size, size_t stride, cul_cmp_f *cmp);
-cul_ptr *cul_punique(cul_ptr *data, size_t size, cul_eq_f *eq);
-cul_ptr *cul_punique_stride(cul_ptr *data, size_t size, size_t stride, cul_eq_f *eq);
+int cul_pcompare(const cul_ptr *data_a, const cul_ptr *data_b, size_t size, cul_cmp_f *cmp_f);
+int cul_pcompare_stride(const cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t stride_a, size_t stride_b, cul_cmp_f *cmp_f);
+int cul_pcompare_tda(const cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b, cul_cmp_f *cmp_f);
+
+cul_ptr *cul_plfind(cul_ptr key, cul_ptr *data, size_t size, cul_cmp_f *cmp_f);
+cul_ptr *cul_plfind_stride(cul_ptr key, cul_ptr *data, size_t size, size_t stride, cul_cmp_f *cmp_f);
+cul_ptr *cul_pbfind(cul_ptr key, cul_ptr *data, size_t size, cul_cmp_f *cmp_f);
+cul_ptr *cul_pbfind_stride(cul_ptr key, cul_ptr *data, size_t size, size_t stride, cul_cmp_f *cmp_f);
+void cul_psort(cul_ptr *data, size_t size, cul_cmp_f *cmp_f);
+void cul_psort_stride(cul_ptr *data, size_t size, size_t stride, cul_cmp_f *cmp_f);
+cul_ptr *cul_punique(cul_ptr *data, size_t size, cul_cmp_f *cmp_f);
+cul_ptr *cul_punique_stride(cul_ptr *data, size_t size, size_t stride, cul_cmp_f *cmp_f);
 
 /* implementations */
 
