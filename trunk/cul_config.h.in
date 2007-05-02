@@ -16,8 +16,6 @@
 #define CUL_SFACTOR_SUM 0
 
 /* all define macros from cul */
-/* #define CUL_MESSAGE_SYSTEM_OFF */
-/* #define CUL_MESSAGE_SYSTEM_CLOCK_OFF */
 /* #define CUL_RANGE_CHECK */
 
 #cmakedefine HAVE_ASPRINTF
