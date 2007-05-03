@@ -31,7 +31,7 @@ size_t cul_file_lines(const char *filename) {
 }
 
 
-cul_errno cul_file_read_raw(const char *filename, char ***contents, size_t *lines) {
+cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lines) {
 	CulList *line = NULL;
 	size_t line_size = 0;
 
@@ -163,7 +163,7 @@ cul_errno cul_file_read_raw(const char *filename, char ***contents, size_t *line
 	return CUL_SUCCESS;
 }
 
-cul_errno cul_file_write_raw(const char *filename, char **contents) {
+cul_errno cul_file_write_strv(const char *filename, char **contents) {
 	if( filename == NULL )
 		CUL_ERROR_ERRNO_RET_VAL(CUL_EINVAL, CUL_EINVAL);
 

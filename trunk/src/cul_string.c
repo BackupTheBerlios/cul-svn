@@ -335,7 +335,7 @@ CulString *cul_string_cut_end(CulString *s, size_t size) {
 }
 
 int cul_string_compare(const CulString *s, const CulString *compare) {
-	return memcmp(s->str, compare->str, s->size > compare->size? compare->size+1: s->size+1);
+	return memcmp(s->str, compare->str, s->size > compare->size? (compare->size+1)*sizeof(char): (s->size+1)*sizeof(char));
 }
 
 int cul_string_compare_str(const CulString *s, const char *compare) {
@@ -343,7 +343,7 @@ int cul_string_compare_str(const CulString *s, const char *compare) {
 		return 0;
 
 	const size_t size = strlen(compare);
-	return memcmp(s->str, compare, s->size > size? size+1: s->size+1);
+	return memcmp(s->str, compare, s->size > size? (size+1)*sizeof(char): (s->size+1)*sizeof(char));
 }
 
 int cul_string_subcompare(const CulString *s, size_t pos, const CulString *compare) {
@@ -359,7 +359,7 @@ int cul_string_subcompare_block(const CulString *s, size_t pos, const char *comp
 		 possible similarity on all characters, but s is shorter that block */
 	pos = pos > s->size? s->size: pos;
 	size = s->size - pos > size? size: s->size - pos + 1;
-	return memcmp(s->str + pos, compare, size);
+	return memcmp(s->str + pos, compare, size*sizeof(char));
 }
 
 cul_bool cul_string_equal(const CulString *s, const CulString *compare) {
