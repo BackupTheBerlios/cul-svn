@@ -18,11 +18,11 @@ typedef enum _CulArgFlag CulArgFlag;
  */ 
 enum _CulArgFlag {
 	/* type */
-	CUL_ARG_BOOL    = 1,  /**< option is a switch, no additional parameter */
-	CUL_ARG_INT     = 2,  /**< option has an integer number parameter (int) */
-	CUL_ARG_DOUBLE  = 3,  /**< option has an floating point number parameter (double) */
-	CUL_ARG_STR     = 4,  /**< option has an string parameter */
-	CUL_ARG_STRV    = 5,  /**< option has a string array parameter, store all flag parameters */
+	CUL_ARG_BOOL       = 1,  /**< option is a switch, no additional parameter */
+	CUL_ARG_INT        = 2,  /**< option has an integer number parameter (int) */
+	CUL_ARG_DOUBLE     = 3,  /**< option has an floating point number parameter (double) */
+	CUL_ARG_STR        = 4,  /**< option has an string parameter */
+	CUL_ARG_STRV       = 5,  /**< option has a string array parameter, store all flag parameters */
 
 	/* flags */
 	CUL_ARG_END        = 1 << 4,  /**< indicate last option in argument table */
