@@ -7,7 +7,7 @@
 /* global cul library io stream for printing */
 
 FILE *cul_stream_get(void);
+FILE *cul_stream_get_default(void);
 FILE *cul_stream_set(FILE *stream);
-FILE *cul_stream_default(void);
 
 #endif /* CUL_STREAM */
