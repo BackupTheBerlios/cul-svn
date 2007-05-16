@@ -1,17 +1,28 @@
 #include <cul/cul_random.h>    /* rand rng functions */
 #include <cul/cul_rng.h>
 
-/* private rng type */
-typedef enum _CulRngType _CulRngType;
-enum _CulRngType {
-	CUL_RNG_RAND,
-	CUL_RNG_MT19937,
-	CUL_RNG_MT19937_64
-};
+CulRngType cul_rng_default = CUL_RNG_DEFAULT;
+
+/* private get default function */
+CulRngType _cul_rng_get_default(void);
+CulRngType _cul_rng_set_default(CulRngType type);
+
+CulRngType _cul_rng_get_default(void) {
+	/* TODO possible environment variable read in future */
+	if( cul_rng_default == CUL_RNG_DEFAULT )
+		_cul_rng_set_default(CUL_RNG_MT19937);
+	return cul_rng_default;
+}
+
+CulRngType _cul_rng_set_default(CulRngType type) {
+	CulRngType old_type = cul_rng_default;
+	cul_rng_default = type;
+	return old_type;
+}
 
 /* private rng structure */
 struct _CulRng {
-	_CulRngType type;                /* type of rng */
+	CulRngType type;                /* type of rng */
 	cul_rng_get_f *get;              /* generic size_t sampling routine */
 	cul_rng_get_real_f *get_real;    /* generic double sampling routine */
 	void *state;                     /* rng state used for sampling */
@@ -25,7 +36,7 @@ static inline void cul_rng_free_struct(CulRng *rng) {
 	cul_slab_free(sizeof(CulRng), rng);
 }
 
-static inline void cul_rng_init_struct(CulRng *rng, _CulRngType type, cul_rng_get_f *get, cul_rng_get_real_f *get_real, void *state) {
+static inline void cul_rng_init_struct(CulRng *rng, CulRngType type, cul_rng_get_f *get, cul_rng_get_real_f *get_real, void *state) {
 	rng->type = type;
 	rng->get = get;
 	rng->get_real = get_real;
@@ -33,6 +44,24 @@ static inline void cul_rng_init_struct(CulRng *rng, _CulRngType type, cul_rng_ge
 }
 
 /* basic rng functions */
+
+CulRng *cul_rng_new(CulRngType type) {
+	CulRng *rng;
+
+	/* check if we have to use default rng */
+	if( type == CUL_RNG_DEFAULT )
+		type = _cul_rng_get_default();
+
+	switch( type ) {
+		case CUL_RNG_DEFAULT:    rng = NULL; break;
+		case CUL_RNG_RAND:       rng = cul_rng_rand_new(); break;
+		case CUL_RNG_MT19937:    rng = cul_rng_mt19937_new(); break;
+		case CUL_RNG_MT19937_64: rng = cul_rng_mt19937_64_new(); break;
+	}
+	if( rng == NULL )
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
+	return rng;
+}
 
 void cul_rng_free(CulRng *rng) {
 	if( rng != NULL ) {
@@ -70,7 +99,7 @@ CulRng *cul_rng_rand_new() {
 	CulRng *rng;
 
 	if( (rng = cul_rng_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	cul_rng_init_struct(rng, CUL_RNG_RAND, cul_rng_rand_get, cul_rng_rand_get_real, NULL);
 	cul_rng_rand_seed(rng->state, default_seed32);
@@ -111,17 +140,17 @@ struct _CulRngState_mt19937 {
 	size_t mti;
 };
 
-CulRng *cul_rng_mt_19937_new() {
+CulRng *cul_rng_mt19937_new() {
 	const uint32_t default_seed32 = UINT32_C(0);
 	CulRng *rng;
 	void *state;
 
 	if( (rng = cul_rng_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( (state = malloc(sizeof(_CulRngState_mt19937))) == NULL ) {
 		cul_rng_free_struct(rng);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	}
 
 	cul_rng_init_struct(rng, CUL_RNG_MT19937, cul_rng_mt19937_get, cul_rng_mt19937_get_real, state);
@@ -202,17 +231,17 @@ struct _CulRngState_mt19937_64 {
 	size_t mti;
 };
 
-CulRng *cul_rng_mt_19937_64_new() {
+CulRng *cul_rng_mt19937_64_new() {
 	const uint64_t default_seed64 = UINT64_C(0);
 	CulRng *rng;
 	void *state;
 
 	if( (rng = cul_rng_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( (state = malloc(sizeof(_CulRngState_mt19937_64))) == NULL ) {
 		cul_rng_free_struct(rng);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	}
 
 	cul_rng_init_struct(rng, CUL_RNG_MT19937_64, cul_rng_mt19937_64_get, cul_rng_mt19937_64_get_real, state);

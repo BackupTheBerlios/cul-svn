@@ -7,11 +7,21 @@
 typedef double cul_rng_get_real_f(void *state);
 typedef size_t cul_rng_get_f(void *state);
 
-typedef struct _CulRng CulRng;
+typedef struct _CulRng     CulRng;
+typedef enum   _CulRngType CulRngType;
 
+enum _CulRngType {
+	CUL_RNG_DEFAULT,
+	CUL_RNG_RAND,
+	CUL_RNG_MT19937,
+	CUL_RNG_MT19937_64
+};
+
+/* generic rng allocation */
+CulRng *cul_rng_new(CulRngType type);
 void cul_rng_free(CulRng *rng);
 
-/* generic acces to rng */
+/* generic rng acces */
 size_t cul_rng_max(const CulRng *rng);
 size_t cul_rng_get(const CulRng *rng);
 double cul_rng_get_real(const CulRng *rng);
@@ -34,7 +44,7 @@ double cul_rng_rand_get_real(void *state);
 
 #define CUL_RNG_MT19937_MAX UINT32_C(0xffffffff)
 
-CulRng *cul_rng_mt_19937_new();
+CulRng *cul_rng_mt19937_new();
 void cul_rng_mt19937_seed(void *state, uint32_t seed);
 uint32_t cul_rng_mt19937_sample(void *state);
 size_t cul_rng_mt19937_get(void *state);
@@ -44,7 +54,7 @@ double cul_rng_mt19937_get_real(void *state);
 
 #define CUL_RNG_MT19937_64_MAX UINT64_C(0xffffffffffffffff)
 
-CulRng *cul_rng_mt_19937_64_new();
+CulRng *cul_rng_mt19937_64_new();
 void cul_rng_mt19937_64_seed(void *state, uint64_t seed);
 uint64_t cul_rng_mt19937_64_sample(void *state);
 size_t cul_rng_mt19937_64_get(void *state);
