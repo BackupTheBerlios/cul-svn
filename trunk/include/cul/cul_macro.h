@@ -15,6 +15,9 @@
 #define CUL_STMT_START do
 #define CUL_STMT_END   while(0)
 
+#define CUL_FATAL(...) CUL_STMT_START {                      \
+		cul_log(CUL_MODULE, CUL_LOG_FATAL, __VA_ARGS__);         \
+	} CUL_STMT_END
 #define CUL_FATAL_ERRNO(errno) CUL_STMT_START {              \
 		cul_log(CUL_MODULE, CUL_LOG_FATAL, "%s: (%s:%d) %s\n",   \
 			__PRETTY_FUNCTION__,                                   \
@@ -22,26 +25,7 @@
 			__LINE__,                                              \
 			cul_error_string(errno));                              \
 	} CUL_STMT_END
-#define CUL_FATAL(...) CUL_STMT_START {                      \
-		cul_log(CUL_MODULE, CUL_LOG_FATAL, __VA_ARGS__);         \
-	} CUL_STMT_END
 
-#define CUL_ERROR_ERRNO_RET_VAL(val, errno) CUL_STMT_START { \
-		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
-			__PRETTY_FUNCTION__,                                   \
-			__FILE__,                                              \
-			__LINE__,                                              \
-			cul_error_string(errno));                              \
-		return (val);                                            \
-	} CUL_STMT_END
-#define CUL_ERROR_ERRNO_RET(errno, ...) CUL_STMT_START {     \
-		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
-			__PRETTY_FUNCTION__,                                   \
-			__FILE__,                                              \
-			__LINE__,                                              \
-			cul_error_string(errno));                              \
-		return __VA_ARGS__;                                      \
-	} CUL_STMT_END
 #define CUL_ERROR_ERRNO(errno) CUL_STMT_START {              \
 		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
 			__PRETTY_FUNCTION__,                                   \
@@ -49,8 +33,33 @@
 			__LINE__,                                              \
 			cul_error_string(errno));                              \
 	} CUL_STMT_END
+#define CUL_ERROR_ERRNO_RET(val, errno) CUL_STMT_START {     \
+		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
+			__PRETTY_FUNCTION__,                                   \
+			__FILE__,                                              \
+			__LINE__,                                              \
+			cul_error_string(errno));                              \
+		return (val);                                            \
+	} CUL_STMT_END
+#define CUL_ERROR_ERRNO_RET_VOID(errno) CUL_STMT_START {     \
+		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
+			__PRETTY_FUNCTION__,                                   \
+			__FILE__,                                              \
+			__LINE__,                                              \
+			cul_error_string(errno));                              \
+		return;                                                  \
+	} CUL_STMT_END
+
 #define CUL_ERROR(...) CUL_STMT_START {                      \
 		cul_log(CUL_MODULE, CUL_LOG_ERROR, __VA_ARGS__);         \
+	} CUL_STMT_END
+#define CUL_ERROR_RET(val, ...) CUL_STMT_START {             \
+		cul_log(CUL_MODULE, CUL_LOG_ERROR, __VA_ARGS__);         \
+		return val;                                              \
+	} CUL_STMT_END
+#define CUL_ERROR_RET_VOID(...) CUL_STMT_START {             \
+		cul_log(CUL_MODULE, CUL_LOG_ERROR, __VA_ARGS__);         \
+		return;                                                  \
 	} CUL_STMT_END
 
 #define CUL_CLOCK(...) CUL_STMT_START {                      \

@@ -3,7 +3,7 @@
 CulList *cul_list_new(cul_ptr data) {
 	CulList *l;
 	if( (l = cul_list_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	cul_list_init_struct(l, NULL, NULL, data);
 	return l;
 }
@@ -67,7 +67,7 @@ size_t cul_list_size(CulList *l) {
 CulList *cul_list_insert_next(CulList *l, cul_ptr data) {
 	CulList *n;
 	if( (n = cul_list_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( l != NULL ) {
 		CulList *next = cul_list_next(l);
@@ -86,7 +86,7 @@ CulList *cul_list_insert_next(CulList *l, cul_ptr data) {
 CulList *cul_list_insert_prev(CulList *l, cul_ptr data) {
 	CulList *n;
 	if( (n = cul_list_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( l != NULL ) {
 		CulList *prev = cul_list_prev(l);
@@ -123,11 +123,11 @@ CulList *cul_list_copy(CulList *l) {
 	CulList *first = NULL, *n;
 	if( l != NULL ) {
 		if( (first = cul_list_insert_next(first, l->data)) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 		for( n = first, l = cul_list_next(l); l != NULL; l = cul_list_next(l))
 			if( (n = cul_list_insert_next(n, l->data)) == NULL ) {
 				cul_list_free_all(first, NULL);
-				CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+				CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 			}
 	}
 	return first;
@@ -140,7 +140,7 @@ CulList *cul_list_detach(CulList *l, cul_cpy_f *cpy_f) {
 			/* erase rest of undetached pointers */
 			for( l = cul_list_next(l); l != NULL; l = cul_list_next(l))
 				l->data = NULL;
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 		}
 	}
 	return first;
@@ -232,7 +232,7 @@ CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp_f) {
 size_t cul_list_unique(CulList *l, cul_cmp_f *cmp_f) {
 	CUL_UNUSED(l);
 	CUL_UNUSED(cmp_f);
-	CUL_ERROR_ERRNO_RET_VAL(0, CUL_ESTUB);
+	CUL_ERROR_ERRNO_RET(0, CUL_ESTUB);
 }
 
 size_t cul_list_foreach(CulList *l, cul_foreach_f *foreach) {

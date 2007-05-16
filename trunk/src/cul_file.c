@@ -27,7 +27,7 @@ cul_bool cul_file_writeable(const char *filename) {
 
 size_t cul_file_lines(const char *filename) {
 	CUL_UNUSED(filename);
-	CUL_ERROR_ERRNO_RET_VAL(0, CUL_ESTUB);
+	CUL_ERROR_ERRNO_RET(0, CUL_ESTUB);
 }
 
 
@@ -43,16 +43,16 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 
 	cul_bool is_eof, is_token;
 
-	if( filename == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EINVAL, CUL_EINVAL);
-
-	FILE *stream = fopen(filename, "r");
-	if( stream == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EFACCESS, CUL_EFACCESS);
-
 	/* initialize output data */
 	*contents = NULL;
 	*lines = 0;
+
+	if( filename == NULL )
+		return CUL_SUCCESS;
+
+	FILE *stream = fopen(filename, "r");
+	if( stream == NULL )
+		CUL_ERROR_ERRNO_RET(CUL_EFACCESS, CUL_EFACCESS);
 
 	/* read file */
 	is_eof = feof(stream);
@@ -68,7 +68,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 		if( buffer_size != BUFSIZ && !is_eof ) {
 			fclose(stream); free(data);
 			cul_list_free_all(cul_list_first(line), free);
-			CUL_ERROR_ERRNO_RET_VAL(CUL_EFIO, CUL_EFIO);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		}
 
 		is_token = (next = memchr(token, CUL_STR_NEWLINE, buffer_size)) != NULL;
@@ -77,7 +77,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 		if( (string = malloc((data_size + size + 1)*sizeof(char))) == NULL ) {
 			fclose(stream); free(data);
 			cul_list_free_all(cul_list_first(line), free);
-			CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 		}
 
 		memcpy(string, data, data_size);         /* copy previous data */
@@ -89,7 +89,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 			if( (node = cul_list_insert_next(line, string)) == NULL ) {
 				fclose(stream); free(string);
 				cul_list_free_all(cul_list_first(line), free);
-				CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+				CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 			}
 			line = node;
 			line_size += 1;
@@ -111,7 +111,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 			if( (string = malloc((size + 1)*sizeof(char))) == NULL ) {
 				fclose(stream);
 				cul_list_free_all(cul_list_first(line), free);
-				CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+				CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 			}
 
 			memcpy(string, token, size);    /* copy token */
@@ -121,7 +121,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 				if( (node = cul_list_insert_next(line, string)) == NULL ) {
 					fclose(stream); free(string);
 					cul_list_free_all(cul_list_first(line), free);
-					CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+					CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 				}
 				line = node;
 				line_size += 1;
@@ -144,7 +144,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 	if( linesv == NULL ) {
 		fclose(stream);
 		cul_list_free_all(cul_list_first(line), free);
-		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 	}
 
 	/* set output variables */
@@ -165,20 +165,20 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 
 cul_errno cul_file_write_strv(const char *filename, char **contents) {
 	if( filename == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EINVAL, CUL_EINVAL);
+		CUL_ERROR_ERRNO_RET(CUL_EINVAL, CUL_EINVAL);
 
 	FILE *stream = fopen(filename, "w");
 	if( stream == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EFACCESS, CUL_EFACCESS);
+		CUL_ERROR_ERRNO_RET(CUL_EFACCESS, CUL_EFACCESS);
 
 	/* write contents if present */
 	if( contents != NULL ) {
 		const size_t lines = cul_strv_size(contents);
 		for( size_t i=0; i<lines; ++i) {
 			if( fputs(contents[i], stream) < 0 )
-				CUL_ERROR_ERRNO_RET_VAL(CUL_EFIO, CUL_EFIO);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 			if( fputc(CUL_STR_NEWLINE, stream) == EOF )
-				CUL_ERROR_ERRNO_RET_VAL(CUL_EFIO, CUL_EFIO);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		}
 	}
 

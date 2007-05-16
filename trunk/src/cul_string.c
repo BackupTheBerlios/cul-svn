@@ -28,14 +28,14 @@ CulString *cul_string_new_printf(const char *format, ...) {
 	va_list arg;
 
 	if( (s = cul_string_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	cul_string_init_struct(s, 0, 0, NULL);
 
 	va_start(arg, format);
 	if( _cul_string_insert_vprintf(s, 0, format, arg) == NULL ) {
 		va_end(arg);
 		cul_string_free_struct(s);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 	}
 	va_end(arg);
 	return s;
@@ -50,20 +50,20 @@ CulString *cul_string_new_block(const char *block, size_t size) {
 	char *str;
 
 	if( (s = cul_string_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	/* initialize */
 	cul_string_init_struct(s, 0, 0, NULL);
 
 	/* copy block */
 	if( cul_string_copy_block(s, block, size) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 
 	if( size > 0 ) {
 		/* allocate string */
 		if( (str = malloc((size+1)*sizeof(char))) == NULL ) {
 			cul_string_free_struct(s);
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 		}
 
 		/* copy string */
@@ -102,7 +102,7 @@ CulString *cul_string_resize(CulString *s, size_t size) {
 
 	if( size > 0 ) {
 		if( (str = malloc((size+1)*sizeof(char))) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	}
 	else
 		return cul_string_clear(s);
@@ -127,7 +127,7 @@ CulString *cul_string_reserve(CulString *s, size_t size) {
 		size = s->size+1;
 
 	if( (str = malloc((size)*sizeof(char))) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	/* we can safly copy null terminator */
 	memcpy(str, s->str, (s->size+1)*sizeof(char));
@@ -158,7 +158,7 @@ CulString *cul_string_copy_block(CulString *s, const char *copy, size_t size) {
 	/* reserve new space if needed */
 	if( s->reserved < size + 1 ) {
 		if( (str = malloc( (size+1)*sizeof(char))) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 		free(s->str);
 
 		/* init string */
@@ -186,7 +186,7 @@ CulString *cul_string_append_printf(CulString *s, const char *format, ...) {
 	va_start(arg, format);
 	if( _cul_string_insert_vprintf(s, s->size, format, arg) == NULL ) {
 		va_end(arg);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 	}
 	va_end(arg);
 	return s;
@@ -206,7 +206,7 @@ CulString *cul_string_prepend_printf(CulString *s, const char *format, ...) {
 	va_start(arg, format);
 	if( _cul_string_insert_vprintf(s, 0, format, arg) == NULL ) {
 		va_end(arg);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 	}
 	va_end(arg);
 	return s;
@@ -227,15 +227,15 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 	/* copy data to buffer */
 #ifdef HAVE_ASPRINTF
 	if( (strsize = vasprintf(&str, format, arg)) < 0 )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EPRINTF);
 #else
 	char character;
 	if( (strsize = vsnprintf(&character, 1, format, arg)) < 0 )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EPRINTF);
 	if( (str = malloc((strsize+1) * sizeof(char))) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	if( vsprintf(str, format, arg) < 0 )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EPRINTF);
 #endif
 
 	/* insert buffer to string */
@@ -245,7 +245,7 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 	else {
 		if( cul_string_insert_block(s, pos, str, strsize ) == NULL ) {
 			free(str);
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 		}
 		free(str);
 	}
@@ -279,7 +279,7 @@ CulString *cul_string_insert_block(CulString *s, size_t pos, const char *insert,
 
 	if( s->reserved < s_size + size + 1 ) {
 		if( (str = malloc( (s_size+size+1)*sizeof(char))) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 
 		if( s->str != NULL ) {
 			/* copy previous data, create gap for insert */
@@ -449,7 +449,7 @@ CulList *cul_string_split(const CulString *s, const char *delimiter) {
 		if( cul_list_insert_next(split, item) == NULL || item == NULL) {
 			cul_list_free_all(cul_list_first(split), CUL_FREE_F(cul_string_free));
 			cul_string_free(item);
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 		}
 
 		/* update current position */
@@ -461,7 +461,7 @@ CulList *cul_string_split(const CulString *s, const char *delimiter) {
 	if( cul_list_insert_next(split, item) == NULL || item == NULL) {
 		cul_list_free_all(cul_list_first(split), CUL_FREE_F(cul_string_free));
 		cul_string_free(item);
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EFAILED);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 	}
 
 	return cul_list_first(split);

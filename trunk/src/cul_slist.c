@@ -3,7 +3,7 @@
 CulSList *cul_slist_new(cul_ptr data) {
 	CulSList *l;
 	if( (l = cul_slist_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	cul_slist_init_struct(l, NULL, data);
 	return l;
 }
@@ -60,7 +60,7 @@ size_t cul_slist_size(CulSList *l) {
 CulSList *cul_slist_insert_next(CulSList *l, cul_ptr data) {
 	CulSList *n;
 	if( (n = cul_slist_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( l != NULL ) {
 		cul_slist_init_struct(n, cul_slist_next(l), data);
@@ -95,11 +95,11 @@ CulSList *cul_slist_copy(CulSList *l) {
 	CulSList *first = NULL, *n;
 	if( l != NULL ) {
 		if( (first = cul_slist_insert_next(first, l->data)) == NULL )
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 		for( n = first, l = cul_slist_next(l); l != NULL; l = cul_slist_next(l))
 			if( (n = cul_slist_insert_next(n, l->data)) == NULL ) {
 				cul_slist_free_all(first, NULL);
-				CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+				CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 			}
 	}
 	return first;
@@ -112,7 +112,7 @@ CulSList *cul_slist_detach(CulSList *l, cul_cpy_f *cpy_f) {
 			/* erase rest of undetached pointers */
 			for( l = cul_slist_next(l); l != NULL; l = cul_slist_next(l))
 				l->data = NULL;
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 		}
 	}
 	return first;
@@ -142,13 +142,13 @@ CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_cmp_f *cmp_f) {
 CulSList *cul_slist_sort(CulSList *l, cul_cmp_f *cmp_f) {
 	CUL_UNUSED(l);
 	CUL_UNUSED(cmp_f);
-	CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ESTUB);
+	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
 size_t cul_slist_unique(CulSList *l, cul_cmp_f *cmp_f) {
 	CUL_UNUSED(l);
 	CUL_UNUSED(cmp_f);
-	CUL_ERROR_ERRNO_RET_VAL(0, CUL_ESTUB);
+	CUL_ERROR_ERRNO_RET(0, CUL_ESTUB);
 }
 
 size_t cul_slist_foreach(CulSList *l, cul_foreach_f *foreach) {

@@ -3,14 +3,14 @@ TYPE(Vector) *FUNCTION(vector_new)(size_t size) {
 	ATOM *data;
 
 	if( (v = FUNCTION(vector_new_struct)()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( size == 0 )
 		FUNCTION(vector_init_struct)(v, NULL, 0, 0);
 	else {
 		if( (data = malloc(size * sizeof(ATOM))) == NULL ) {
 			FUNCTION(vector_free_struct)(v);
-			CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 		}
 		FUNCTION(vector_init_struct)(v, data, size, size);
 	}
@@ -32,7 +32,7 @@ void FUNCTION(vector_free)(TYPE(Vector) *v) {
 VIEW(Vector) *FUNCTION(vectorview_new)(void) {
 	VIEW(Vector) *vv;
 	if( (vv = FUNCTION(vectorview_new_struct)()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, NULL, 0, 0);
 }
 
@@ -42,15 +42,15 @@ void FUNCTION(vectorview_free)(VIEW(Vector) *vv) {
 
 VIEW(Vector) *FUNCTION(vectorview_vector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v) {
 	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_v->data, base_v->size, 1);
 }
 
 VIEW(Vector) *FUNCTION(vectorview_subvector)(VIEW(Vector) *vv, const TYPE(Vector) *base_v, size_t base_offset, size_t base_size, size_t base_stride) {
 	if( base_offset + base_size > base_v->size )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 	if( vv == NULL && (vv = FUNCTION(vectorview_new_struct)()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	return FUNCTION(vectorview_init_struct)(vv, base_v->data + base_offset, base_size, base_stride);
 }
 
@@ -91,49 +91,49 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *vv, size_t i) {
 
 cul_errno FUNCTION(vector_copy)(TYPE(Vector) *v, const TYPE(Vector) *base_v) {
 	if( v->size != base_v->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(copy)(v->data, base_v->data, base_v->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_offset)(TYPE(Vector) *v, const TYPE(Vector) *base_v, size_t offset) {
 	if( v->size - offset < base_v->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADPOS, CUL_EBADPOS);
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	FUNCTION(copy)(v->data + offset, base_v->data, base_v->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_subvector)(TYPE(Vector) *v, const TYPE(Vector) *base_v, size_t base_offset) {
 	if( base_v->size - base_offset < v->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADPOS, CUL_EBADPOS);
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	FUNCTION(copy)(v->data, base_v->data + base_offset, v->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_view)(TYPE(Vector) *v, const VIEW(Vector) *base_vv) {
 	if( v->size != base_vv->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(copy)(v->data, base_vv->data, base_vv->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vectorview_copy)(VIEW(Vector) *vv, const VIEW(Vector) *base_vv) {
 	if( vv->size != base_vv->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(copy_stride)(vv->data, base_vv->data, base_vv->size, vv->stride, base_vv->stride);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_swap)(TYPE(Vector) *a, TYPE(Vector) *b) {
 	if( a->size != b->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(swap)(a->data, b->data, a->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vectorview_swap)(VIEW(Vector) *va, VIEW(Vector) *vb) {
 	if( va->size != vb->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(swap_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
@@ -157,7 +157,7 @@ cul_errno FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
 		v->size = size;
 		return CUL_SUCCESS;
 	} else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 
 	FUNCTION(vector_init_struct)(v, d, size, size);
 	return CUL_SUCCESS;
@@ -174,7 +174,7 @@ cul_errno FUNCTION(vector_resize_empty)(TYPE(Vector) *v, size_t size) {
 		v->size = size;
 		return CUL_SUCCESS;
 	} else if( (d = (ATOM *)malloc(size * sizeof(ATOM))) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 
 	free(v->data);
 	FUNCTION(vector_init_struct)(v, d, size, size);
@@ -190,7 +190,7 @@ cul_errno FUNCTION(vector_reserve)(TYPE(Vector) *v, size_t size) {
 		return CUL_SUCCESS;
 	}
 	else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_ENOMEM, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 
 	if( size < v->size )
 		FUNCTION(vector_init_struct)(v, d, size, size);
@@ -202,7 +202,7 @@ cul_errno FUNCTION(vector_reserve)(TYPE(Vector) *v, size_t size) {
 cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *v, ATOM val) {
 	if( v->size >= v->reserved )
 		if( FUNCTION(vector_reserve)(v, (v->size + 1)*CUL_EFACTOR_MUL + CUL_EFACTOR_SUM) )
-			CUL_ERROR_ERRNO_RET_VAL(CUL_EFAILED, CUL_EFAILED);
+			CUL_ERROR_ERRNO_RET(CUL_EFAILED, CUL_EFAILED);
 
 	v->size += 1;
 	FUNCTION(vector_set)(v, v->size - 1, val);
@@ -320,28 +320,28 @@ void FUNCTION(vector_mul_scalar)(TYPE(Vector)  *v, ATOM val) {
 
 cul_errno FUNCTION(vector_add)(TYPE(Vector)  *a, const TYPE(Vector)  *b) {
 	if( a->size != b->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(add)(a->data, b->data, a->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_sub)(TYPE(Vector)  *a, const TYPE(Vector)  *b) {
 	if( a->size != b->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(sub)(a->data, b->data, a->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_mul)(TYPE(Vector)  *a, const TYPE(Vector)  *b) {
 	if( a->size != b->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(mul)(a->data, b->data, a->size);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_div)(TYPE(Vector)  *a, const TYPE(Vector)  *b) {
 	if( a->size != b->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(div)(a->data, b->data, a->size);
 	return CUL_SUCCESS;
 }
@@ -356,28 +356,28 @@ void FUNCTION(vectorview_mul_scalar)(VIEW(Vector)  *vv, ATOM val) {
 
 cul_errno FUNCTION(vectorview_add)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
 	if( va->size != vb->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(add_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vectorview_sub)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
 	if( va->size != vb->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(sub_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vectorview_mul)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
 	if( va->size != vb->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(mul_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vectorview_div)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
 	if( va->size != vb->size )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EBADLEN, CUL_EBADLEN);
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(div_stride)(va->data, vb->data, va->size, va->stride, vb->stride);
 	return CUL_SUCCESS;
 }
@@ -385,9 +385,9 @@ cul_errno FUNCTION(vectorview_div)(VIEW(Vector)  *va, const VIEW(Vector)  *vb) {
 cul_errno FUNCTION(vector_fprintf)(FILE *id, const TYPE(Vector) *v, const char *format, const char *separator) {
 
 	if( !FUNCTION(fprintf)(id, format, separator, v->data, v->size) )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
 	if( fprintf(id, "\n") < 0 )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
 
 	return CUL_SUCCESS;
 }
@@ -395,7 +395,7 @@ cul_errno FUNCTION(vector_fprintf)(FILE *id, const TYPE(Vector) *v, const char *
 cul_errno FUNCTION(vector_fscanf)(FILE *id, TYPE(Vector) *v, const char *format, const char *separator) {
 
 	if( !FUNCTION(fscanf)(id, format, separator, v->data, v->size) )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_ESCANF, CUL_ESCANF);
+		CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
 
 	return CUL_SUCCESS;
 }
@@ -403,9 +403,9 @@ cul_errno FUNCTION(vector_fscanf)(FILE *id, TYPE(Vector) *v, const char *format,
 cul_errno FUNCTION(vectorview_fprintf)(FILE *id, const VIEW(Vector) *vv, const char *format, const char *separator) {
 
 	if( !FUNCTION(fprintf_stride)(id, format, separator, vv->data, vv->size, vv->stride) )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
 	if( fprintf(id, "\n") < 0 )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_EPRINTF, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
 
 	return CUL_SUCCESS;
 }
@@ -413,7 +413,7 @@ cul_errno FUNCTION(vectorview_fprintf)(FILE *id, const VIEW(Vector) *vv, const c
 cul_errno FUNCTION(vectorview_fscanf)(FILE *id, VIEW(Vector) *vv, const char *format, const char *separator) {
 
 	if( !FUNCTION(fscanf_stride)(id, format, separator, vv->data, vv->size, vv->stride) )
-		CUL_ERROR_ERRNO_RET_VAL(CUL_ESCANF, CUL_ESCANF);
+		CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
 
 	return CUL_SUCCESS;
 }

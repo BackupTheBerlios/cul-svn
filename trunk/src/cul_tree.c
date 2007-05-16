@@ -3,7 +3,7 @@
 CulTree *cul_tree_new(void) {
 	CulTree *t;
 	if( (t = cul_tree_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	return cul_tree_init_struct(t, NULL, NULL, NULL, NULL, NULL);
 }
 
@@ -51,7 +51,7 @@ CulTree *cul_tree_root(CulTree *t) {
 CulTree *cul_tree_insert_next(CulTree *t, cul_ptr data) {
 	CulTree *n;
 	if( (n = cul_tree_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( t != NULL ) {
 		CulTree *next = cul_tree_next(t);
@@ -70,7 +70,7 @@ CulTree *cul_tree_insert_next(CulTree *t, cul_ptr data) {
 CulTree *cul_tree_insert_prev(CulTree *t, cul_ptr data) {
 	CulTree *n;
 	if( (n = cul_tree_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( t != NULL ) {
 		CulTree *prev = cul_tree_prev(t);
@@ -91,7 +91,7 @@ CulTree *cul_tree_insert_prev(CulTree *t, cul_ptr data) {
 CulTree *cul_tree_insert_child_first(CulTree *t, cul_ptr data) {
 	CulTree *n;
 	if( (n = cul_tree_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( t != NULL ) {
 		CulTree *child = cul_tree_child(t);
@@ -110,7 +110,7 @@ CulTree *cul_tree_insert_child_first(CulTree *t, cul_ptr data) {
 CulTree *cul_tree_insert_child_last(CulTree *t, cul_ptr data) {
 	CulTree *n;
 	if( (n = cul_tree_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	if( t != NULL ) {
 		CulTree *child = cul_tree_last(cul_tree_child(t));

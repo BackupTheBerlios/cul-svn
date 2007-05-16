@@ -11,7 +11,6 @@
 #include "templates_off.h"
 #undef  TEMPLATE_CUL_CHAR
 
-
 #define TEMPLATE_CUL_DOUBLE
 #include "templates_on.h"
 #include "cul_matrix-template.c"

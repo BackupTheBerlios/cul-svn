@@ -52,7 +52,7 @@ static inline void cul_bbtree_node_free_struct(CulBBTreeNode *tn) {
 CulBBTree *cul_bbtree_new(cul_cmp_f *cmp) {
 	CulBBTree *t;
 	if( (t = cul_bbtree_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_ENOMEM);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	return cul_bbtree_init_struct(t, NULL, cmp, 0, 0, CUL_TRUE);
 }
 
