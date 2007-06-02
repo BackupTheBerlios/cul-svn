@@ -80,8 +80,8 @@ size_t    cul_dmatrix_max_index(const CulDMatrix *m);
 void      cul_dmatrix_minmax(const CulDMatrix *m, double *min, double *max);
 void      cul_dmatrix_minmax_index(const CulDMatrix *m, size_t *min_i, size_t *max_i);
 
-cul_errno cul_dmatrix_fprintf(FILE *stream, const CulDMatrix *m, const char *format, const char *separator);
-cul_errno cul_dmatrix_fscanf(FILE *stream, CulDMatrix *m, const char *format, const char *separator);
+cul_errno cul_dmatrix_fprintf(FILE *stream, const CulDMatrix *m, const char *format, const char *separator, const char *begin, const char *end, const char *row);
+cul_errno cul_dmatrix_fscanf(FILE *stream, CulDMatrix *m, const char *format, const char *separator, const char *begin, const char *end, const char *row);
 
 /* implementation */
 
@@ -118,56 +118,56 @@ static inline CulDMatrixView *cul_dmatrixview_init_struct(CulDMatrixView *mv, do
 
 static inline double cul_dmatrix_get(const CulDMatrix *m, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(0.0, CUL_EBADPOS);
 #endif
 	return *(m->data + m->size_x * y + x);
 }
 
 static inline void cul_dmatrix_set(CulDMatrix *m, size_t x, size_t y, double value) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
 	*(m->data + m->size_x * y + x) = value;
 }
 
 static inline double *cul_dmatrix_ptr(CulDMatrix *m, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (m->data + m->size_x * y + x);
 }
 
 static inline const double *cul_dmatrix_const_ptr(const CulDMatrix *m, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (m->data + m->size_x * y + x);
 }
 
 static inline double cul_dmatrixview_get(const CulDMatrixView *mv, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(0.0, CUL_EBADPOS);
 #endif
 	return mv->data[mv->tda * y + x];
 }
 
 static inline void cul_dmatrixview_set(CulDMatrixView *mv, size_t x, size_t y, double value) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
 	mv->data[mv->tda * y + x] = value;
 }
 
 static inline double *cul_dmatrixview_ptr(CulDMatrixView *mv, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (mv->data + mv->tda * y + x);
 }
 
 static inline const double *cul_dmatrixview_const_ptr(const CulDMatrixView *mv, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (mv->data + mv->tda * y + x);
 }

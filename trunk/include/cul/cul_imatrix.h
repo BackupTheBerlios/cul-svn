@@ -80,8 +80,8 @@ size_t    cul_imatrix_max_index(const CulIMatrix *m);
 void      cul_imatrix_minmax(const CulIMatrix *m, int *min, int *max);
 void      cul_imatrix_minmax_index(const CulIMatrix *m, size_t *min_i, size_t *max_i);
 
-cul_errno cul_imatrix_fprintf(FILE *stream, const CulIMatrix *m, const char *format, const char *separator);
-cul_errno cul_imatrix_fscanf(FILE *stream, CulIMatrix *m, const char *format, const char *separator);
+cul_errno cul_imatrix_fprintf(FILE *stream, const CulIMatrix *m, const char *format, const char *separator, const char *begin, const char *end, const char *row);
+cul_errno cul_imatrix_fscanf(FILE *stream, CulIMatrix *m, const char *format, const char *separator, const char *begin, const char *end, const char *row);
 
 /* implementation */
 
@@ -118,56 +118,56 @@ static inline CulIMatrixView *cul_imatrixview_init_struct(CulIMatrixView *mv, in
 
 static inline int cul_imatrix_get(const CulIMatrix *m, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
 #endif
 	return *(m->data + m->size_x * y + x);
 }
 
 static inline void cul_imatrix_set(CulIMatrix *m, size_t x, size_t y, int value) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
 	*(m->data + m->size_x * y + x) = value;
 }
 
 static inline int *cul_imatrix_ptr(CulIMatrix *m, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (m->data + m->size_x * y + x);
 }
 
 static inline const int *cul_imatrix_const_ptr(const CulIMatrix *m, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (m->data + m->size_x * y + x);
 }
 
 static inline int cul_imatrixview_get(const CulIMatrixView *mv, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
 #endif
 	return mv->data[mv->tda * y + x];
 }
 
 static inline void cul_imatrixview_set(CulIMatrixView *mv, size_t x, size_t y, int value) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
 	mv->data[mv->tda * y + x] = value;
 }
 
 static inline int *cul_imatrixview_ptr(CulIMatrixView *mv, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (mv->data + mv->tda * y + x);
 }
 
 static inline const int *cul_imatrixview_const_ptr(const CulIMatrixView *mv, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (mv->data + mv->tda * y + x);
 }

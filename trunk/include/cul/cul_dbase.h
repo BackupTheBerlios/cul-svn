@@ -69,10 +69,10 @@ void cul_dsort_desc_stride(double *data, size_t size, size_t stride);
 double *cul_dunique(double *data, size_t size);
 double *cul_dunique_stride(double *data, size_t size, size_t stride);
 
-cul_bool cul_dfprintf(FILE *stream, const char *format, const char *separator, const double *data, size_t size);
-cul_bool cul_dfprintf_stride(FILE *stream, const char *format, const char *separator, const double *data, size_t size, size_t strid);
-cul_bool cul_dfscanf(FILE *stream, const char *format, const char *separator, const double *data, size_t size);
-cul_bool cul_dfscanf_stride(FILE *stream, const char *format, const char *separator, const double *data, size_t size, size_t stride);
+cul_bool cul_dfprintf(FILE *stream, const double *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
+cul_bool cul_dfprintf_stride(FILE *stream, const double *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
+cul_bool cul_dfscanf(FILE *stream, const double *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
+cul_bool cul_dfscanf_stride(FILE *stream, const double *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
 
 cul_bool cul_dfwrite(FILE *stream, const double *data, size_t size);
 cul_bool cul_dfwrite_stride(FILE *stream, const double *data, size_t size, size_t stride);

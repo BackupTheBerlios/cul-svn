@@ -239,23 +239,32 @@ void FUNCTION(matrix_minmax_index)(const TYPE(Matrix) *m, size_t *min_i, size_t 
 	return FUNCTION(minmax_index)(m->data, m->size_x * m->size_y, min_i, max_i);
 }
 
-cul_errno FUNCTION(matrix_fprintf)(FILE *id, const TYPE(Matrix) *m, const char *format, const char *separator) {
+cul_errno FUNCTION(matrix_fprintf)(FILE *id, const TYPE(Matrix) *m, const char *format, const char *separator, const char *begin, const char *end, const char *row) {
 	size_t i;
 
+	/* prepare formatting */
+	row = row == NULL? "\n": row;
+
 	for( i=0; i<m->size_y; ++i) {
-		if( FUNCTION(fprintf)(id, format, separator, FUNCTION(matrix_const_ptr)(m, 0, i), m->size_x) < 0 )
+		if( !FUNCTION(fprintf)(id, FUNCTION(matrix_const_ptr)(m, 0, i), m->size_x, format, separator, begin, end) )
 			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
-		if( fprintf(id, "\n") < 0 )
+		if( row != NULL && fprintf(id, row) < 0 )
 			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
 	}
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(matrix_fscanf)(FILE *id, TYPE(Matrix) *m, const char *format, const char *separator) {
+cul_errno FUNCTION(matrix_fscanf)(FILE *id, TYPE(Matrix) *m, const char *format, const char *separator, const char *begin, const char *end, const char *row) {
 	size_t i;
 
-	for( i=0; i<m->size_y; ++i)
-		if( FUNCTION(fscanf)(id, format, separator, FUNCTION(matrix_ptr)(m, 0, i), m->size_x) < 0 )
+	/* prepare formatting */
+	row = row == NULL? "\n": row;
+
+	for( i=0; i<m->size_y; ++i) {
+		if( !FUNCTION(fscanf)(id, FUNCTION(matrix_ptr)(m, 0, i), m->size_x, format, separator, begin, end) )
 			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+		if( row != NULL && fscanf(id, row) != 0 )
+			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+	}
 	return CUL_SUCCESS;
 }

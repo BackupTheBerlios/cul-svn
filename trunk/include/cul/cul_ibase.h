@@ -69,10 +69,10 @@ void cul_isort_desc_stride(int *data, size_t size, size_t stride);
 int *cul_iunique(int *data, size_t size);
 int *cul_iunique_stride(int *data, size_t size, size_t stride);
 
-cul_bool cul_ifprintf(FILE *stream, const char *format, const char *separator, const int *data, size_t size);
-cul_bool cul_ifprintf_stride(FILE *stream, const char *format, const char *separator, const int *data, size_t size, size_t strid);
-cul_bool cul_ifscanf(FILE *stream, const char *format, const char *separator, const int *data, size_t size);
-cul_bool cul_ifscanf_stride(FILE *stream, const char *format, const char *separator, const int *data, size_t size, size_t stride);
+cul_bool cul_ifprintf(FILE *stream, const int *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
+cul_bool cul_ifprintf_stride(FILE *stream, const int *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
+cul_bool cul_ifscanf(FILE *stream, const int *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
+cul_bool cul_ifscanf_stride(FILE *stream, const int *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
 
 cul_bool cul_ifwrite(FILE *stream, const int *data, size_t size);
 cul_bool cul_ifwrite_stride(FILE *stream, const int *data, size_t size, size_t stride);

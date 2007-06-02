@@ -1,11 +1,9 @@
 #ifndef TEMPLATE_CUL_PTR
 	ATOM FUNCTION(min)(const ATOM *data, size_t size) {
-		const ATOM *end;
-		ATOM min;
+		const ATOM *last = data + size;
+		ATOM min = *data;
 
-		end = data + size;
-		min = *data;
-		for( ++data; data < end; ++data) {
+		for( ++data; data < last; ++data) {
 			if( *data < min )
 				min = *data;
 		}
@@ -13,12 +11,10 @@
 	}
 
 	ATOM FUNCTION(min_stride)(const ATOM *data, size_t size, size_t stride) {
-		const ATOM *end;
-		ATOM min;
+		const ATOM *last = data + size * stride;
+		ATOM min = *data;
 
-		end = data + size * stride;
-		min = *data;
-		for( data += stride; data < end; data += stride) {
+		for( data += stride; data < last; data += stride) {
 			if( *data < min )
 				min = *data;
 		}
@@ -26,13 +22,10 @@
 	}
 
 	size_t FUNCTION(min_index)(const ATOM *data, size_t size) {
-		const ATOM *begin, *end, *index;
-		ATOM min;
+		const ATOM *begin = data, *last = data + size, *index = data;
+		ATOM min = *data;
 
-		begin = data;
-		end = data + size;
-		min = *data; index = data;
-		for( ++data; data < end; ++data) {
+		for( ++data; data < last; ++data) {
 			if( *data < min ) {
 				min = *data;
 				index = data;
@@ -42,13 +35,10 @@
 	}
 
 	size_t FUNCTION(min_index_stride)(const ATOM *data, size_t size, size_t stride) {
-		const ATOM *begin, *end, *index;
-		ATOM min;
+		const ATOM *begin = data, *last = data + size * stride, *index = data;
+		ATOM min = *data;
 
-		begin = data;
-		end = data + size * stride;
-		min = *data; index = data;
-		for( data += stride; data < end; data += stride) {
+		for( data += stride; data < last; data += stride) {
 			if( *data < min ) {
 				min = *data;
 				index = data;
@@ -61,12 +51,10 @@
 
 #ifndef TEMPLATE_CUL_PTR
 	ATOM FUNCTION(max)(const ATOM *data, size_t size) {
-		const ATOM *end;
-		ATOM max;
+		const ATOM *last = data + size;
+		ATOM max = *data;
 
-		end = data + size;
-		max = *data;
-		for( ++data; data < end; ++data) {
+		for( ++data; data < last; ++data) {
 			if( *data > max )
 				max = *data;
 		}
@@ -74,12 +62,10 @@
 	}
 
 	ATOM FUNCTION(max_stride)(const ATOM *data, size_t size, size_t stride) {
-		const ATOM *end;
-		ATOM max;
+		const ATOM *last = data + size * stride;
+		ATOM max = *data;
 
-		end = data + size * stride;
-		max = *data;
-		for( data += stride; data < end; data += stride) {
+		for( data += stride; data < last; data += stride) {
 			if( *data > max )
 				max = *data;
 		}
@@ -87,13 +73,10 @@
 	}
 
 	size_t FUNCTION(max_index)(const ATOM *data, size_t size) {
-		const ATOM *begin, *end, *index;
-		ATOM max;
+		const ATOM *begin = data, *last = data + size, *index = data;
+		ATOM max = *data;
 
-		begin = data;
-		end = data + size;
-		max = *data; index = data;
-		for( ++data; data < end; ++data) {
+		for( ++data; data < last; ++data) {
 			if( *data > max ) {
 				max = *data;
 				index = data;
@@ -103,13 +86,10 @@
 	}
 
 	size_t FUNCTION(max_index_stride)(const ATOM *data, size_t size, size_t stride) {
-		const ATOM *begin, *end, *index;
-		ATOM max;
+		const ATOM *begin = data, *last = data + size * stride, *index = data;
+		ATOM max = *data;
 
-		begin = data;
-		end = data + size * stride;
-		max = *data; index = data;
-		for( data += stride; data < end; data += stride) {
+		for( data += stride; data < last; data += stride) {
 			if( *data > max ) {
 				max = *data;
 				index = data;
@@ -122,13 +102,10 @@
 
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(minmax)(const ATOM *data, size_t size, ATOM *min_out, ATOM *max_out) {
-		const ATOM *end;
-		ATOM min, max;
+		const ATOM *last = data + size;
+		ATOM min = *data, max = *data;
 
-		end = data + size;
-		min = *data;
-		max = *data;
-		for( ++data; data < end; ++data) {
+		for( ++data; data < last; ++data) {
 			if( *data < min )
 				min = *data;
 			if( *data > max )
@@ -140,13 +117,10 @@
 	}
 
 	void FUNCTION(minmax_stride)(const ATOM *data, size_t size, size_t stride, ATOM *min_out, ATOM *max_out) {
-		const ATOM *end;
-		ATOM min, max;
+		const ATOM *last = data + size * stride;
+		ATOM min = *data, max = *data;
 
-		end = data + size * stride;
-		min = *data;
-		max = *data;
-		for( data += stride; data < end; data += stride) {
+		for( data += stride; data < last; data += stride) {
 			if( *data < min )
 				min = *data;
 			if( *data > max )
@@ -158,14 +132,10 @@
 	}
 
 	void FUNCTION(minmax_index)(const ATOM *data, size_t size, size_t *min_index_out, size_t *max_index_out) {
-		const ATOM *begin, *end, *min_index, *max_index;
-		ATOM min, max;
+		const ATOM *begin = data, *last = data + size, *min_index = data, *max_index = data;
+		ATOM min = *data, max = *data;
 
-		begin = data;
-		end = data + size;
-		min = *data; min_index = data;
-		max = *data; max_index = data;
-		for( ++data; data < end; ++data) {
+		for( ++data; data < last; ++data) {
 			if( *data < min ) {
 				min = *data;
 				min_index = data;
@@ -181,14 +151,10 @@
 	}
 
 	void FUNCTION(minmax_index_stride)(const ATOM *data, size_t size, size_t stride, size_t *min_index_out, size_t *max_index_out) {
-		const ATOM *begin, *end, *min_index, *max_index;
-		ATOM min, max;
+		const ATOM *begin = data, *last = data + size * stride, *min_index = data, *max_index = data;
+		ATOM min = *data, max = *data;
 
-		begin = data;
-		end = data + size * stride;
-		min = *data; min_index = data;
-		max = *data; max_index = data;
-		for( data += stride; data < end; data += stride) {
+		for( data += stride; data < last; data += stride) {
 			if( *data < min ) {
 				min = *data;
 				min_index = data;
@@ -207,32 +173,32 @@
 
 #ifndef TEMPLATE_CUL_PTR
 	ATOM *FUNCTION(lfind)(ATOM key, ATOM *data, size_t size) {
-		ATOM *const end = data + size;
-		for( ; data < end; ++data)
+		ATOM *const last = data + size;
+		for( ; data < last; ++data)
 			if( *data == key )
 				return data;
 		return NULL;
 	}
 
 	ATOM *FUNCTION(lfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride) {
-		ATOM *const end = data + size * stride;
-		for( ; data < end; data += stride)
+		ATOM *const last = data + size * stride;
+		for( ; data < last; data += stride)
 			if( *data == key )
 				return data;
 		return NULL;
 	}
 #else /* TEMPLATE_CUL_PTR */
 	ATOM *FUNCTION(lfind)(ATOM key, ATOM *data, size_t size, cul_cmp_f *cmp_f) {
-		ATOM *const end = data + size;
-		for( ; data < end; ++data)
+		ATOM *const last = data + size;
+		for( ; data < last; ++data)
 			if( !cmp_f(data, &key) )
 				return data;
 		return NULL;
 	}
 
 	ATOM *FUNCTION(lfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp_f) {
-		ATOM *const end = data + size * stride;
-		for( ; data < end; data += stride)
+		ATOM *const last = data + size * stride;
+		for( ; data < last; data += stride)
 			if( !cmp_f(data, &key) )
 				return data;
 		return NULL;
@@ -241,14 +207,14 @@
 
 #ifndef TEMPLATE_CUL_PTR
 	ATOM *FUNCTION(bfind)(ATOM key, ATOM *data, size_t size) {
-		ATOM *end = data + size;
+		ATOM *last = data + size;
 		for( size >>= 1; size > 0; size >>= 1) {
 			const ATOM val = *(data + size);
 			if( val < key ) {
 				data += size + 1;
-				size = end - data;
+				size = last - data;
 			}	else if( val > key )
-				end = data + size;
+				last = data + size;
 			else
 				return data + size;
 		}
@@ -258,14 +224,14 @@
 	}
 
 	ATOM *FUNCTION(bfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride) {
-		ATOM *end = data + size * stride;
+		ATOM *last = data + size * stride;
 		for( size >>= 1; size > 0 ; size >>= 1) {
 			const ATOM val = *(data + size * stride);
 			if( val < key ) {
 				data += (size + 1) * stride;
-				size = (end - data) / stride;
+				size = (last - data) / stride;
 			}	else if( val > key )
-				end = data + size * stride;
+				last = data + size * stride;
 			else
 				return data + size * stride;
 		}
@@ -275,15 +241,15 @@
 	}
 #else /* TEMPLATE_CUL_PTR */
 	ATOM *FUNCTION(bfind)(ATOM key, ATOM *data, size_t size, cul_cmp_f *cmp_f) {
-		ATOM *end = data + size;
+		ATOM *last = data + size;
 		for( size >>= 1; size > 0; size >>= 1) {
 			int cmp_res = cmp_f(*(data + size), &key);
 			if( cmp_res < 0 ) {
 				data += size + 1;
-				size = end - data;
+				size = last - data;
 			}
 			else if( cmp_res > 0 )
-				end = data + size;
+				last = data + size;
 			else
 				return data + size;
 		}
@@ -293,15 +259,15 @@
 	}
 
 	ATOM *FUNCTION(bfind_stride)(ATOM key, ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp_f) {
-		ATOM *end = data + size * stride;
+		ATOM *last = data + size * stride;
 		for( size >>= 1; size > 0 ; size >>= 1) {
 			int cmp_res = cmp_f(*(data + size * stride), &key);
 			if( cmp_res < 0 ) {
 				data += (size + 1) * stride;
-				size = (end - data) / stride;
+				size = (last - data) / stride;
 			}
 			else if( cmp_res > 0 )
-				end = data + size * stride;
+				last = data + size * stride;
 			else
 				return data + size * stride;
 		}
@@ -338,7 +304,7 @@
 	}
 
 	void PFUNCTION(qsort_asc)(ATOM *l, ATOM *r) {
-		ATOM *const begin = l, *const end = r;
+		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + 8 )
 			PFUNCTION(isort_asc)(l, r);
@@ -365,12 +331,12 @@
 				}
 			} while( l <= r );
 			PFUNCTION(qsort_asc)(begin, r);
-			PFUNCTION(qsort_asc)(l, end);
+			PFUNCTION(qsort_asc)(l, last);
 		}
 	}
 
 	void PFUNCTION(qsort_asc_stride)(ATOM *l, ATOM *r, size_t stride) {
-		ATOM *const begin = l, *const end = r;
+		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + (stride << 3) )
 			PFUNCTION(isort_asc_stride)(l, r, stride);
@@ -397,7 +363,7 @@
 				}
 			} while( l <= r );
 			PFUNCTION(qsort_asc_stride)(begin, r, stride);
-			PFUNCTION(qsort_asc_stride)(l, end, stride);
+			PFUNCTION(qsort_asc_stride)(l, last, stride);
 		}
 	}
 
@@ -427,7 +393,7 @@
 	}
 
 	void PFUNCTION(qsort_desc)(ATOM *l, ATOM *r) {
-		ATOM *const begin = l, *const end = r;
+		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + 8 )
 			PFUNCTION(isort_desc)(l, r);
@@ -454,12 +420,12 @@
 				}
 			} while( l <= r );
 			PFUNCTION(qsort_desc)(begin, r);
-			PFUNCTION(qsort_desc)(l, end);
+			PFUNCTION(qsort_desc)(l, last);
 		}
 	}
 
 	void PFUNCTION(qsort_desc_stride)(ATOM *l, ATOM *r, size_t stride) {
-		ATOM *const begin = l, *const end = r;
+		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + (stride << 3) )
 			PFUNCTION(isort_asc_stride)(l, r, stride);
@@ -486,7 +452,7 @@
 				}
 			} while( l <= r );
 			PFUNCTION(qsort_asc_stride)(begin, r, stride);
-			PFUNCTION(qsort_asc_stride)(l, end, stride);
+			PFUNCTION(qsort_asc_stride)(l, last, stride);
 		}
 	}
 
@@ -540,7 +506,7 @@
 	}
 
 	void PFUNCTION(qsort)(ATOM *l, ATOM *r, cul_cmp_f *cmp_f) {
-		ATOM *const begin = l, *const end = r;
+		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + 8 )
 			PFUNCTION(isort)(l, r, cmp_f);
@@ -567,12 +533,12 @@
 				}
 			} while( l <= r );
 			PFUNCTION(qsort)(begin, r, cmp_f);
-			PFUNCTION(qsort)(l, end, cmp_f);
+			PFUNCTION(qsort)(l, last, cmp_f);
 		}
 	}
 
 	void PFUNCTION(qsort_stride)(ATOM *l, ATOM *r, size_t stride, cul_cmp_f *cmp_f) {
-		ATOM *const begin = l, *const end = r;
+		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + (stride << 3) )
 			PFUNCTION(isort_stride)(l, r, stride, cmp_f);
@@ -599,15 +565,15 @@
 				}
 			} while( l <= r );
 			PFUNCTION(qsort_stride)(begin, r, stride, cmp_f);
-			PFUNCTION(qsort_stride)(l, end, stride, cmp_f);
+			PFUNCTION(qsort_stride)(l, last, stride, cmp_f);
 		}
 	}
 #endif /* TEMPLATE_CUL_PTR */
 
 #ifndef TEMPLATE_CUL_PTR
 	ATOM * FUNCTION(unique)(ATOM *data, size_t size) {
-		ATOM *cur = data + 1, *const end = data + size;
-		for(++data; data < end; ++data) {
+		ATOM *cur = data + 1, *const last = data + size;
+		for(++data; data < last; ++data) {
 			if( *(data - 1) == *data )
 				continue;
 			*cur = *data;
@@ -617,8 +583,8 @@
 	}
 
 	ATOM * FUNCTION(unique_stride)(ATOM *data, size_t size, size_t stride) {
-		ATOM *cur = data + stride, * const end = data + size * stride;
-		for( data += stride; data < end; data += stride) {
+		ATOM *cur = data + stride, * const last = data + size * stride;
+		for( data += stride; data < last; data += stride) {
 			if( *(data - stride) == *data )
 				continue;
 			*cur = *data;
@@ -628,8 +594,8 @@
 	}
 #else /* TEMPLATE_CUL_PTR */
 	ATOM * FUNCTION(unique)(ATOM *data, size_t size, cul_cmp_f *cmp_f) {
-		ATOM *cur = data + 1, *const end = data + size;
-		for(++data; data < end; ++data) {
+		ATOM *cur = data + 1, *const last = data + size;
+		for(++data; data < last; ++data) {
 			if( !cmp_f(data - 1, data) )
 				continue;
 			*cur = *data;
@@ -639,8 +605,8 @@
 	}
 
 	ATOM * FUNCTION(unique_stride)(ATOM *data, size_t size, size_t stride, cul_cmp_f *cmp_f) {
-		ATOM *cur = data + stride, *const end = data + size * stride;
-		for( data += stride; data < end; data += stride) {
+		ATOM *cur = data + stride, *const last = data + size * stride;
+		for( data += stride; data < last; data += stride) {
 			if( !cmp_f(data - stride, data) )
 				continue;
 			*cur = *data;

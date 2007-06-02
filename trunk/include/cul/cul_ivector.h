@@ -61,6 +61,7 @@ cul_errno cul_ivector_copy_offset(CulIVector *v, const CulIVector *base_v, size_
 cul_errno cul_ivector_copy_subvector(CulIVector *v, const CulIVector *base_v, size_t base_offset);
 cul_errno cul_ivector_copy_view(CulIVector *v, const CulIVectorView *base_vv);
 cul_errno cul_ivectorview_copy(CulIVectorView *vv, const CulIVectorView *base_vv);
+cul_errno cul_ivectorview_copy_vector(CulIVectorView *vv, const CulIVector *base_v);
 
 cul_errno cul_ivector_swap(CulIVector *a, CulIVector *b);
 cul_errno cul_ivectorview_swap(CulIVectorView *va, CulIVectorView *vb);
@@ -113,10 +114,10 @@ cul_errno cul_ivectorview_sub(CulIVectorView *va, const CulIVectorView *vb);
 cul_errno cul_ivectorview_mul(CulIVectorView *va, const CulIVectorView *vb);
 cul_errno cul_ivectorview_div(CulIVectorView *va, const CulIVectorView *vb);
 
-cul_errno cul_ivector_fprintf(FILE *stream, const CulIVector *v, const char *format, const char *separator);
-cul_errno cul_ivector_fscanf(FILE *stream, CulIVector *v, const char *format, const char *separator);
-cul_errno cul_ivectorview_fprintf(FILE *stream, const CulIVectorView *vv, const char *format, const char *separator);
-cul_errno cul_ivectorview_fscanf(FILE *stream, CulIVectorView *vv, const char *format, const char *separator);
+cul_errno cul_ivector_fprintf(FILE *stream, const CulIVector *v, const char *format, const char *separator, const char *begin, const char *end);
+cul_errno cul_ivector_fscanf(FILE *stream, CulIVector *v, const char *format, const char *separator, const char *begin, const char *end);
+cul_errno cul_ivectorview_fprintf(FILE *stream, const CulIVectorView *vv, const char *format, const char *separator, const char *begin, const char *end);
+cul_errno cul_ivectorview_fscanf(FILE *stream, CulIVectorView *vv, const char *format, const char *separator, const char *begin, const char *end);
 
 /* implementations */
 
@@ -152,14 +153,14 @@ static inline CulIVectorView *cul_ivectorview_init_struct(CulIVectorView *vv, in
 
 static inline int cul_ivector_get(const CulIVector *v, size_t x) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= v->size ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
+	if( x >= v->size ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
 #endif
 	return v->data[x];
 }
 
 static inline void cul_ivector_set(CulIVector *v, size_t x, int val) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= v->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x >= v->size ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
 	v->data[x] = val;
 	return;
@@ -167,28 +168,28 @@ static inline void cul_ivector_set(CulIVector *v, size_t x, int val) {
 
 static inline int *cul_ivector_ptr(CulIVector *v, size_t x) {
 #ifdef CUL_RANGE_CHECK
-	if( x > v->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x > v->size ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (v->data + x);
 }
 
 static inline const int *cul_ivector_const_ptr(const CulIVector *v, size_t x) {
 #ifdef CUL_RANGE_CHECK
-	if( x > v->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x > v->size ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (v->data + x);
 }
 
 static inline int cul_ivectorview_get(const CulIVectorView *vv, size_t x) {
 #ifdef CUL_RANGE_CHECK
-	if( i >= vv->size ) CUL_ERROR_ERRNO_RET_VAL(0, CUL_EBADPOS);
+	if( x >= vv->size ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
 #endif
 	return vv->data[x * vv->stride];
 }
 
 static inline void cul_ivectorview_set(CulIVectorView *vv, size_t x, int val) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= vv->size ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( x >= vv->size ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
 	vv->data[x * vv->stride] = val;
 	return;
@@ -196,28 +197,28 @@ static inline void cul_ivectorview_set(CulIVectorView *vv, size_t x, int val) {
 
 static inline int *cul_ivectorview_ptr(CulIVectorView *vv, size_t x) {
 #ifdef CUL_RANGE_CHECK
-	if( x > v->size ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x > vv->size ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (vv->data + x * vv->stride);
 }
 
 static inline const int *cul_ivectorview_const_ptr(const CulIVectorView *vv, size_t x) {
 #ifdef CUL_RANGE_CHECK
-	if( x > v->size ) CUL_ERROR_ERRNO_RET_VAL(NULL, CUL_EBADPOS);
+	if( x > vv->size ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (vv->data + x * vv->stride);
 }
 
 static inline int *cul_ivectorview_next(CulIVectorView *vv, int *ptr) {
 #ifdef CUL_RANGE_CHECK
-	if( ptr > vv->data + vv->size * vv->stride ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( ptr > vv->data + vv->size * vv->stride ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (ptr + vv->stride);
 }
 
 static inline const int *cul_ivectorview_const_next(const CulIVectorView *vv, const int *ptr) {
 #ifdef CUL_RANGE_CHECK
-	if( ptr > vv->data + vv->size * vv->stride ) CUL_ERROR_ERRNO_RET(CUL_EBADPOS);
+	if( ptr > vv->data + vv->size * vv->stride ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
 	return (ptr + vv->stride);
 }
