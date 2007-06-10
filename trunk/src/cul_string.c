@@ -59,21 +59,6 @@ CulString *cul_string_new_block(const char *block, size_t size) {
 	if( cul_string_copy_block(s, block, size) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
 
-	if( size > 0 ) {
-		/* allocate string */
-		if( (str = malloc((size+1)*sizeof(char))) == NULL ) {
-			cul_string_free_struct(s);
-			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-		}
-
-		/* copy string */
-		memcpy(str, block, size*sizeof(char));
-		str[size] = CUL_STR_NULL;
-		cul_string_init_struct(s, size, size+1, str);
-	}
-	else
-		cul_string_init_struct(s, 0, 0, NULL);
-
 	return s;
 }
 
