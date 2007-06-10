@@ -47,7 +47,6 @@ CulString *cul_string_new_str(const char *str) {
 
 CulString *cul_string_new_block(const char *block, size_t size) {
 	CulString *s;
-	char *str;
 
 	if( (s = cul_string_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
