@@ -24,7 +24,7 @@ struct _CulDMatrixView {
 };
 
 static inline CulDMatrix *cul_dmatrix_new_struct(void);
-static inline void cul_dmatrix_free_struct(CulCVector *m);
+static inline void cul_dmatrix_free_struct(CulDMatrix *m);
 static inline CulDMatrix *cul_dmatrix_init_struct(CulDMatrix *m, double *data, size_t size_x, size_t size_y);
 
 static inline CulDMatrixView *cul_dmatrixview_new_struct(void);
@@ -89,7 +89,7 @@ static inline CulDMatrix *cul_dmatrix_new_struct(void) {
 	return cul_slab_new(sizeof(CulDMatrix));
 }
 
-static inline void cul_dmatrix_free_struct(CulCVector *m) {
+static inline void cul_dmatrix_free_struct(CulDMatrix *m) {
 	cul_slab_free(sizeof(CulDMatrix), m);
 }
 
