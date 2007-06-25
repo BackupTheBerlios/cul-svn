@@ -19,9 +19,6 @@ char *cul_strtrim_left(char *str);
 char *cul_strtolower(char *str);
 char *cul_strtoupper(char *str);
 
-char *cul_strchr_space(const char *str);
-char *cul_strchr_nonspace(const char *str);
-
 char **cul_strsplit(const char *s, const char *delimiter);
 
 /* strv functions */

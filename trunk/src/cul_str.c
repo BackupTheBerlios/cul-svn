@@ -12,7 +12,7 @@ size_t _cul_strtrim_left_size(char *str, size_t size);
 size_t _cul_strtrim_right_size(char *str, size_t size) {
 	char *end = str + size - 1;
 	for( ; str <= end && cul_isspace(*end); --end );
-	*(++end) = CUL_STR_NULL;
+		*(++end) = CUL_STR_NULL;
 	return end - str;
 }
 
@@ -76,16 +76,6 @@ char *cul_strtoupper(char *str) {
 	for( ; *str; ++str)
 		*str = cul_toupper(*str);
 	return begin;
-}
-
-char *cul_strchr_space(const char *str) {
-	for( ; *str && !cul_isspace(*str); ++str) ;
-	return (char *)str;
-}
-
-char *cul_strchr_nonspace(const char *str) {
-	for( ; *str && cul_isspace(*str); ++str) ;
-	return (char *)str;
 }
 
 char **cul_strsplit(const char *s, const char *delimiter) {
