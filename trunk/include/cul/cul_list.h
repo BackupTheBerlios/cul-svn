@@ -32,7 +32,7 @@ CulList *cul_list_first(CulList *l);
 CulList *cul_list_last(CulList *l);
 CulList *cul_list_half(CulList *l);
 CulList *cul_list_nth(CulList *l, size_t n);
-size_t cul_list_size(CulList *l);
+size_t   cul_list_size(CulList *l);
 
 /* Resize */
 
@@ -50,9 +50,9 @@ CulList *cul_list_reverse(CulList *l);
 
 CulList *cul_list_find(CulList *l, cul_ptr data, cul_cmp_f *cmp_f);
 CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp_f);
-size_t cul_list_unique(CulList *l, cul_cmp_f *cmp_f);
-size_t cul_list_foreach(CulList *l, cul_foreach_f *foreach);
-size_t cul_list_foreach_data(CulList *l, cul_foreach_data_f *foreach, cul_ptr data);
+size_t   cul_list_unique_free(CulList *l, cul_cmp_f *cmp_f, cul_free_f *free_f);
+size_t   cul_list_foreach(CulList *l, cul_foreach_f *foreach);
+size_t   cul_list_foreach_data(CulList *l, cul_foreach_data_f *foreach, cul_ptr data);
 
 /* implementations */
 
@@ -71,10 +71,16 @@ static inline void cul_list_init_struct(CulList *l, CulList *next, CulList *prev
 }
 
 static inline CulList *cul_list_next(CulList *l) {
+#ifdef CUL_RANGE_CHECK
+	if( l == NULL ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
+#endif
 	return l->next;
 }
 
 static inline CulList *cul_list_prev(CulList *l) {
+#ifdef CUL_RANGE_CHECK
+	if( l == NULL ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
+#endif
 	return l->prev;
 }
 

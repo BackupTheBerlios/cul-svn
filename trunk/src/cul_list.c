@@ -13,9 +13,10 @@ CulList *cul_list_new_empty() {
 }
 
 void cul_list_free(CulList *l, cul_free_f *free_f) {
-	if( l != NULL && free_f != NULL )
+	if( l != NULL && free_f != NULL ) {
 		free_f(l->data);
-	cul_list_free_struct(l);
+		cul_list_free_struct(l);
+	}
 }
 
 void cul_list_free_all(CulList *l, cul_free_f *free_f) {
@@ -229,14 +230,37 @@ CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp_f) {
 	return _cul_list_sort(l, cmp_f, cul_list_size(l));
 }
 
-size_t cul_list_unique(CulList *l, cul_cmp_f *cmp_f) {
-	CUL_UNUSED(l);
-	CUL_UNUSED(cmp_f);
-	CUL_ERROR_ERRNO_RET(0, CUL_ESTUB);
+size_t cul_list_unique_free(CulList *l, cul_cmp_f *cmp_f, cul_free_f *free_f) {
+	if( l == NULL )
+		return 0;
+
+	size_t unique = 0;
+	CulList *l_last = l, *next = cul_list_next(l);
+
+	for(l = next; l != NULL; l = next)
+		if( cmp_f(l_last->data, l->data) == 0 ) {
+			/* item is not unique */
+			next = cul_list_next(l);
+			l_last->next = next;
+			next->prev = l_last;
+
+			/* free item */
+			if( free_f != NULL )
+				free_f(l->data);
+			cul_list_free_struct(l);
+		} else {
+			/* item is unique */
+			next = cul_list_next(l);
+			l_last = l;
+			++unique;
+		}
+
+	return unique;
 }
 
 size_t cul_list_foreach(CulList *l, cul_foreach_f *foreach) {
 	size_t i_foreach = 0;
+
 	for( ; l != NULL; l = cul_list_next(l), ++i_foreach )
 		if( foreach(l->data) )
 			break;

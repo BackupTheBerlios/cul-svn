@@ -145,10 +145,31 @@ CulSList *cul_slist_sort(CulSList *l, cul_cmp_f *cmp_f) {
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
-size_t cul_slist_unique(CulSList *l, cul_cmp_f *cmp_f) {
-	CUL_UNUSED(l);
-	CUL_UNUSED(cmp_f);
-	CUL_ERROR_ERRNO_RET(0, CUL_ESTUB);
+size_t cul_slist_unique_free(CulSList *l, cul_cmp_f *cmp_f, cul_free_f *free_f) {
+	if( l == NULL )
+		return 0;
+
+	size_t unique = 0;
+	CulSList *l_last = l, *next = cul_slist_next(l);
+
+	for(l = next; l != NULL; l = next)
+		if( cmp_f(l_last->data, l->data) == 0 ) {
+			/* item is not unique */
+			next = cul_slist_next(l);
+			l_last->next = next;
+
+			/* free item */
+			if( free_f != NULL )
+				free_f(l->data);
+			cul_slist_free_struct(l);
+		} else {
+			/* item is unique */
+			next = cul_slist_next(l);
+			l_last = l;
+			++unique;
+		}
+
+	return unique;
 }
 
 size_t cul_slist_foreach(CulSList *l, cul_foreach_f *foreach) {
