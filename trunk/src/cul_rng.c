@@ -22,7 +22,8 @@ CulRngType _cul_rng_set_default(CulRngType type) {
 
 /* private rng structure */
 struct _CulRng {
-	CulRngType type;                /* type of rng */
+	CulRngType type;                 /* type of rng */
+	cul_rng_seed_f *seed;            /* generic seed routine */
 	cul_rng_get_f *get;              /* generic size_t sampling routine */
 	cul_rng_get_real_f *get_real;    /* generic double sampling routine */
 	void *state;                     /* rng state used for sampling */
@@ -70,7 +71,14 @@ void cul_rng_free(CulRng *rng) {
 	}
 }
 
+/* private helper functions */
 static inline size_t _cul_rng_max(const CulRng *rng);
+static inline size_t _cul_rng_size(const CulRng *rng);
+
+void cul_rng_seed(CulRng *rng, CulRngSeed seed) {
+	rng->seed(rng->state, seed);
+}
+
 size_t cul_rng_max(const CulRng *rng) {
 	return _cul_rng_max(rng);
 }
@@ -87,7 +95,6 @@ void *cul_rng_state(const CulRng *rng) {
 	return rng->state;
 }
 
-static inline size_t _cul_rng_size(const CulRng *rng);
 size_t cul_rng_size(const CulRng *rng) {
 	return _cul_rng_size(rng);
 }
@@ -95,20 +102,20 @@ size_t cul_rng_size(const CulRng *rng) {
 /* default rand rng */
 
 CulRng *cul_rng_rand_new() {
-	const uint32_t default_seed32 = UINT32_C(0);
+	const CulRngSeed default_seed = cul_rng_seed_32( UINT32_C(0) );
 	CulRng *rng;
 
 	if( (rng = cul_rng_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	cul_rng_init_struct(rng, CUL_RNG_RAND, cul_rng_rand_get, cul_rng_rand_get_real, NULL);
-	cul_rng_rand_seed(rng->state, default_seed32);
+	cul_rng_rand_seed(rng->state, default_seed);
 	return rng;
 }
 
-void cul_rng_rand_seed(void *state, uint32_t seed) {
+void cul_rng_rand_seed(void *state, CulRngSeed seed) {
 	CUL_UNUSED(state);
-	cul_srand(seed);
+	cul_srand(seed._32);
 }
 
 uint32_t cul_rng_rand_sample(void *state) {
@@ -141,7 +148,7 @@ struct _CulRngState_mt19937 {
 };
 
 CulRng *cul_rng_mt19937_new() {
-	const uint32_t default_seed32 = UINT32_C(0);
+	const CulRngSeed default_seed = cul_rng_seed_32( UINT32_C(0) );
 	CulRng *rng;
 	void *state;
 
@@ -154,15 +161,15 @@ CulRng *cul_rng_mt19937_new() {
 	}
 
 	cul_rng_init_struct(rng, CUL_RNG_MT19937, cul_rng_mt19937_get, cul_rng_mt19937_get_real, state);
-	cul_rng_mt19937_64_seed(rng->state, default_seed32);
+	cul_rng_mt19937_seed(rng->state, default_seed);
 	return rng;
 }
 
-void cul_rng_mt19937_seed(void *state, uint32_t seed) {
+void cul_rng_mt19937_seed(void *state, CulRngSeed seed) {
 	_CulRngState_mt19937 *const _state = state;
 	uint32_t *const mt = _state->mt;
 
-	mt[0] = seed;
+	mt[0] = seed._32;
 	for(size_t i=1; i<N; ++i)
 		mt[i] = (UINT32_C(1812433253)*(mt[i-1] ^ (mt[i-1] >> 30)) + i);
 	_state->mti = N;
@@ -232,7 +239,7 @@ struct _CulRngState_mt19937_64 {
 };
 
 CulRng *cul_rng_mt19937_64_new() {
-	const uint64_t default_seed64 = UINT64_C(0);
+	const CulRngSeed default_seed = cul_rng_seed_64( UINT64_C(0) );
 	CulRng *rng;
 	void *state;
 
@@ -245,15 +252,15 @@ CulRng *cul_rng_mt19937_64_new() {
 	}
 
 	cul_rng_init_struct(rng, CUL_RNG_MT19937_64, cul_rng_mt19937_64_get, cul_rng_mt19937_64_get_real, state);
-	cul_rng_mt19937_64_seed(rng->state, default_seed64);
+	cul_rng_mt19937_64_seed(rng->state, default_seed);
 	return rng;
 }
 
-void cul_rng_mt19937_64_seed(void *state, uint64_t seed) {
+void cul_rng_mt19937_64_seed(void *state, CulRngSeed seed) {
 	_CulRngState_mt19937_64 *_state = state;
 	uint64_t *mt = _state->mt;
 
-	mt[0] = seed;
+	mt[0] = seed._64;
 	for(size_t i=1; i<NN; ++i)
 		mt[i] = (UINT64_C(6364136223846793005)*(mt[i-1] ^ (mt[i-1] >> 62)) + i);
 	_state->mti = NN;
