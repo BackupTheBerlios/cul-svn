@@ -36,8 +36,10 @@ int main(int argc, char* argv[]) {
 	CUL_ASSERT( test_permute(data_rand, permutation, size) );
 
 	/* shuffle identitity permutation */
-	for( size_t i=size-1; i>0; i--)
-		cul_uswap_pos(permutation, i, (rand()/RAND_MAX) * (i+1));
+	for( size_t i=size-1; i>0; i--) {
+		size_t tmp, pos = (rand()/RAND_MAX) * (i+1);
+		CUL_SWAP(permutation[i], permutation[pos], tmp);
+	}
 
 	CUL_MESSAGE("Shuffled permutation test...\n");
 	CUL_ASSERT( test_permute(data_identity, permutation, size) );
