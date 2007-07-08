@@ -50,11 +50,9 @@ CulIVectorView *cul_ivectorview_vector(CulIVectorView *vv, const CulIVector *bas
 CulIVectorView *cul_ivectorview_subvector(CulIVectorView *vv, const CulIVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
 
 void      cul_ivector_set_all(CulIVector *v, int val);
-void      cul_ivector_set_zero(CulIVector *v);
-void      cul_ivector_set_basis(CulIVector *v, size_t index);
+void      cul_ivector_set_basis(CulIVector *v, size_t index, int val, int basis);
 void      cul_ivectorview_set_all(CulIVectorView *vv, int val);
-void      cul_ivectorview_set_zero(CulIVectorView *vv);
-void      cul_ivectorview_set_basis(CulIVectorView *vv, size_t index);
+void      cul_ivectorview_set_basis(CulIVectorView *vv, size_t index, int val, int basis);
 
 cul_errno cul_ivector_copy(CulIVector *v, const CulIVector *base_v);
 cul_errno cul_ivector_copy_offset(CulIVector *v, const CulIVector *base_v, size_t offset);
@@ -97,9 +95,13 @@ double    cul_ivectorview_variance(const CulIVectorView *vv, double mean);
 void      cul_ivector_sort_asc(CulIVector *v);
 void      cul_ivector_sort_desc(CulIVector *v);
 size_t    cul_ivector_unique(CulIVector *v);
+size_t    cul_ivector_find(const CulIVector *v, size_t offset, int key);
+size_t    cul_ivector_bfind(const CulIVector *v, int key);
 void      cul_ivectorview_sort_asc(CulIVectorView *vv);
 void      cul_ivectorview_sort_desc(CulIVectorView *vv);
 size_t    cul_ivectorview_unique(CulIVectorView *vv);
+size_t    cul_ivectorview_find(const CulIVectorView *vv, size_t offset, int key);
+size_t    cul_ivectorview_bfind(const CulIVectorView *vv, int key);
 
 void      cul_ivector_add_scalar(CulIVector *v, int val);
 void      cul_ivector_mul_scalar(CulIVector *v, int val);

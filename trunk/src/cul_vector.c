@@ -27,3 +27,9 @@
 #include "cul_vector-template.c"
 #include "templates_off.h"
 #undef  TEMPLATE_CUL_SIZE
+
+#define TEMPLATE_CUL_PTR
+#include "templates_on.h"
+#include "cul_vector-template.c"
+#include "templates_off.h"
+#undef  TEMPLATE_CUL_PTR

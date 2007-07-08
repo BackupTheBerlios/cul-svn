@@ -22,25 +22,25 @@ struct _CulUVectorView {
 	size_t stride;
 };
 
-static inline CulUVector *cul_uvector_new_struct(void);
-static inline void cul_uvector_free_struct(CulUVector *v);
-static inline CulUVector *cul_uvector_init_struct(CulUVector *v, size_t *data, size_t reserved, size_t size);
+static inline CulUVector     *cul_uvector_new_struct(void);
+static inline void            cul_uvector_free_struct(CulUVector *v);
+static inline CulUVector     *cul_uvector_init_struct(CulUVector *v, size_t *data, size_t reserved, size_t size);
 
 static inline CulUVectorView *cul_uvectorview_new_struct(void);
-static inline void cul_uvectorview_free_struct(CulUVectorView *vv);
+static inline void            cul_uvectorview_free_struct(CulUVectorView *vv);
 static inline CulUVectorView *cul_uvectorview_init_struct(CulUVectorView *vv, size_t *data, size_t size, size_t stride);
 
-static inline size_t cul_uvector_get(const CulUVector *v, size_t x);
-static inline void cul_uvector_set(CulUVector *v, size_t x, size_t val);
-static inline size_t *cul_uvector_ptr(CulUVector *v, size_t x);
-static inline const size_t *cul_uvector_const_ptr(const CulUVector *v, size_t x);
+static inline size_t          cul_uvector_get(const CulUVector *v, size_t x);
+static inline void            cul_uvector_set(CulUVector *v, size_t x, size_t val);
+static inline size_t         *cul_uvector_ptr(CulUVector *v, size_t x);
+static inline const size_t   *cul_uvector_const_ptr(const CulUVector *v, size_t x);
 
-static inline size_t cul_uvectorview_get(const CulUVectorView *vv, size_t x);
-static inline void cul_uvectorview_set(CulUVectorView *vv, size_t x, size_t val);
-static inline size_t *cul_uvectorview_ptr(CulUVectorView *vv, size_t x);
-static inline size_t *cul_uvectorview_next(CulUVectorView *vv, size_t *ptr);
-static inline const size_t *cul_uvectorview_const_ptr(const CulUVectorView *vv, size_t x);
-static inline const size_t *cul_uvectorview_const_next(const CulUVectorView *vv, const size_t *ptr);
+static inline size_t          cul_uvectorview_get(const CulUVectorView *vv, size_t x);
+static inline void            cul_uvectorview_set(CulUVectorView *vv, size_t x, size_t val);
+static inline size_t         *cul_uvectorview_ptr(CulUVectorView *vv, size_t x);
+static inline size_t         *cul_uvectorview_next(CulUVectorView *vv, size_t *ptr);
+static inline const size_t   *cul_uvectorview_const_ptr(const CulUVectorView *vv, size_t x);
+static inline const size_t   *cul_uvectorview_const_next(const CulUVectorView *vv, const size_t *ptr);
 
 CulUVector     *cul_uvector_new(size_t size);
 CulUVector     *cul_uvector_new_empty(void);
@@ -52,11 +52,9 @@ CulUVectorView *cul_uvectorview_vector(CulUVectorView *vv, const CulUVector *bas
 CulUVectorView *cul_uvectorview_subvector(CulUVectorView *vv, const CulUVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
 
 void      cul_uvector_set_all(CulUVector *v, size_t val);
-void      cul_uvector_set_zero(CulUVector *v);
-void      cul_uvector_set_basis(CulUVector *v, size_t index);
+void      cul_uvector_set_basis(CulUVector *v, size_t index, size_t val, size_t basis);
 void      cul_uvectorview_set_all(CulUVectorView *vv, size_t val);
-void      cul_uvectorview_set_zero(CulUVectorView *vv);
-void      cul_uvectorview_set_basis(CulUVectorView *vv, size_t index);
+void      cul_uvectorview_set_basis(CulUVectorView *vv, size_t index, size_t val, size_t basis);
 
 cul_errno cul_uvector_copy(CulUVector *v, const CulUVector *base_v);
 cul_errno cul_uvector_copy_offset(CulUVector *v, const CulUVector *base_v, size_t offset);
@@ -99,9 +97,13 @@ double    cul_uvectorview_variance(const CulUVectorView *vv, double mean);
 void      cul_uvector_sort_asc(CulUVector *v);
 void      cul_uvector_sort_desc(CulUVector *v);
 size_t    cul_uvector_unique(CulUVector *v);
+size_t    cul_uvector_find(const CulUVector *v, size_t offset, size_t key);
+size_t    cul_uvector_bfind(const CulUVector *v, size_t key);
 void      cul_uvectorview_sort_asc(CulUVectorView *vv);
 void      cul_uvectorview_sort_desc(CulUVectorView *vv);
 size_t    cul_uvectorview_unique(CulUVectorView *vv);
+size_t    cul_uvectorview_find(const CulUVectorView *vv, size_t offset, size_t key);
+size_t    cul_uvectorview_bfind(const CulUVectorView *vv, size_t key);
 
 void      cul_uvector_add_scalar(CulUVector *v, size_t val);
 void      cul_uvector_mul_scalar(CulUVector *v, size_t val);
