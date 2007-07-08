@@ -19,33 +19,21 @@
 		cul_log(CUL_MODULE, CUL_LOG_FATAL, __VA_ARGS__);         \
 	} CUL_STMT_END
 #define CUL_FATAL_ERRNO(errno) CUL_STMT_START {              \
-		cul_log(CUL_MODULE, CUL_LOG_FATAL, "%s: (%s:%d) %s\n",   \
-			__PRETTY_FUNCTION__,                                   \
-			__FILE__,                                              \
-			__LINE__,                                              \
+		cul_log(CUL_MODULE, CUL_LOG_FATAL, "%s\n",               \
 			cul_error_string(errno));                              \
 	} CUL_STMT_END
 
 #define CUL_ERROR_ERRNO(errno) CUL_STMT_START {              \
-		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
-			__PRETTY_FUNCTION__,                                   \
-			__FILE__,                                              \
-			__LINE__,                                              \
+		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s\n",               \
 			cul_error_string(errno));                              \
 	} CUL_STMT_END
 #define CUL_ERROR_ERRNO_RET(val, errno) CUL_STMT_START {     \
-		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
-			__PRETTY_FUNCTION__,                                   \
-			__FILE__,                                              \
-			__LINE__,                                              \
+		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s\n",               \
 			cul_error_string(errno));                              \
 		return (val);                                            \
 	} CUL_STMT_END
 #define CUL_ERROR_ERRNO_RET_VOID(errno) CUL_STMT_START {     \
-		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s: (%s:%d) %s\n",   \
-			__PRETTY_FUNCTION__,                                   \
-			__FILE__,                                              \
-			__LINE__,                                              \
+		cul_log(CUL_MODULE, CUL_LOG_ERROR, "%s\n",               \
 			cul_error_string(errno));                              \
 		return;                                                  \
 	} CUL_STMT_END
@@ -76,10 +64,7 @@
 		if( (expr) ) {                                           \
 		}                                                        \
 		else {                                                   \
-			CUL_FATAL("%s: (%s:%d) assertion '%s' failed\n",       \
-				__PRETTY_FUNCTION__,                                 \
-				__FILE__,                                            \
-				__LINE__,                                            \
+			CUL_FATAL("assertion '%s' failed\n",                   \
 				#expr);                                              \
 		}                                                        \
 	} CUL_STMT_END
@@ -87,23 +72,26 @@
 		if( (expr) ) {                                           \
 		}                                                        \
 		else {                                                   \
-			CUL_WARNING("%s: (%s:%d) check '%s' failed\n",         \
-				__PRETTY_FUNCTION__,                                 \
-				__FILE__,                                            \
-				__LINE__,                                            \
+			CUL_WARNING("check '%s' failed\n",                     \
 				#expr);                                              \
 		}                                                        \
 	} CUL_STMT_END
-#define CUL_CHECK_RET(expr, ...) CUL_STMT_START {            \
+#define CUL_CHECK_RET(val, expr) CUL_STMT_START {            \
 		if( (expr) ) {                                           \
 		}                                                        \
 		else {                                                   \
-			CUL_WARNING("%s: (%s:%d) check '%s' failed\n",         \
-				__PRETTY_FUNCTION__,                                 \
-				__FILE__,                                            \
-				__LINE__,                                            \
+			CUL_WARNING("check '%s' failed\n",                     \
 				#expr);                                              \
-			return __VA_ARGS__;                                    \
+			return val;                                            \
+		}                                                        \
+	} CUL_STMT_END
+#define CUL_CHECK_RET_VOID(expr) CUL_STMT_START {            \
+		if( (expr) ) {                                           \
+		}                                                        \
+		else {                                                   \
+			CUL_WARNING("check '%s' failed\n",                     \
+				#expr);                                              \
+			return;                                                \
 		}                                                        \
 	} CUL_STMT_END
 
