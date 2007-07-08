@@ -45,6 +45,15 @@ void cul_log(const char *module, CulLogType type, const char *format, ...) {
 	else
 		cul_log_handler_get()(module, type, message);
 
-	if( type == CUL_LOG_FATAL || (type == CUL_LOG_ERROR && cul_error_fatal_get()) )
-		abort();
+	switch( type ) {
+		case CUL_LOG_FATAL:
+			abort();
+			break;
+		case CUL_LOG_ERROR:
+			if( cul_error_fatal_get() )
+				abort();
+			break;
+		default:
+			break;
+	}
 }
