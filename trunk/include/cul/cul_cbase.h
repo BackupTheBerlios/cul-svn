@@ -12,14 +12,13 @@ void cul_ccopy_tda(char *data_a, const char *data_b, size_t size, size_t tda_siz
 void cul_cswap(char *data_a, char *data_b, size_t size);
 void cul_cswap_stride(char *data_a, char *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_cswap_tda(char *data_a, char *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
-static inline void cul_cswap_pos(char *data, size_t i, size_t j);
 void cul_cpermute(char *data, const size_t *permutation, size_t size);
 void cul_cpermute_stride(char *data, const size_t *permutation, size_t size, size_t stride);
 void cul_creverse(char *data, size_t size);
 void cul_creverse_stride(char *data, size_t size, size_t stride);
 
-void cul_cset_all(char *data, size_t size, char value);
-void cul_cset_all_stride(char *data, size_t size, size_t stride, char value);
+void cul_cset(char *data, size_t size, char value);
+void cul_cset_stride(char *data, size_t size, size_t stride, char value);
 void cul_cadd_scalar(char *data, size_t size, char value);
 void cul_cadd_scalar_stride(char *data, size_t size, size_t stride, char value);
 void cul_cmul_scalar(char *data, size_t size, char value);
@@ -58,16 +57,16 @@ void cul_cminmax_stride(const char *data, size_t size, size_t stride, char *min,
 void cul_cminmax_index(const char *data, size_t size, size_t *min_index, size_t *max_index);
 void cul_cminmax_index_stride(const char *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
 
-char *cul_clfind(char key, char *data, size_t size);
-char *cul_clfind_stride(char key, char *data, size_t size, size_t stride);
-char *cul_cbfind(char key, char *data, size_t size);
-char *cul_cbfind_stride(char key, char *data, size_t size, size_t stride);
 void cul_csort_asc(char *data, size_t size);
 void cul_csort_asc_stride(char *data, size_t size, size_t stride);
 void cul_csort_desc(char *data, size_t size);
 void cul_csort_desc_stride(char *data, size_t size, size_t stride);
 char *cul_cunique(char *data, size_t size);
 char *cul_cunique_stride(char *data, size_t size, size_t stride);
+char *cul_cfind(const char *data, size_t size, char key);
+char *cul_cfind_stride(const char *data, size_t size, size_t stride, char key);
+char *cul_cbfind(const char *data, size_t size, char key);
+char *cul_cbfind_stride(const char *data, size_t size, size_t stride, char key);
 
 cul_bool cul_cfprintf(FILE *stream, const char *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
 cul_bool cul_cfprintf_stride(FILE *stream, const char *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
@@ -80,14 +79,6 @@ cul_bool cul_cfread(FILE *stream, const char *data, size_t size);
 cul_bool cul_cfread_stride(FILE *stream, const char *data, size_t size, size_t stride);
 
 /* implemenations */
-
-static inline void cul_cswap_pos(char *data, size_t i, size_t j) {
-	char tmp;
-
-	tmp = *(data + i);
-	*(data + i) = *(data + j);
-	*(data + j) = tmp;
-}
 
 static inline char cul_cmin_pair(char a, char b) {
 	return a < b ? a : b;

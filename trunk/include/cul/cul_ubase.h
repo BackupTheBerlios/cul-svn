@@ -12,14 +12,13 @@ void cul_ucopy_tda(size_t *data_a, const size_t *data_b, size_t size, size_t tda
 void cul_uswap(size_t *data_a, size_t *data_b, size_t size);
 void cul_uswap_stride(size_t *data_a, size_t *data_b, size_t size, size_t stride_a, size_t stride_b);
 void cul_uswap_tda(size_t *data_a, size_t *data_b, size_t size, size_t tda_size, size_t tda_stride_a, size_t tda_stride_b);
-static inline void cul_uswap_pos(size_t *data, size_t i, size_t j);
 void cul_upermute(size_t *data, const size_t *permutation, size_t size);
 void cul_upermute_stride(size_t *data, const size_t *permutation, size_t size, size_t stride);
 void cul_ureverse(size_t *data, size_t size);
 void cul_ureverse_stride(size_t *data, size_t size, size_t stride);
 
-void cul_uset_all(size_t *data, size_t size, size_t value);
-void cul_uset_all_stride(size_t *data, size_t size, size_t stride, size_t value);
+void cul_uset(size_t *data, size_t size, size_t value);
+void cul_uset_stride(size_t *data, size_t size, size_t stride, size_t value);
 void cul_uadd_scalar(size_t *data, size_t size, size_t value);
 void cul_uadd_scalar_stride(size_t *data, size_t size, size_t stride, size_t value);
 void cul_umul_scalar(size_t *data, size_t size, size_t value);
@@ -58,16 +57,16 @@ void cul_uminmax_stride(const size_t *data, size_t size, size_t stride, size_t *
 void cul_uminmax_index(const size_t *data, size_t size, size_t *min_index, size_t *max_index);
 void cul_uminmax_index_stride(const size_t *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
 
-size_t *cul_ulfind(size_t key, size_t *data, size_t size);
-size_t *cul_ulfind_stride(size_t key, size_t *data, size_t size, size_t stride);
-size_t *cul_ubfind(size_t key, size_t *data, size_t size);
-size_t *cul_ubfind_stride(size_t key, size_t *data, size_t size, size_t stride);
 void cul_usort_asc(size_t *data, size_t size);
 void cul_usort_asc_stride(size_t *data, size_t size, size_t stride);
 void cul_usort_desc(size_t *data, size_t size);
 void cul_usort_desc_stride(size_t *data, size_t size, size_t stride);
 size_t *cul_uunique(size_t *data, size_t size);
 size_t *cul_uunique_stride(size_t *data, size_t size, size_t stride);
+size_t *cul_ufind(const size_t *data, size_t size, size_t key);
+size_t *cul_ufind_stride(const size_t *data, size_t size, size_t stride, size_t key);
+size_t *cul_ubfind(const size_t *data, size_t size, size_t key);
+size_t *cul_ubfind_stride(const size_t *data, size_t size, size_t stride, size_t key);
 
 cul_bool cul_ufprintf(FILE *stream, const size_t *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
 cul_bool cul_ufprintf_stride(FILE *stream, const size_t *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
@@ -80,14 +79,6 @@ cul_bool cul_ufread(FILE *stream, const size_t *data, size_t size);
 cul_bool cul_ufread_stride(FILE *stream, const size_t *data, size_t size, size_t stride);
 
 /* implementations */
-
-static inline void cul_uswap_pos(size_t *data, size_t i, size_t j) {
-	size_t tmp;
-
-	tmp = *(data + i);
-	*(data + i) = *(data + j);
-	*(data + j) = tmp;
-}
 
 static inline size_t cul_umin_pair(size_t a, size_t b) {
 	return a < b ? a : b;

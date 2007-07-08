@@ -1,70 +1,71 @@
+void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size) {
+	memcpy(data_a, data_b, size*sizeof(ATOM));
+}
+
+void FUNCTION(copy_overlap)(ATOM *data_a, const ATOM *data_b, size_t size) {
+	memmove(data_a, data_b, size*sizeof(ATOM));
+}
+
+void FUNCTION(copy_stride)(ATOM *data_a, const ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
+	const ATOM *const last = data_b + size * stride_b;
+	for(; data_b < last; data_a += stride_a, data_b += stride_b)
+		*data_a = *data_b;
+}
+
+void FUNCTION(copy_tda)(ATOM *data_a, const ATOM *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b) {
+	const ATOM *const last = data_b + size;
+
+	for(; data_b < last; data_a += tda_a, data_b += tda_b)
+		memcpy(data_a, data_b, tda_size*sizeof(ATOM));
+}
+
 #ifndef TEMPLATE_CUL_PTR
-	void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size) {
-		memcpy(data_a, data_b, size*sizeof(ATOM));
-	}
-
-	void FUNCTION(copy_overlap)(ATOM *data_a, const ATOM *data_b, size_t size) {
-		memmove(data_a, data_b, size*sizeof(ATOM));
-	}
-
-	void FUNCTION(copy_stride)(ATOM *data_a, const ATOM *data_b, size_t size, size_t stride_a, size_t stride_b) {
-		const ATOM *const last = data_b + size * stride_b;
-		for(; data_b < last; data_a += stride_a, data_b += stride_b)
-			*data_a = *data_b;
-	}
-
-	void FUNCTION(copy_tda)(ATOM *data_a, const ATOM *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b) {
-		const ATOM *const last = data_b + size;
-
-		/* move through all rows */
-		for(; data_b < last; data_a += tda_a, data_b += tda_b)
-			/* copy single row */
-			memcpy(data_a, data_b, tda_size*sizeof(ATOM));
-	}
-
 #else /* TEMPLATE_CUL_PTR */
-	void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size, cul_cpy_f *cpy_item) {
-		const ATOM *const last = data_b + size;
-		for(; data_b < last; ++data_a, ++data_b)
-			*data_a = cpy_item(*data_b);
+	ATOM FUNCTION(detach)(ATOM *data, size_t size, cul_cpy_f *cpy_f) {
+		ATOM *const first = data, *const last = data + size;
+		for(; data < last; ++data)
+			if( (*data = cpy_f(*data)) == NULL ) {
+				/* erase rest of undetached pointers */
+				for(++data; data < last; ++data)
+					*data = NULL;
+				return NULL;
+			}
+		return first;
 	}
 
-	void FUNCTION(copy_overlap)(ATOM *data_a, const ATOM *data_b, size_t size, cul_cpy_f *cpy_item) {
-		if( data_b < data_a ) {
-			const ATOM *const last = data_b + size;
-			for(; data_b < last; ++data_a, ++data_b)
-				*data_a = cpy_item(*data_b);
-		}
-		else {
-			const ATOM *const first = data_b;
-			for(data_a += size - 1, data_b += size - 1; data_b >= first; --data_a, --data_b)
-				*data_a = cpy_item(*data_b);
-		}
+	ATOM FUNCTION(detach_stride)(ATOM *data, size_t size, size_t stride, cul_cpy_f *cpy_f) {
+		ATOM *const first = data, *const last = data + size * stride;
+		for(; data < last; data += stride)
+			if( (*data = cpy_f(*data)) == NULL ) {
+				/* erase rest of undetached pointers */
+				for(++data; data < last; data += stride)
+					*data = NULL;
+				return NULL;
+			}
+		return first;
 	}
 
-	void FUNCTION(copy_stride)(ATOM *data_a, const ATOM *data_b, size_t size, size_t stride_a, size_t stride_b, cul_cpy_f *cpy_item) {
-		const ATOM *const last = data_b + size * stride_b;
-		for(; data_b < last; data_a += stride_a, data_b += stride_b)
-			*data_a = cpy_item(*data_b);
-	}
-
-	void FUNCTION(copy_tda)(ATOM *data_a, const ATOM *data_b, size_t size, size_t tda_size, size_t tda_a, size_t tda_b, cul_cpy_f *cpy_item) {
-		const ATOM *const last = data_b + size, *tda_last = data_b + tda_size;
-		const size_t tda_size_b = tda_b;
+	ATOM FUNCTION(detach_tda)(ATOM *data, size_t size, size_t tda_size, size_t tda, cul_cpy_f *cpy_f) {
+		ATOM *const first = data, *const last = data + size, *tda_last = data + tda_size;
 
 		/* adjust tda jumps */
-		tda_a -= tda_size;
-		tda_b -= tda_size;
+		tda_size = tda - tda_size;
 
-		/* move through all rows */
-		for(; data_b < last; tda_last += tda_size_b) {
-			/* copy one row */
-			for(; data_b < tda_last; ++data_a, ++data_b)
-				*data_a = cpy_item(*data_b);
-			/* adjust size, possible empty space */
-			data_a += tda_a;
-			data_b += tda_b;
-		}
+		for(; data < last; data += tda_size, tda_last += tda)
+			for(; data < tda_last; ++data)
+				if( (*data = cpy_f(*data)) == NULL ) {
+					/* erase rest of undetached pointers */
+					for(; data < tda_last; ++data)
+						*data = NULL;
+
+					data += tda_size, tda_last += tda;
+					for(; data < last; data += tda_size, tda_last += tda)
+						for(; data < tda_last; ++data)
+							*data = NULL;
+
+					return NULL;
+				}
+		return first;
 	}
 #endif /* TEMPLATE_CUL_PTR */
 
@@ -143,21 +144,21 @@ void FUNCTION(reverse_stride)(ATOM *data, size_t size, size_t stride) {
 		CUL_SWAP(*data, *last, tmp);
 }
 
+void FUNCTION(set)(ATOM *data, size_t size, ATOM value) {
+	const ATOM *last = data + size;
+	for(; data < last; ++data)
+		*data = value;
+	return;
+}
+
+void FUNCTION(set_stride)(ATOM *data, size_t size, size_t stride, ATOM value) {
+	const ATOM *last = data + size * stride;
+	for(; data < last; data += stride)
+		*data = value;
+	return;
+}
+
 #ifndef TEMPLATE_CUL_PTR
-	void FUNCTION(set_all)(ATOM *data, size_t size, ATOM value) {
-		const ATOM *last = data + size;
-		for(; data < last; ++data)
-			*data = value;
-		return;
-	}
-
-	void FUNCTION(set_all_stride)(ATOM *data, size_t size, size_t stride, ATOM value) {
-		const ATOM *last = data + size * stride;
-		for(; data < last; data += stride)
-			*data = value;
-		return;
-	}
-
 	void FUNCTION(add_scalar)(ATOM *data, size_t size, ATOM value) {
 		const ATOM *last = data + size;
 		for(; data < last; ++data)
