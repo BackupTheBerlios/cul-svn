@@ -1,7 +1,5 @@
 #undef FUNC_GEN
 #undef TYPE_GEN
-#undef ONE
-#undef ZERO
 #undef ATOM
 #undef ATOM_EX
 

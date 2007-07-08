@@ -1,36 +1,26 @@
 #if defined(TEMPLATE_CUL_CHAR)
 	#define FUNC_GEN  c
 	#define TYPE_GEN  C
-	#define ONE       1
-	#define ZERO      0
 	#define ATOM      char
 	#define ATOM_EX   double
 #elif defined(TEMPLATE_CUL_INT)
 	#define FUNC_GEN  i
 	#define TYPE_GEN  I
-	#define ONE       1
-	#define ZERO      0
 	#define ATOM      int
 	#define ATOM_EX   double
 #elif defined(TEMPLATE_CUL_DOUBLE)
 	#define FUNC_GEN  d
 	#define TYPE_GEN  D
-	#define ONE       1.0
-	#define ZERO      0.0
 	#define ATOM      double
 	#define ATOM_EX   double
 #elif defined(TEMPLATE_CUL_SIZE)
 	#define FUNC_GEN  u
 	#define TYPE_GEN  U
-	#define ONE       1
-	#define ZERO      0
 	#define ATOM      size_t
 	#define ATOM_EX   double
 #elif defined(TEMPLATE_CUL_PTR)
 	#define FUNC_GEN  p
 	#define TYPE_GEN  P
-	#define ONE       1
-	#define ZERO      NULL
 	#define ATOM      cul_ptr
 #else
 	#error TEMPLATE_* directive undifined!
