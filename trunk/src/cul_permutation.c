@@ -27,17 +27,23 @@ void cul_permutation_identity(CulUVector *p) {
 
 void cul_permutation_shuffle(CulUVector *p, const CulRng *rng) {
 	size_t *restrict data = p->data;
+	size_t tmp, pos;
 
-	for( size_t i=p->size-1; i>0; i--)
-		cul_uswap_pos(data, i, cul_rng_get_real(rng) * (i+1));
+	for(size_t i = p->size - 1; i > 0; --i) {
+		pos = cul_rng_get_real(rng) * (i+1);
+		CUL_SWAP(data[i], data[pos], tmp);
+	}
 }
 
 void cul_permutation_reverse(CulUVector *p) {
 	size_t *restrict data = p->data;
+	size_t tmp, pos;
 
 	const size_t size = p->size;
 	const size_t half = size >> 1;
 
-	for( size_t i=0; i<half; ++i)
-		cul_uswap_pos(data, i, size-i-1);
+	for(size_t i = 0; i < half; ++i) {
+		pos = size - i - 1;
+		CUL_SWAP(data[i], data[pos], tmp);
+	}
 }
