@@ -22,38 +22,46 @@ cul_log_t *cul_log_handler_get(void) {
 
 void cul_log(const char *module, CulLogType type, const char *format, ...) {
 	char message[CUL_LOG_MSG_SIZE] = "";
-	size_t length;
+	size_t length = 0;
 	va_list arg;
 
-	/* prepare prefixes */
-	if( type == CUL_LOG_CLOCK )
-		snprintf(message, 15, "%10.5lf: ", (double)clock()/(double)CLOCKS_PER_SEC);
-
-	if( module != NULL ) {
-		strcat(message, module);
-		strcat(message, ": ");
+	/* write time if needed */
+	if( type == CUL_LOG_CLOCK ) {
+		snprintf(message, 13, "%10.5lf: ", (double)clock()/(double)CLOCKS_PER_SEC);
+		length = strlen(message);
 	}
 
-	length = strlen(message);
-
+	/* write message */
 	va_start(arg, format);
-	vsnprintf(message + length, CUL_LOG_MSG_SIZE - length, format, arg);
+	vsnprintf(message + length, CUL_LOG_MSG_SIZE - length - 1, format, arg);
 	va_end(arg);
 
-	if( cul_log_handler_get() == NULL )
-		fprintf(cul_stream_get(), "%s", message);
-	else
-		cul_log_handler_get()(module, type, message);
-
+	/* handle message */
 	switch( type ) {
-		case CUL_LOG_FATAL:
-			abort();
+		case CUL_LOG_CLOCK:
+		case CUL_LOG_MESSAGE:
+			if( cul_log_handler_get() != NULL )
+				cul_log_handler_get()(module, type, message);
+			else
+				fprintf(cul_stream_get(), "%s", message);
 			break;
+		case CUL_LOG_WARNING:
 		case CUL_LOG_ERROR:
-			if( cul_error_fatal_get() )
-				abort();
-			break;
-		default:
-			break;
+		case CUL_LOG_FATAL:
+			if( cul_log_handler_get() != NULL )
+				cul_log_handler_get()(module, type, message);
+			else {
+				if( module != NULL ) fprintf(cul_stream_get(), "%s: %s", module, message);
+				else                 fprintf(cul_stream_get(), "%s", message);
+			}
+	}
+
+	/* handle abort */
+	switch( type ) {
+		case CUL_LOG_CLOCK:
+		case CUL_LOG_MESSAGE:
+		case CUL_LOG_WARNING: break;
+		case CUL_LOG_ERROR:   if( cul_error_fatal_get() ) abort(); break;
+		case CUL_LOG_FATAL:   abort(); break;
 	}
 }
