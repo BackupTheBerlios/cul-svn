@@ -62,35 +62,25 @@
 
 #define CUL_ASSERT(expr) CUL_STMT_START {                    \
 		if( (expr) ) {                                           \
-		}                                                        \
-		else {                                                   \
-			CUL_FATAL("assertion '%s' failed\n",                   \
-				#expr);                                              \
-		}                                                        \
+		} else                                                   \
+			CUL_FATAL("assertion '%s' failed\n", #expr);           \
 	} CUL_STMT_END
 #define CUL_CHECK(expr) CUL_STMT_START {                     \
 		if( (expr) ) {                                           \
-		}                                                        \
-		else {                                                   \
-			CUL_WARNING("check '%s' failed\n",                     \
-				#expr);                                              \
-		}                                                        \
+		} else                                                   \
+			CUL_WARNING("check '%s' failed\n", #expr);             \
 	} CUL_STMT_END
 #define CUL_CHECK_RET(val, expr) CUL_STMT_START {            \
 		if( (expr) ) {                                           \
-		}                                                        \
-		else {                                                   \
-			CUL_WARNING("check '%s' failed\n",                     \
-				#expr);                                              \
+		} else {                                                 \
+			CUL_WARNING("check '%s' failed\n", #expr);             \
 			return val;                                            \
 		}                                                        \
 	} CUL_STMT_END
 #define CUL_CHECK_RET_VOID(expr) CUL_STMT_START {            \
 		if( (expr) ) {                                           \
-		}                                                        \
-		else {                                                   \
-			CUL_WARNING("check '%s' failed\n",                     \
-				#expr);                                              \
+		} else {                                                 \
+			CUL_WARNING("check '%s' failed\n", #expr);             \
 			return;                                                \
 		}                                                        \
 	} CUL_STMT_END
