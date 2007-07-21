@@ -1,7 +1,6 @@
 #undef FUNC_GEN
 #undef TYPE_GEN
 #undef ATOM
-#undef ATOM_EX
 
 #undef CONCAT2
 #undef CONCAT2x
@@ -16,5 +15,3 @@
 #undef PFUNCTION
 #undef TYPE
 #undef VIEW
-#undef STRING
-#undef NAME
