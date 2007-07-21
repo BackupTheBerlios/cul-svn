@@ -4,6 +4,8 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
+void cul_pfree(cul_ptr *data, size_t size, cul_free_f *free);
+
 void cul_pcopy(cul_ptr *data_a, const cul_ptr *data_b, size_t size);
 void cul_pcopy_overlap(cul_ptr *data_a, const cul_ptr *data_b, size_t size);
 void cul_pcopy_stride(cul_ptr *data_a, const cul_ptr *data_b, size_t size, size_t stride_a, size_t stride_b);

@@ -1,3 +1,12 @@
+#ifndef TEMPLATE_CUL_PTR
+#else /* TEMPLATE_CUL_PTR */
+	void FUNCTION(free)(ATOM *data, size_t size, cul_free_f *free_f) {
+		ATOM *const last = data + size;
+		for(; data < last; ++data)
+			free_f(*data);
+	}
+#endif /* TEMPLATE_CUL_PTR */
+
 void FUNCTION(copy)(ATOM *data_a, const ATOM *data_b, size_t size) {
 	memcpy(data_a, data_b, size*sizeof(ATOM));
 }

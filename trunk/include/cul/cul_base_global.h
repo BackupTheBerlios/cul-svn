@@ -10,26 +10,28 @@
 
 /* basic types */
 
+typedef _Bool         CulBool;
+typedef void         *CulPtr;
+typedef const void   *CulConstPtr;
 typedef unsigned long CulHash;
-typedef void* CulPtr;
-typedef _Bool CulBool;
 
 /* type mappings */
 
-typedef CulPtr  cul_ptr;
-typedef CulBool cul_bool;
-typedef CulHash cul_hash;
+typedef CulBool     cul_bool;
+typedef CulPtr      cul_ptr;
+typedef CulConstPtr cul_const_ptr;
+typedef CulHash     cul_hash;
 
 /* base callback functions */
 
-typedef int cul_cmp_f(const void *a, const void *b);
-typedef void cul_free_f(cul_ptr data);
-typedef void *cul_cpy_f(const cul_ptr data);
+typedef int     cul_cmp_f (cul_const_ptr a, cul_const_ptr b);
+typedef void    cul_free_f(cul_ptr data);
+typedef cul_ptr cul_cpy_f (cul_const_ptr data);
 
-typedef cul_bool cul_foreach_f(cul_ptr data);
+typedef cul_bool cul_foreach_f     (cul_ptr data);
 typedef cul_bool cul_foreach_data_f(cul_ptr data, cul_ptr user_data);
 
-#define CUL_CMP_T(ptr) ((cul_cmp_f *)(ptr))
+#define CUL_CMP_F(ptr)  ((cul_cmp_f *)(ptr))
 #define CUL_FREE_F(ptr) ((cul_free_f *)(ptr))
 #define CUL_CPY_F(ptr)  ((cul_cpy_f *)(ptr))
 

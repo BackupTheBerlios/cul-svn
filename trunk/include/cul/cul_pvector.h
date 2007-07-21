@@ -32,18 +32,18 @@ static inline CulPVectorView *cul_pvectorview_init_struct(CulPVectorView *vv, cu
 static inline cul_ptr         cul_pvector_get(const CulPVector *v, size_t x);
 static inline void            cul_pvector_set(CulPVector *v, size_t x, cul_ptr val);
 static inline cul_ptr        *cul_pvector_ptr(CulPVector *v, size_t x);
-static inline const cul_ptr  *cul_pvector_const_ptr(const CulPVector *v, size_t x);
+static inline cul_const_ptr  *cul_pvector_const_ptr(const CulPVector *v, size_t x);
 
 static inline cul_ptr         cul_pvectorview_get(const CulPVectorView *vv, size_t x);
 static inline void            cul_pvectorview_set(CulPVectorView *vv, size_t x, cul_ptr val);
 static inline cul_ptr        *cul_pvectorview_ptr(CulPVectorView *vv, size_t x);
 static inline cul_ptr        *cul_pvectorview_next(CulPVectorView *vv, cul_ptr *ptr);
-static inline const cul_ptr  *cul_pvectorview_const_ptr(const CulPVectorView *vv, size_t x);
-static inline const cul_ptr  *cul_pvectorview_const_next(const CulPVectorView *vv, const cul_ptr *ptr);
+static inline cul_const_ptr  *cul_pvectorview_const_ptr(const CulPVectorView *vv, size_t x);
+static inline cul_const_ptr  *cul_pvectorview_const_next(const CulPVectorView *vv, const cul_ptr *ptr);
 
 CulPVector     *cul_pvector_new(size_t size);
 CulPVector     *cul_pvector_new_empty(void);
-void            cul_pvector_free(CulPVector *v);
+void            cul_pvector_free(CulPVector *v, cul_free_f *free_f);
 CulPVectorView *cul_pvectorview_new(void);
 void            cul_pvectorview_free(CulPVectorView *vv);
 
@@ -70,11 +70,11 @@ cul_errno cul_pvectorview_swap(CulPVectorView *va, CulPVectorView *vb);
 void      cul_pvector_reverse(CulPVector *v);
 void      cul_pvectorview_reverse(CulPVectorView *vv);
 
-cul_errno cul_pvector_resize(CulPVector *v, size_t size);
+cul_errno cul_pvector_resize(CulPVector *v, size_t size, cul_free_f *free_f);
 cul_errno cul_pvector_resize_empty(CulPVector *v, size_t size);
 cul_errno cul_pvector_reserve(CulPVector *v, size_t size);
 cul_errno cul_pvector_push_back(CulPVector *v, cul_ptr val);
-cul_errno cul_pvector_pop_back(CulPVector *v);
+cul_errno cul_pvector_pop_back(CulPVector *v, cul_free_f *free_f);
 
 void      cul_pvector_sort(CulPVector *v, cul_cmp_f *cmp_f);
 size_t    cul_pvector_unique(CulPVector *v, cul_cmp_f *cmp_f);
@@ -138,11 +138,11 @@ static inline cul_ptr *cul_pvector_ptr(CulPVector *v, size_t x) {
 	return (v->data + x);
 }
 
-static inline const cul_ptr *cul_pvector_const_ptr(const CulPVector *v, size_t x) {
+static inline cul_const_ptr *cul_pvector_const_ptr(const CulPVector *v, size_t x) {
 #ifdef CUL_RANGE_CHECK
 	if( x > v->size ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
-	return (v->data + x);
+	return (cul_const_ptr *)(v->data + x);
 }
 
 static inline cul_ptr cul_pvectorview_get(const CulPVectorView *vv, size_t x) {
@@ -173,18 +173,18 @@ static inline cul_ptr *cul_pvectorview_next(CulPVectorView *vv, cul_ptr *ptr) {
 	return (ptr + vv->stride);
 }
 
-static inline const cul_ptr *cul_pvectorview_const_ptr(const CulPVectorView *vv, size_t x) {
+static inline cul_const_ptr *cul_pvectorview_const_ptr(const CulPVectorView *vv, size_t x) {
 #ifdef CUL_RANGE_CHECK
 	if( x > vv->size ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
-	return (vv->data + x * vv->stride);
+	return (cul_const_ptr *)(vv->data + x * vv->stride);
 }
 
-static inline const cul_ptr *cul_pvectorview_const_next(const CulPVectorView *vv, const cul_ptr *ptr) {
+static inline cul_const_ptr *cul_pvectorview_const_next(const CulPVectorView *vv, const cul_ptr *ptr) {
 #ifdef CUL_RANGE_CHECK
 	if( ptr > vv->data + vv->size * vv->stride ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
-	return (ptr + vv->stride);
+	return (cul_const_ptr *)(ptr + vv->stride);
 }
 
 #endif /* CUL_PVECTOR_H */

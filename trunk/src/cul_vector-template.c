@@ -22,12 +22,22 @@ TYPE(Vector) *FUNCTION(vector_new_empty)(void) {
 	return FUNCTION(vector_new)(0);
 }
 
-void FUNCTION(vector_free)(TYPE(Vector) *v) {
-	if( v != NULL ) {
-		free(v->data);
-		FUNCTION(vector_free_struct)(v);
+#ifndef TEMPLATE_CUL_PTR
+	void FUNCTION(vector_free)(TYPE(Vector) *v) {
+		if( v != NULL ) {
+			free(v->data);
+			FUNCTION(vector_free_struct)(v);
+		}
 	}
-}
+#else /* TEMPLATE_CUL_PTR */
+	void FUNCTION(vector_free)(TYPE(Vector) *v, cul_free_f *free_f) {
+		if( v != NULL ) {
+			if( free_f != NULL) FUNCTION(free)(v->data, v->size, free_f);
+			free(v->data);
+			FUNCTION(vector_free_struct)(v);
+		}
+	}
+#endif /* TEMPLATE_CUL_PTR */
 
 VIEW(Vector) *FUNCTION(vectorview_new)(void) {
 	VIEW(Vector) *vv;
@@ -142,22 +152,50 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *vv) {
 	FUNCTION(reverse_stride)(vv->data, vv->size, vv->stride);
 }
 
-cul_errno FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
-	ATOM *d;
-
-	if( size == 0 ) {
-		free(v->data);
-		FUNCTION(vector_init_struct)(v, NULL, 0, 0);
+#ifndef TEMPLATE_CUL_PTR
+	cul_errno FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size) {
+		ATOM *d;
+	
+		if( size == 0 ) {
+			free(v->data);
+			FUNCTION(vector_init_struct)(v, NULL, 0, 0);
+		} else if( size >= v->size && size <= v->reserved )
+			v->size = size;
+		else {
+			if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
+				CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
+			FUNCTION(vector_init_struct)(v, d, size, size);
+		}
 		return CUL_SUCCESS;
-	}	else if( size >= v->size && size <= v->reserved ) {
-		v->size = size;
-		return CUL_SUCCESS;
-	} else if( (d = (ATOM *)realloc(v->data, size * sizeof(ATOM))) == NULL )
-		CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
+	}
+#else /* TEMPLATE_CUL_PTR */
+	cul_errno FUNCTION(vector_resize)(TYPE(Vector) *v, size_t size, cul_free_f *free_f) {
+		ATOM *d;
+	
+		if( size == 0 ) {
+			if( free_f != NULL) FUNCTION(free)(v->data, v->size, free_f);
+			free(v->data);
+			FUNCTION(vector_init_struct)(v, NULL, 0, 0);
+		} else if( size >= v->size && size <= v->reserved )
+			v->size = size;
+		else {
+			size_t copy = size < v->size? size: v->size;
 
-	FUNCTION(vector_init_struct)(v, d, size, size);
-	return CUL_SUCCESS;
-}
+			/* allocate and copy data */
+			if( (d = (ATOM *)malloc(size * sizeof(ATOM))) == NULL )
+				CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
+			memcpy(d, v->data, copy * sizeof(ATOM));
+
+			/* free old data */
+			if( free_f != NULL )
+				FUNCTION(free)(v->data + size, v->size - copy, free_f);
+			free(v->data);
+
+			FUNCTION(vector_init_struct)(v, d, size, size);
+		}
+		return CUL_SUCCESS;
+	}
+#endif /* TEMPLATE_CUL_PTR */
 
 cul_errno FUNCTION(vector_resize_empty)(TYPE(Vector) *v, size_t size) {
 	ATOM *d;
@@ -205,10 +243,21 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *v, ATOM val) {
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(vector_pop_back)(TYPE(Vector) *v) {
-	v->size -= 1;
-	return CUL_SUCCESS;
-}
+#ifndef TEMPLATE_CUL_PTR
+	cul_errno FUNCTION(vector_pop_back)(TYPE(Vector) *v) {
+		if( v->size > 0 )
+			v->size -= 1;
+		return CUL_SUCCESS;
+	}
+#else /* TEMPLATE_CUL_PTR */
+	cul_errno FUNCTION(vector_pop_back)(TYPE(Vector) *v, cul_free_f *free_f) {
+		if( v->size > 0 ) {
+			v->size -= 1;
+			if( free_f != NULL ) free_f(v->data[v->size]);
+		}
+		return CUL_SUCCESS;
+	}
+#endif /* TEMPLATE_CUL_PTR */
 
 #ifndef TEMPLATE_CUL_PTR
 	ATOM FUNCTION(vector_min)(const TYPE(Vector) *v) {
@@ -302,13 +351,21 @@ cul_errno FUNCTION(vector_pop_back)(TYPE(Vector) *v) {
 	}
 
 	size_t FUNCTION(vector_find)(const TYPE(Vector) *v, size_t offset, ATOM key) {
+		ATOM *find;
+
 		if( offset >= v->size )
-			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-		return (size_t)(FUNCTION(find)(v->data + offset, v->size - offset, key) - v->data);
+			CUL_ERROR_ERRNO_RET(v->size, CUL_EBADPOS);
+		if( (find = FUNCTION(find)(v->data + offset, v->size - offset, key)) == NULL )
+			return v->size;
+		return (size_t)(find - v->data);
 	}
 
 	size_t FUNCTION(vector_bfind)(const TYPE(Vector) *v, ATOM key) {
-		return (size_t)(FUNCTION(bfind)(v->data, v->size, key) - v->data);
+		ATOM *find;
+
+		if( (find = FUNCTION(bfind)(v->data, v->size, key)) == NULL )
+			return v->size;
+		return (size_t)(find - v->data);
 	}
 
 	void FUNCTION(vectorview_sort_asc)(VIEW(Vector) *vv) {
@@ -324,13 +381,21 @@ cul_errno FUNCTION(vector_pop_back)(TYPE(Vector) *v) {
 	}
 
 	size_t FUNCTION(vectorview_find)(const VIEW(Vector) *vv, size_t offset, ATOM key) {
+		ATOM *find;
+
 		if( offset >= vv->size )
-			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-		return (size_t)(FUNCTION(find_stride)(vv->data + offset * vv->stride, vv->size - offset, vv->stride, key) - vv->data)/vv->stride;
+			CUL_ERROR_ERRNO_RET(vv->size, CUL_EBADPOS);
+		if( (find = FUNCTION(find_stride)(vv->data + offset * vv->stride, vv->size - offset, vv->stride, key)) == NULL )
+			return vv->size;
+		return (size_t)(find - vv->data)/vv->stride;
 	}
 
 	size_t FUNCTION(vectorview_bfind)(const VIEW(Vector) *vv, ATOM key) {
-		return (size_t)(FUNCTION(bfind_stride)(vv->data, vv->size, vv->stride, key) - vv->data)/vv->stride;
+		ATOM *find;
+
+		if( (find = FUNCTION(bfind_stride)(vv->data, vv->size, vv->stride, key)) == NULL )
+			return vv->size;
+		return (size_t)(find - vv->data)/vv->stride;
 	}
 #else /* TEMPLATE_CUL_PTR */
 	void FUNCTION(vector_sort)(TYPE(Vector) *v, cul_cmp_f *cmp_f) {
