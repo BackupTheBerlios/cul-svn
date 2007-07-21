@@ -16,13 +16,13 @@ struct _CulList {
 /* Allocation */
 
 static inline CulList *cul_list_new_struct(void);
-static inline void cul_list_free_struct(CulList *l);
-static inline void cul_list_init_struct(CulList *l, CulList *next, CulList *prev, cul_ptr data);
+static inline void     cul_list_free_struct(CulList *l);
+static inline CulList *cul_list_init_struct(CulList *l, CulList *next, CulList *prev, cul_ptr data);
 
 CulList *cul_list_new(cul_ptr data);
 CulList *cul_list_new_empty();
-void cul_list_free(CulList *l, cul_free_f *free_f);
-void cul_list_free_all(CulList *l, cul_free_f *free_f);
+void     cul_list_free(CulList *l, cul_free_f *free_f);
+void     cul_list_free_all(CulList *l, cul_free_f *free_f);
 
 /* Basic List Operators */
 
@@ -51,8 +51,8 @@ CulList *cul_list_reverse(CulList *l);
 CulList *cul_list_find(CulList *l, cul_ptr data, cul_cmp_f *cmp_f);
 CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp_f);
 size_t   cul_list_unique_free(CulList *l, cul_cmp_f *cmp_f, cul_free_f *free_f);
-size_t   cul_list_foreach(CulList *l, cul_foreach_f *foreach);
-size_t   cul_list_foreach_data(CulList *l, cul_foreach_data_f *foreach, cul_ptr data);
+size_t   cul_list_foreach(CulList *l, cul_foreach_f *foreach_f);
+size_t   cul_list_foreach_data(CulList *l, cul_foreach_data_f *foreach_f, cul_ptr data);
 
 /* implementations */
 
@@ -64,10 +64,11 @@ static inline void cul_list_free_struct(CulList *l) {
 	cul_slab_free(sizeof(CulList), l);
 }
 
-static inline void cul_list_init_struct(CulList *l, CulList *next, CulList *prev, cul_ptr data) {
+static inline CulList *cul_list_init_struct(CulList *l, CulList *next, CulList *prev, cul_ptr data) {
 	l->data = data;
 	l->next = next;
 	l->prev = prev;
+	return l;
 }
 
 static inline CulList *cul_list_next(CulList *l) {

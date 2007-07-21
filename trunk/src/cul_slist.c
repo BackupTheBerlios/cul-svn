@@ -4,8 +4,7 @@ CulSList *cul_slist_new(cul_ptr data) {
 	CulSList *l;
 	if( (l = cul_slist_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	cul_slist_init_struct(l, NULL, data);
-	return l;
+	return cul_slist_init_struct(l, NULL, data);
 }
 
 CulSList *cul_slist_new_empty() {
@@ -172,19 +171,19 @@ size_t cul_slist_unique_free(CulSList *l, cul_cmp_f *cmp_f, cul_free_f *free_f) 
 	return unique;
 }
 
-size_t cul_slist_foreach(CulSList *l, cul_foreach_f *foreach) {
+size_t cul_slist_foreach(CulSList *l, cul_foreach_f *foreach_f) {
 	size_t i_foreach = 0;
 	for( ; l != NULL; l = cul_slist_next(l), ++i_foreach )
-		if( foreach(l->data) )
+		if( foreach_f(l->data) )
 			break;
 
 	return i_foreach;
 }
 
-size_t cul_slist_foreach_data(CulSList *l, cul_foreach_data_f *foreach, cul_ptr data) {
+size_t cul_slist_foreach_data(CulSList *l, cul_foreach_data_f *foreach_f, cul_ptr data) {
 	size_t i_foreach = 0;
 	for( ; l != NULL; l = cul_slist_next(l), ++i_foreach )
-		if( foreach(l->data, data) )
+		if( foreach_f(l->data, data) )
 			break;
 
 	return i_foreach;

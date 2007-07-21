@@ -5,7 +5,6 @@ struct _CulBBTree {
 	cul_cmp_f *cmp;
 	size_t nodes;
 	uint16_t depth;
-	uint16_t is_unique : 1;
 };
 
 struct _CulBBTreeNode {
@@ -17,46 +16,56 @@ struct _CulBBTreeNode {
 	uint16_t is_right : 1;
 };
 
-static inline CulBBTree *cul_bbtree_new_struct(void);
-static inline void cul_bbtree_free_struct(CulBBTree *t);
-static inline CulBBTree *cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth, cul_bool is_unique);
+static inline CulBBTree     *_cul_bbtree_new_struct(void);
+static inline void           _cul_bbtree_free_struct(CulBBTree *t);
+static inline CulBBTree     *_cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth);
 
-static inline CulBBTreeNode *cul_bbtree_node_new_struct(void);
-static inline void cul_bbtree_node_free_struct(CulBBTreeNode *tn);
+static inline CulBBTreeNode *_cul_bbtree_node_new_struct(void);
+static inline void           _cul_bbtree_node_free_struct(CulBBTreeNode *tn);
+static inline CulBBTreeNode *_cul_bbtree_node_init_struct(CulBBTreeNode *tn, cul_ptr data, CulBBTreeNode *left, CulBBTreeNode *right, uint16_t depth, cul_bool is_left, cul_bool is_right);
 
-static inline CulBBTree *cul_bbtree_new_struct(void) {
+static inline CulBBTree *_cul_bbtree_new_struct(void) {
 	return cul_slab_new(sizeof(CulBBTree));
 }
 
-static inline void cul_bbtree_free_struct(CulBBTree *t) {
+static inline void _cul_bbtree_free_struct(CulBBTree *t) {
 	cul_slab_free(sizeof(CulBBTree), t);
 }
 
-static inline CulBBTree *cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth, cul_bool is_unique) {
+static inline CulBBTree *_cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth) {
 	t->root = root;
 	t->cmp = cmp;
 	t->nodes = nodes;
 	t->depth = depth;
-	t->is_unique = is_unique;
 	return t;
 }
 
-static inline CulBBTreeNode *cul_bbtree_node_new_struct(void) {
+static inline CulBBTreeNode *_cul_bbtree_node_new_struct(void) {
 	return cul_slab_new(sizeof(CulBBTreeNode));
 }
 
-static inline void cul_bbtree_node_free_struct(CulBBTreeNode *tn) {
+static inline void _cul_bbtree_node_free_struct(CulBBTreeNode *tn) {
 	cul_slab_free(sizeof(CulBBTreeNode), tn);
+}
+
+static inline CulBBTreeNode *_cul_bbtree_node_init_struct(CulBBTreeNode *tn, cul_ptr data, CulBBTreeNode *left, CulBBTreeNode *right, uint16_t depth, cul_bool is_left, cul_bool is_right) {
+	tn->data = data;
+	tn->left = left;
+	tn->right = right;
+	tn->depth = depth;
+	tn->is_left = is_left;
+	tn->is_right = is_right;
+	return tn;
 }
 
 CulBBTree *cul_bbtree_new(cul_cmp_f *cmp) {
 	CulBBTree *t;
-	if( (t = cul_bbtree_new_struct()) == NULL )
+	if( (t = _cul_bbtree_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	return cul_bbtree_init_struct(t, NULL, cmp, 0, 0, CUL_TRUE);
+	return _cul_bbtree_init_struct(t, NULL, cmp, 0, 0);
 }
 
-void cul_bbtree_free(CulBBTree *t, cul_free_f *free_data) {
+void cul_bbtree_free(CulBBTree *t, cul_free_f *free_f) {
 	CulBBTreeNode *tn, *tn_next;
 
 	if( t != NULL ) {
@@ -64,31 +73,31 @@ void cul_bbtree_free(CulBBTree *t, cul_free_f *free_data) {
 
 		for( ; tn != NULL; tn = tn_next) {
 			tn_next = cul_bbtree_node_next(tn);
-			if( free_data != NULL )
-				free_data(tn->data);
-			cul_bbtree_node_free_struct(tn);
+			if( free_f != NULL )
+				free_f(tn->data);
+			_cul_bbtree_node_free_struct(tn);
 		}
 
-		cul_bbtree_free_struct(t);
+		_cul_bbtree_free_struct(t);
 	}
 }
 
 CulBBTreeNode *cul_bbtree_insert(CulBBTree *t, cul_ptr data) {
 	CUL_UNUSED(t);
 	CUL_UNUSED(data);
-	return NULL;
+	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
 cul_bool cul_bbtree_remove(CulBBTree *t, cul_ptr data) {
 	CUL_UNUSED(t);
 	CUL_UNUSED(data);
-	return CUL_FALSE;
+	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
 
 cul_bool cul_bbtree_remove_node(CulBBTree *t, CulBBTreeNode *tn) {
 	CUL_UNUSED(t);
 	CUL_UNUSED(tn);
-	return CUL_FALSE;
+	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
 
 CulBBTreeNode *cul_bbtree_find(const CulBBTree *t, cul_ptr data) {
@@ -113,13 +122,25 @@ CulBBTreeNode *cul_bbtree_find(const CulBBTree *t, cul_ptr data) {
 	return NULL;
 }
 
-size_t cul_bbtree_foreach(CulBBTree *t, cul_foreach_f *foreach) {
+size_t cul_bbtree_foreach(CulBBTree *t, cul_foreach_f *foreach_f) {
 	CulBBTreeNode *tn;
 	size_t i_foreach = 0;
 
 	tn = cul_bbtree_node_first(t);
 	for( ; tn != NULL; tn = cul_bbtree_node_next(tn), ++i_foreach )
-		if( foreach(tn->data) )
+		if( foreach_f(tn->data) )
+			break;
+
+	return i_foreach;
+}
+
+size_t cul_bbtree_foreach_data(CulBBTree *t, cul_foreach_data_f *foreach_f, cul_ptr data) {
+	CulBBTreeNode *tn;
+	size_t i_foreach = 0;
+
+	tn = cul_bbtree_node_first(t);
+	for( ; tn != NULL; tn = cul_bbtree_node_next(tn), ++i_foreach )
+		if( foreach_f(tn->data, data) )
 			break;
 
 	return i_foreach;
