@@ -128,9 +128,20 @@ char **cul_strsplit(const char *s, const char *delimiter) {
 
 size_t cul_strv_size(char **strv) {
 	size_t size = 0;
+
 	for(; *strv != NULL; ++strv)
 		++size;
 	return size;
+}
+
+size_t cul_strv_find(char **strv, const char *key, cul_cmp_f *cmp_f) {
+	size_t find = 0;
+
+	for(; *strv != NULL; ++strv){
+		if( !cmp_f(*strv, key) ) break;
+		++find;
+	}
+	return find;
 }
 
 char **cul_strv_dup(char **strv) {

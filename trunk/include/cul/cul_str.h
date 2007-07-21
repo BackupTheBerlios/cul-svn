@@ -24,6 +24,7 @@ char **cul_strsplit(const char *s, const char *delimiter);
 /* strv functions */
 
 size_t cul_strv_size(char **strv);
+size_t cul_strv_find(char **strv, const char *key, cul_cmp_f *cmp_f);
 
 char **cul_strv_dup(char **strv);
 char **cul_strv_dup_size(char **strv, size_t size);
