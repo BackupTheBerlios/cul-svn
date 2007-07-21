@@ -17,8 +17,6 @@ const char *cul_error_string(CulErrno eid) {
 		case CUL_EARGMISS:  return "missing required argument";
 		case CUL_EARGUNK:   return "unknown argument";
 		case CUL_EARGCONV:  return "argument conversion failed";
-		case CUL_EARGSHORT: return "bad format of short switch";
-		case CUL_EARGLONG:  return "bad format of long switch";
 		case CUL_EFACCESS:  return "file access error";
 		case CUL_EFIO:      return "input/output error";
 	}

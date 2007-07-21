@@ -3,8 +3,8 @@
 
 #include <cul/cul_global.h>
 
-typedef struct _CulArg CulArg;
-typedef enum _CulArgFlag CulArgFlag;
+typedef struct _CulArg     CulArg;
+typedef enum   _CulArgFlag CulArgFlag;
 
 /** \brief Argument flag describing its type and properties.
  * 
@@ -24,18 +24,23 @@ enum _CulArgFlag {
 	CUL_ARG_STR        = 4,  /**< option has an string parameter */
 	CUL_ARG_STRV       = 5,  /**< option has a string array parameter, store all flag parameters */
 
-	/* flags */
-	CUL_ARG_END        = 1 << 4,  /**< indicate last option in argument table */
-	CUL_ARG_HELP       = 1 << 5,  /**< indicate no option, entry contains only help message to print on screen */
-	CUL_ARG_REQUIRED   = 1 << 6,  /**< option is required */
-	CUL_ARG_FOUND      = 1 << 7,  /**< option was found in application aguments */
+	/* type flags */
+	CUL_ARG_NEED       = 1 << 4,  /**< option is required */
+	CUL_ARG_FOUND      = 1 << 5,  /**< option was found in application aguments */
 
-	/* masks */
-	CUL_ARG_TYPE_MASK  = 0x000f,       /**< mask for argument type */
+	/* non-type */
+	CUL_ARG_END        = 1 << 6,  /**< indicate last option in argument table */
+	CUL_ARG_HELP       = 1 << 7,  /**< indicate no option, entry contains only help message to print on screen */
+
+	/* internal masks */
+	CUL_ARG_TYPE_MASK  = 0x00f,        /**< mask for type */
+	CUL_ARG_NTYPE_MASK = 0x0c0,        /**< mask for non-type */
 	CUL_ARG_CONF_MASK  = 0xfff,        /**< mask for argument configuration, flags and type */
 	CUL_ARG_POS_MASK   = 0xffff << 12, /**< mask for argument position */
 	CUL_ARG_MASK       = 0xfffffff     /**< maximal possible flag value */
 };
+
+#define CUL_ARG_NULL {CUL_ARG_END, 0, NULL, NULL, NULL}
 
 /** \brief Argument description structure.
  * 
@@ -46,17 +51,19 @@ struct _CulArg {
 	CulArgFlag flags;          /**< option flags */
 	const char short_name;     /**< short name for option */
 	const char *long_name;     /**< long name for option */
-	const char *desciption;    /**< description of option */
+	const char *description;   /**< description of option */
 	cul_ptr value;             /**< callback for value, if option is not found it is left unchanged */
 };
 
-cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table);
-void cul_arg_print_help(CulArg *table);
-void cul_arg_free(CulArg *table);
+cul_errno cul_arg_parse         (int *argc, char ***argv, CulArg **table);
+void      cul_arg_print_help    (CulArg *t);
+void      cul_arg_free          (CulArg *t, cul_bool is_free_value);
 
 /* utility functions */
-CulArg *cul_arg_check_required(CulArg *table);
-CulArg *cul_arg_search_short(CulArg *t, char arg);
-CulArg *cul_arg_search_long(CulArg *t, const char *arg);
+void      cul_arg_connect       (CulArg *t, CulArg *connect);
+void      cul_arg_disconnect    (CulArg *t, CulArg *connect);
+CulArg   *cul_arg_check_required(CulArg *t);
+CulArg   *cul_arg_search_short  (CulArg *t, char arg);
+CulArg   *cul_arg_search_long   (CulArg *t, const char *arg);
 
 #endif /* CUL_ARG_H */

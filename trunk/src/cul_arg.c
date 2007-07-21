@@ -7,13 +7,10 @@
 #include <string.h>
 
 /* private functions */
-static CulArg *_cul_arg_next(CulArg *t);
-static CulArg *_cul_arg_next_option(CulArg *t);
-
 static inline void _cul_arg_cmd_next(int *argc, char ***argv);
-static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t pos);
-static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table, size_t pos);
-static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos);
+static cul_errno   _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *t, size_t pos);
+static cul_errno   _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *t, size_t pos);
+static cul_bool    _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos);
 
 /* Parse program arguments using argument tables */
 cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
@@ -67,63 +64,106 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 	return CUL_SUCCESS;
 }
 
+void cul_arg_connect(CulArg *t, CulArg *connect) {
+	/* find end of table */
+	for(; !(t->flags & CUL_ARG_END); t += 1) ;
+
+	/* find last end of table */
+	while( t->value != NULL )
+		for(t = t->value; !(t->flags & CUL_ARG_END); t += 1) ;
+
+	/* connect tables */
+	t->value = connect;
+}
+
+void cul_arg_disconnect(CulArg *t, CulArg *disconnect) {
+	/* find end of table */
+	for(; !(t->flags & CUL_ARG_END); t += 1) ;
+
+	/* find disconnect table */
+	while( t->value != NULL ) {
+		if( t->value == disconnect ) {
+			CulArg *connect = t->value;
+
+			/* find end of disconnect table */
+			for(; !(connect->flags & CUL_ARG_END); connect += 1) ;
+
+			/* connect next table */
+			t->value = connect->value;
+		} else
+			for(t = t->value; !(t->flags & CUL_ARG_END); t += 1) ;
+	}
+}
+
 /* Print all help string information from table */
-void cul_arg_print_help(CulArg *table) {
-	CulArg *t = table;
-	while( t ) {
-		switch( t->flags & ~CUL_ARG_TYPE_MASK ) {
-			case CUL_ARG_HELP:
-				fprintf(cul_stream_get(), "%s\n", t->desciption);
-				break;
-			default:
-				if( t->short_name ) {
-					if( t->long_name )
-						fprintf(cul_stream_get(),"  -%c, --%-16s  %s\n", t->short_name, t->long_name, t->desciption);
-					else
-						fprintf(cul_stream_get(),"  -%-21c  %s\n", t->short_name, t->desciption);
-				}
-				else if( t->long_name )
-					fprintf(cul_stream_get(),  "  --%-20s  %s\n", t->long_name, t->desciption);
-				break;
-		}
-		t = _cul_arg_next(t);
+void cul_arg_print_help(CulArg *t) {
+	while( t != NULL ) switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END:
+			t = t->value;
+			break;
+		case CUL_ARG_HELP:
+			fprintf(cul_stream_get(), "%s\n", t->description);
+			t += 1;
+			break;
+		default:
+			if( t->short_name ) {
+				if( t->long_name )
+					fprintf(cul_stream_get(),"  -%c, --%-16s  %s\n", t->short_name, t->long_name, t->description);
+				else
+					fprintf(cul_stream_get(),"  -%-21c  %s\n", t->short_name, t->description);
+			}
+			else if( t->long_name )
+				fprintf(cul_stream_get(),  "  --%-20s  %s\n", t->long_name, t->description);
+			t += 1;
+			break;
 	}
 }
 
-void cul_arg_free(CulArg *table) {
-	while( table != NULL ) {
-		CulArgFlag flag = table->flags;
-		if( flag & CUL_ARG_FOUND ) {
-			/* get only type */
-			flag &= CUL_ARG_TYPE_MASK;
-
-			if( flag == CUL_ARG_STR )
-				free(*((char **)table->value));
-			else if( flag == CUL_ARG_STRV )
-				cul_strv_free(*((char ***)table->value));
-		}
-		table = _cul_arg_next_option(table);
+void cul_arg_free(CulArg *t, cul_bool is_free_value) {
+	while( t != NULL ) switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END:  t = t->value; break;
+		case CUL_ARG_HELP: t += 1; break;
+		default:
+			if( t->flags & CUL_ARG_FOUND ) switch( t->flags & CUL_ARG_TYPE_MASK ) {
+				case CUL_ARG_STR:
+					if( is_free_value ) free(*(char **)t->value);
+					break;
+				case CUL_ARG_STRV:
+					if( is_free_value ) cul_strv_free(*(char ***)t->value);
+					break;
+				default:
+					break;
+			}
+			t += 1;
+			break;
 	}
 }
 
-/* Check argument table if all required arguments were found */
-CulArg *cul_arg_check_required(CulArg *table) {
-	while( table != NULL ) {
-		if( table->flags & CUL_ARG_REQUIRED && !(table->flags & CUL_ARG_FOUND) )
-			return table;
-		table = _cul_arg_next_option(table);
+CulArg *cul_arg_check_required(CulArg *t) {
+	while( t != NULL ) switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END: t = t->value; break;
+		case CUL_ARG_HELP: t += 1; break;
+		default:
+			if( t->flags & CUL_ARG_NEED && !(t->flags & CUL_ARG_FOUND) )
+				return t;
+			t += 1;
+			break;
 	}
 	return NULL;
 }
 
 /* Find and return specific short argument in argument table */
 CulArg *cul_arg_search_short(CulArg *t, char arg) {
-	while( t != NULL ) {
-		if( t->short_name == arg )
+	while( t != NULL )  switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END: t = t->value; break;
+		case CUL_ARG_HELP: t += 1; break;
+		default:
+			if( t->short_name == arg )
+				return t;
+			t += 1;
 			break;
-		t = _cul_arg_next_option(t);
 	}
-	return t;
+	return NULL;
 }
 
 /* Find and return specific long argument in argument table */
@@ -136,37 +176,18 @@ CulArg *cul_arg_search_long(CulArg *t, const char *arg) {
 	else
 		length = strlen(arg);
 
-	while( t != NULL ) {
-		if( t->long_name != NULL &&
-				( !strncmp(arg, t->long_name, length) &&
-				t->long_name[length] == CUL_STR_NULL) )
+	while( t != NULL )  switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END: t = t->value; break;
+		case CUL_ARG_HELP: t += 1; break;
+		default:
+			if( t->long_name != NULL &&
+					strncmp(arg, t->long_name, length) == 0 &&
+					t->long_name[length] == CUL_STR_NULL )
+				return t;
+			t += 1;
 			break;
-		t = _cul_arg_next_option(t);
 	}
-	return t;
-}
-
-/* Find and return next valid argument description, from argument table */
-static CulArg *_cul_arg_next(CulArg *t) {
-	if( (++t)->flags & CUL_ARG_END )
-		return NULL;
-	return t;
-}
-
-/* Find and return next option, short or long, from argument table */
-static CulArg *_cul_arg_next_option(CulArg *t) {
-	while( t != NULL ) {
-		switch( (++t)->flags & ~CUL_ARG_TYPE_MASK ) {
-			case CUL_ARG_END:
-				return NULL;
-			case CUL_ARG_HELP:
-				continue;
-			default:
-				break;
-		}
-		break;
-	}
-	return t;
+	return NULL;
 }
 
 static inline void _cul_arg_cmd_next(int *argc, char ***argv) {
@@ -190,7 +211,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 		/* we have more flags than one */
 		if( is_multi_flag ) {
 			if( !is_option_bool )
-				return CUL_EARGSHORT;
+				return CUL_EARGCONV;
 
 			/* convert flag option */
 			if( !_cul_arg_cmd_convert(arg_string, t, pos) )
@@ -246,7 +267,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 			}
 		}
 	}
-	return CUL_EARGSHORT;
+	return CUL_FAILURE;
 }
 
 static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table, size_t pos) {
@@ -299,7 +320,7 @@ static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table,
 
 		return CUL_SUCCESS;
 	}
-	return CUL_EARGLONG;
+	return CUL_FAILURE;
 }
 
 static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
@@ -332,16 +353,16 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 				char *tmp = cul_strdup(arg);
 				if( tmp != NULL ) {
 					/* free old string, only if already found */
-					if( t->value && (t->flags & CUL_ARG_FOUND) )
-						free(*((char **)t->value));
-					*((char **)t->value) = tmp;
+					if( t->flags & CUL_ARG_FOUND )
+						free(*(char **)t->value);
+					*(char **)t->value = tmp;
 					break;
 				}
 			}
 			return CUL_FALSE;
 		case CUL_ARG_STRV:
 			if( *arg ) {
-				char **strv = *((char ***)t->value);
+				char **strv = *(char ***)t->value;
 				size_t size = strv == NULL? 0: cul_strv_size(strv);
 
 				char **tmpv = malloc( (size+2)*sizeof(char *) );
@@ -370,7 +391,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
 						tmpv[size] = tmp;
 						tmpv[size+1] = NULL;
 
-						*((char ***)t->value) = tmpv;
+						*(char ***)t->value = tmpv;
 						break;
 					} else
 						free(tmpv);
