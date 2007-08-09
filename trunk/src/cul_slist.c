@@ -126,18 +126,6 @@ CulSList *cul_slist_reverse(CulSList *l) {
 	return prev;
 }
 
-CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_cmp_f *cmp_f) {
-	if( cmp_f == NULL )
-		for( ; l != NULL; l = cul_slist_next(l))
-			if( l->data == data )
-				return l;
-	else
-		for( ; l != NULL; l = cul_slist_next(l))
-			if( !cmp_f(l->data, data) )
-				return l;
-	return NULL;
-}
-
 CulSList *cul_slist_sort(CulSList *l, cul_cmp_f *cmp_f) {
 	CUL_UNUSED(l);
 	CUL_UNUSED(cmp_f);
@@ -171,21 +159,19 @@ size_t cul_slist_unique_free(CulSList *l, cul_cmp_f *cmp_f, cul_free_f *free_f) 
 	return unique;
 }
 
-size_t cul_slist_foreach(CulSList *l, cul_foreach_f *foreach_f) {
-	size_t i_foreach = 0;
-	for( ; l != NULL; l = cul_slist_next(l), ++i_foreach )
-		if( foreach_f(l->data) )
-			break;
-
-	return i_foreach;
+CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_cmp_f *cmp_f) {
+	if( cmp_f == NULL )
+		for( ; l != NULL; l = cul_slist_next(l))
+			if( l->data == data )
+				return l;
+	else
+		for( ; l != NULL; l = cul_slist_next(l))
+			if( !cmp_f(l->data, data) )
+				return l;
+	return NULL;
 }
 
-size_t cul_slist_foreach_data(CulSList *l, cul_foreach_data_f *foreach_f, cul_ptr data) {
-	size_t i_foreach = 0;
-	for( ; l != NULL; l = cul_slist_next(l), ++i_foreach )
-		if( foreach_f(l->data, data) )
-			break;
-
-	return i_foreach;
+void cul_slist_foreach(CulSList *l, cul_foreach_f *foreach_f, cul_ptr user_data) {
+	for(; l != NULL; l = cul_slist_next(l))
+		foreach_f(l->data, user_data);
 }
-

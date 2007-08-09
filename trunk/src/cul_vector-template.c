@@ -416,6 +416,10 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *v, ATOM val) {
 		return (size_t)(FUNCTION(bfind)(v->data, v->size, key, cmp_f) - v->data);
 	}
 
+	void FUNCTION(vector_foreach)(TYPE(Vector) *v, cul_foreach_f *foreach_f, cul_ptr user_data) {
+		FUNCTION(foreach)(v->data, v->size, foreach_f, user_data);
+	}
+
 	void FUNCTION(vectorview_sort)(VIEW(Vector) *vv, cul_cmp_f *cmp_f) {
 		FUNCTION(sort_stride)(vv->data, vv->size, vv->stride, cmp_f);
 	}
@@ -432,6 +436,10 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *v, ATOM val) {
 
 	size_t FUNCTION(vectorview_bfind)(const VIEW(Vector) *vv, ATOM key, cul_cmp_f *cmp_f) {
 		return (size_t)(FUNCTION(bfind_stride)(vv->data, vv->size, vv->stride, key, cmp_f) - vv->data)/vv->stride;
+	}
+
+	void FUNCTION(vectorview_foreach)(VIEW(Vector) *vv, cul_foreach_f *foreach_f, cul_ptr user_data) {
+		FUNCTION(foreach_stride)(vv->data, vv->size, vv->stride, foreach_f, user_data);
 	}
 #endif /* TEMPLATE_CUL_PTR */
 

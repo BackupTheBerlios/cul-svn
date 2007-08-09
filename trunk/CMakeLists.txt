@@ -74,7 +74,7 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 # headers directories
 SET(CUL_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 SET(CUL_HEADERS_PRIVATE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/private)
-SET(CUL_CONFIG_DIR ${PROJECT_BINARY_DIR})
+SET(CUL_CONFIG_DIR ${PROJECT_BINARY_DIR}/include)
 
 # create configuration
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cul_config.h.in "${CUL_CONFIG_DIR}/cul/cul_config.h" ESCAPE_QUOTES)
@@ -97,8 +97,5 @@ IF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 ENDIF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 
 # testing
-#ENABLE_TESTING()
+ENABLE_TESTING()
 INCLUDE(CMakeTests.txt)
-
-# auto build test cases, this brake "make" "make test" "make" chain
-ADD_SUBDIRECTORY(tests)

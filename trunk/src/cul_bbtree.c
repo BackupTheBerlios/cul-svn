@@ -122,28 +122,10 @@ CulBBTreeNode *cul_bbtree_find(const CulBBTree *t, cul_ptr data) {
 	return NULL;
 }
 
-size_t cul_bbtree_foreach(CulBBTree *t, cul_foreach_f *foreach_f) {
-	CulBBTreeNode *tn;
-	size_t i_foreach = 0;
-
-	tn = cul_bbtree_node_first(t);
-	for( ; tn != NULL; tn = cul_bbtree_node_next(tn), ++i_foreach )
-		if( foreach_f(tn->data) )
-			break;
-
-	return i_foreach;
-}
-
-size_t cul_bbtree_foreach_data(CulBBTree *t, cul_foreach_data_f *foreach_f, cul_ptr data) {
-	CulBBTreeNode *tn;
-	size_t i_foreach = 0;
-
-	tn = cul_bbtree_node_first(t);
-	for( ; tn != NULL; tn = cul_bbtree_node_next(tn), ++i_foreach )
-		if( foreach_f(tn->data, data) )
-			break;
-
-	return i_foreach;
+void cul_bbtree_foreach(CulBBTree *t, cul_foreach_f *foreach_f, cul_ptr user_data) {
+	CulBBTreeNode *tn = cul_bbtree_node_first(t);
+	for(; tn != NULL; tn = cul_bbtree_node_next(tn))
+		foreach_f(tn->data, user_data);
 }
 
 CulBBTreeNode *cul_bbtree_node_first(CulBBTree *t) {

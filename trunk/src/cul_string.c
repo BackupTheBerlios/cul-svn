@@ -85,7 +85,7 @@ CulString *cul_string_resize(CulString *s, size_t size) {
 	char *str;
 
 	if( size > 0 ) {
-		if( (str = malloc((size+1)*sizeof(char))) == NULL )
+		if( (str = malloc((size + 1)*sizeof(char))) == NULL )
 			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	}
 	else
@@ -96,7 +96,7 @@ CulString *cul_string_resize(CulString *s, size_t size) {
 	str[copy_size] = CUL_STR_NULL;
 	free(s->str);
 
-	return cul_string_init_struct(s, copy_size, size+1, str);
+	return cul_string_init_struct(s, copy_size, size + 1, str);
 }
 
 /**
@@ -107,25 +107,25 @@ CulString *cul_string_reserve(CulString *s, size_t size) {
 	char *str;
 
 	/* if size is smaller than current size then shirink maximaly */
-	if( size <= s->size )
-		size = s->size+1;
+	if( size < s->size )
+		size = s->size;
 
-	if( (str = malloc((size)*sizeof(char))) == NULL )
+	if( (str = malloc((size + 1)*sizeof(char))) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
-	/* we can safly copy null terminator */
-	memcpy(str, s->str, (s->size+1)*sizeof(char));
+	/* we can safely copy null terminator */
+	memcpy(str, s->str, (s->size + 1)*sizeof(char));
 	free(s->str);
 
 	/* set new string contents */
-	s->reserved = size;
+	s->reserved = size + 1;
 	s->str = str;
 
 	return s;
 }
 
 CulString *cul_string_shrink(CulString *s) {
-	return cul_string_reserve(s, s->size+1);
+	return cul_string_reserve(s, s->size);
 }
 
 CulString *cul_string_copy(CulString *s, const CulString *copy) {

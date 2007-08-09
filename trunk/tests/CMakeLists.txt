@@ -12,4 +12,4 @@ TARGET_LINK_LIBRARIES(cul_matrix-test cul)
 
 PROJECT(CUL_TEST_RNG)
 ADD_EXECUTABLE(cul_rng-test "cul_rng-test.c")
-TARGET_LINK_LIBRARIES(cul_rng-test cul)
+TARGET_LINK_LIBRARIES(cul_rng-test cul "-lm")

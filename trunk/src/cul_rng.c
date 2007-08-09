@@ -37,11 +37,13 @@ static inline void cul_rng_free_struct(CulRng *rng) {
 	cul_slab_free(sizeof(CulRng), rng);
 }
 
-static inline void cul_rng_init_struct(CulRng *rng, CulRngType type, cul_rng_get_f *get, cul_rng_get_real_f *get_real, void *state) {
+static inline CulRng *cul_rng_init_struct(CulRng *rng, CulRngType type, cul_rng_seed_f *seed, cul_rng_get_f *get, cul_rng_get_real_f *get_real, void *state) {
 	rng->type = type;
+	rng->seed = seed;
 	rng->get = get;
 	rng->get_real = get_real;
 	rng->state = state;
+	return rng;
 }
 
 /* basic rng functions */
@@ -108,7 +110,7 @@ CulRng *cul_rng_rand_new() {
 	if( (rng = cul_rng_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
-	cul_rng_init_struct(rng, CUL_RNG_RAND, cul_rng_rand_get, cul_rng_rand_get_real, NULL);
+	cul_rng_init_struct(rng, CUL_RNG_RAND, cul_rng_rand_seed, cul_rng_rand_get, cul_rng_rand_get_real, NULL);
 	cul_rng_rand_seed(rng->state, default_seed);
 	return rng;
 }
@@ -160,7 +162,7 @@ CulRng *cul_rng_mt19937_new() {
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	}
 
-	cul_rng_init_struct(rng, CUL_RNG_MT19937, cul_rng_mt19937_get, cul_rng_mt19937_get_real, state);
+	cul_rng_init_struct(rng, CUL_RNG_MT19937, cul_rng_mt19937_seed, cul_rng_mt19937_get, cul_rng_mt19937_get_real, state);
 	cul_rng_mt19937_seed(rng->state, default_seed);
 	return rng;
 }
@@ -251,7 +253,7 @@ CulRng *cul_rng_mt19937_64_new() {
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 	}
 
-	cul_rng_init_struct(rng, CUL_RNG_MT19937_64, cul_rng_mt19937_64_get, cul_rng_mt19937_64_get_real, state);
+	cul_rng_init_struct(rng, CUL_RNG_MT19937_64, cul_rng_mt19937_64_seed, cul_rng_mt19937_64_get, cul_rng_mt19937_64_get_real, state);
 	cul_rng_mt19937_64_seed(rng->state, default_seed);
 	return rng;
 }

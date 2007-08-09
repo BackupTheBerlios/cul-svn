@@ -45,12 +45,10 @@ CulSList *cul_slist_reverse(CulSList *l);
 
 /* Basic Algorithms */
 
-CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_cmp_f *cmp_f);
 CulSList *cul_slist_sort(CulSList *l, cul_cmp_f *cmp_f);
 size_t    cul_slist_unique_free(CulSList *l, cul_cmp_f *cmp_f, cul_free_f *free_f);
 CulSList *cul_slist_find(CulSList *l, cul_ptr data, cul_cmp_f *cmp_f);
-size_t    cul_slist_foreach(CulSList *l, cul_foreach_f *foreach_f);
-size_t    cul_slist_foreach_data(CulSList *l, cul_foreach_data_f *foreach_f, cul_ptr data);
+void      cul_slist_foreach(CulSList *l, cul_foreach_f *foreach_f, cul_ptr user_data);
 
 /* implementations */
 

@@ -48,11 +48,10 @@ CulList *cul_list_reverse(CulList *l);
 
 /* Basic Algorithms */
 
-CulList *cul_list_find(CulList *l, cul_ptr data, cul_cmp_f *cmp_f);
 CulList *cul_list_sort(CulList *l, cul_cmp_f *cmp_f);
 size_t   cul_list_unique_free(CulList *l, cul_cmp_f *cmp_f, cul_free_f *free_f);
-size_t   cul_list_foreach(CulList *l, cul_foreach_f *foreach_f);
-size_t   cul_list_foreach_data(CulList *l, cul_foreach_data_f *foreach_f, cul_ptr data);
+CulList *cul_list_find(CulList *l, cul_ptr data, cul_cmp_f *cmp_f);
+void     cul_list_foreach(CulList *l, cul_foreach_f *foreach_f, cul_ptr user_data);
 
 /* implementations */
 

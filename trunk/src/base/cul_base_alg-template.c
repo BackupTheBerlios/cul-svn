@@ -615,3 +615,18 @@
 		return NULL;
 	}
 #endif /* TEMPLATE_CUL_PTR */
+
+#ifndef TEMPLATE_CUL_PTR
+#else /* TEMPLATE_CUL_PTR */
+	void FUNCTION(foreach)(const ATOM *data, size_t size, cul_foreach_f *foreach_f, cul_ptr user_data){
+		const ATOM *const last = data + size;
+		for(; data < last; ++data)
+			foreach_f(*data, user_data);
+	}
+
+	void FUNCTION(foreach_stride)(const ATOM *data, size_t size, size_t stride, cul_foreach_f *foreach_f, cul_ptr user_data) {
+		const ATOM *const last = data + size * stride;
+		for(; data < last; data += stride)
+			foreach_f(*data, user_data);
+	}
+#endif /* TEMPLATE_CUL_PTR */

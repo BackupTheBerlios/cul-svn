@@ -20,8 +20,7 @@ cul_bool       cul_bbtree_remove(CulBBTree *t, cul_ptr data);
 cul_bool       cul_bbtree_remove_node(CulBBTree *t, CulBBTreeNode *tn);
 
 CulBBTreeNode *cul_bbtree_find(const CulBBTree *t, cul_ptr data);
-size_t         cul_bbtree_foreach(CulBBTree *t, cul_foreach_f *foreach_f);
-size_t         cul_bbtree_foreach_data(CulBBTree *t, cul_foreach_data_f *foreach_f, cul_ptr data);
+void           cul_bbtree_foreach(CulBBTree *t, cul_foreach_f *foreach_f, cul_ptr user_data);
 
 CulBBTreeNode *cul_bbtree_node_first(CulBBTree *t);
 CulBBTreeNode *cul_bbtree_node_last(CulBBTree *t);
