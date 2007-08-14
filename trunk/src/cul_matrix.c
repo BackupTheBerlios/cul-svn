@@ -22,3 +22,9 @@
 #include "cul_matrix-template.c"
 #include "templates_off.h"
 #undef  TEMPLATE_CUL_INT
+
+#define TEMPLATE_CUL_SIZE
+#include "templates_on.h"
+#include "cul_matrix-template.c"
+#include "templates_off.h"
+#undef  TEMPLATE_CUL_SIZE

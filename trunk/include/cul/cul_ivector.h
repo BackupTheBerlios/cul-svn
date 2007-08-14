@@ -1,5 +1,5 @@
-#ifndef CUL_IVECTOR_H
-#define CUL_IVECTOR_H
+#ifndef __CUL_IVECTOR_H__
+#define __CUL_IVECTOR_H__
 
 #include <cul/cul_global.h>
 #include <stdio.h>
@@ -22,23 +22,23 @@ struct _CulIVectorView {
 	size_t stride;
 };
 
-static inline CulIVector *cul_ivector_new_struct(void);
-static inline void cul_ivector_free_struct(CulIVector *v);
-static inline CulIVector *cul_ivector_init_struct(CulIVector *v, int *data, size_t reserved, size_t size);
+static inline CulIVector     *cul_ivector_new_struct(void);
+static inline void            cul_ivector_free_struct(CulIVector *v);
+static inline CulIVector     *cul_ivector_init_struct(CulIVector *v, int *data, size_t reserved, size_t size);
 
 static inline CulIVectorView *cul_ivectorview_new_struct(void);
-static inline void cul_ivectorview_free_struct(CulIVectorView *vv);
+static inline void            cul_ivectorview_free_struct(CulIVectorView *vv);
 static inline CulIVectorView *cul_ivectorview_init_struct(CulIVectorView *vv, int *data, size_t size, size_t stride);
 
-static inline int cul_ivector_get(const CulIVector *v, size_t x);
-static inline void cul_ivector_set(CulIVector *v, size_t x, int val);
-static inline int *cul_ivector_ptr(CulIVector *v, size_t x);
-static inline const int *cul_ivector_const_ptr(const CulIVector *v, size_t x);
+static inline int             cul_ivector_get(const CulIVector *v, size_t x);
+static inline void            cul_ivector_set(CulIVector *v, size_t x, int val);
+static inline int            *cul_ivector_ptr(CulIVector *v, size_t x);
+static inline const int      *cul_ivector_const_ptr(const CulIVector *v, size_t x);
 
-static inline int cul_ivectorview_get(const CulIVectorView *vv, size_t x);
-static inline void cul_ivectorview_set(CulIVectorView *vv, size_t x, int val);
-static inline int *cul_ivectorview_ptr(CulIVectorView *vv, size_t x);
-static inline int *cul_ivectorview_next(CulIVectorView *vv, int *ptr);
+static inline int             cul_ivectorview_get(const CulIVectorView *vv, size_t x);
+static inline void            cul_ivectorview_set(CulIVectorView *vv, size_t x, int val);
+static inline int            *cul_ivectorview_ptr(CulIVectorView *vv, size_t x);
+static inline int            *cul_ivectorview_next(CulIVectorView *vv, int *ptr);
 
 CulIVector     *cul_ivector_new(size_t size);
 CulIVector     *cul_ivector_new_empty(void);
@@ -48,6 +48,8 @@ void            cul_ivectorview_free(CulIVectorView *vv);
 
 CulIVectorView *cul_ivectorview_vector(CulIVectorView *vv, const CulIVector *base_v);
 CulIVectorView *cul_ivectorview_subvector(CulIVectorView *vv, const CulIVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
+
+void      cul_ivector_zero(CulIVector *v);
 
 void      cul_ivector_set_all(CulIVector *v, int val);
 void      cul_ivector_set_basis(CulIVector *v, size_t index, int val, int basis);
@@ -225,4 +227,4 @@ static inline const int *cul_ivectorview_const_next(const CulIVectorView *vv, co
 	return (ptr + vv->stride);
 }
 
-#endif /* CUL_IVECTOR_H */
+#endif /* __CUL_IVECTOR_H__ */

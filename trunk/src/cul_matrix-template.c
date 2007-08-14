@@ -90,6 +90,10 @@ void FUNCTION(matrixview_free)(VIEW(Matrix) *mv) {
 	free(mv);
 }
 
+void FUNCTION(matrix_zero)(TYPE(Matrix) *m) {
+	FUNCTION(zero)(m->data, m->size_x * m->size_y);
+}
+
 cul_errno FUNCTION(matrix_copy)(TYPE(Matrix) *m, const TYPE(Matrix) *base_m) {
 	if( m->size_x != base_m->size_x || m->size_y != base_m->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);

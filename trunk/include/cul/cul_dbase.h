@@ -1,5 +1,5 @@
-#ifndef CUL_DBASE_H
-#define CUL_DBASE_H
+#ifndef __CUL_DBASE_H__
+#define __CUL_DBASE_H__
 
 #include <cul/cul_base_global.h>
 #include <stdio.h>
@@ -17,6 +17,7 @@ void cul_dpermute_stride(double *data, const size_t *permutation, size_t size, s
 void cul_dreverse(double *data, size_t size);
 void cul_dreverse_stride(double *data, size_t size, size_t stride);
 
+void cul_dzero(double *data, size_t size);
 void cul_dset(double *data, size_t size, double value);
 void cul_dset_stride(double *data, size_t size, size_t stride, double value);
 void cul_dadd_scalar(double *data, size_t size, double value);

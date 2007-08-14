@@ -1,5 +1,5 @@
-#ifndef CUL_VECTOR_H
-#define CUL_VECTOR_H
+#ifndef __CUL_VECTOR_H__
+#define __CUL_VECTOR_H__
 
 #include <cul/cul_cvector.h>
 #include <cul/cul_dvector.h>
@@ -7,4 +7,4 @@
 #include <cul/cul_uvector.h>
 #include <cul/cul_pvector.h>
 
-#endif
+#endif /* __CUL_VECTOR_H__ */

@@ -1,5 +1,5 @@
-#ifndef CUL_IMATRIX_H
-#define CUL_IMATRIX_H
+#ifndef __CUL_IMATRIX_H__
+#define __CUL_IMATRIX_H__
 
 #include <cul/cul_global.h>
 #include <cul/cul_ivector.h>
@@ -23,23 +23,23 @@ struct _CulIMatrixView {
 	size_t tda;
 };
 
-static inline CulIMatrix *cul_imatrix_new_struct(void);
-static inline void cul_imatrix_free_struct(CulCVector *m);
-static inline CulIMatrix *cul_imatrix_init_struct(CulIMatrix *m, int *data, size_t size_x, size_t size_y);
+static inline CulIMatrix     *cul_imatrix_new_struct(void);
+static inline void            cul_imatrix_free_struct(CulIMatrix *m);
+static inline CulIMatrix     *cul_imatrix_init_struct(CulIMatrix *m, int *data, size_t size_x, size_t size_y);
 
 static inline CulIMatrixView *cul_imatrixview_new_struct(void);
-static inline void cul_imatrixview_free_struct(CulIMatrixView *m);
+static inline void            cul_imatrixview_free_struct(CulIMatrixView *m);
 static inline CulIMatrixView *cul_imatrixview_init_struct(CulIMatrixView *mv, int *data, size_t size_x, size_t size_y, size_t tda);
 
-static inline int cul_imatrix_get(const CulIMatrix *m, size_t x, size_t y);
-static inline void cul_imatrix_set(CulIMatrix *m, size_t x, size_t y, int val);
-static inline int *cul_imatrix_ptr(CulIMatrix *m, size_t x, size_t y);
-static inline const int *cul_imatrix_const_ptr(const CulIMatrix *m, size_t x, size_t y);
+static inline int             cul_imatrix_get(const CulIMatrix *m, size_t x, size_t y);
+static inline void            cul_imatrix_set(CulIMatrix *m, size_t x, size_t y, int val);
+static inline int            *cul_imatrix_ptr(CulIMatrix *m, size_t x, size_t y);
+static inline const int      *cul_imatrix_const_ptr(const CulIMatrix *m, size_t x, size_t y);
 
-static inline int cul_imatrixview_get(const CulIMatrixView *mv, size_t x, size_t y);
-static inline void cul_imatrixview_set(CulIMatrixView *mv, size_t x, size_t y, int val);
-static inline int *cul_imatrixview_ptr(CulIMatrixView *mv, size_t x, size_t y);
-static inline const int *cul_imatrixview_const_ptr(const CulIMatrixView *mv, size_t x, size_t y);
+static inline int             cul_imatrixview_get(const CulIMatrixView *mv, size_t x, size_t y);
+static inline void            cul_imatrixview_set(CulIMatrixView *mv, size_t x, size_t y, int val);
+static inline int            *cul_imatrixview_ptr(CulIMatrixView *mv, size_t x, size_t y);
+static inline const int      *cul_imatrixview_const_ptr(const CulIMatrixView *mv, size_t x, size_t y);
 
 CulIMatrix     *cul_imatrix_new(size_t x, size_t y);
 CulIMatrix     *cul_imatrix_new_empty(void);
@@ -54,6 +54,8 @@ CulIVectorView *cul_imatrixview_col(CulIVectorView *vv, const CulIMatrix *base_m
 CulIVectorView *cul_imatrixview_diag(CulIVectorView *vv, const CulIMatrix *base_m);
 CulIVectorView *cul_imatrixview_subdiag(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_k);
 CulIVectorView *cul_imatrixview_superdiag(CulIVectorView *vv, const CulIMatrix *base_m, size_t base_k);
+
+void      cul_imatrix_zero(CulIMatrix *m);
 
 cul_errno cul_imatrix_copy(CulIMatrix *m, const CulIMatrix *base_m);
 cul_errno cul_imatrix_copy_offset(CulIMatrix *m, const CulIMatrix *base_m, size_t offset_x, size_t offset_y);
@@ -89,7 +91,7 @@ static inline CulIMatrix *cul_imatrix_new_struct(void) {
 	return cul_slab_new(sizeof(CulIMatrix));
 }
 
-static inline void cul_imatrix_free_struct(CulCVector *m) {
+static inline void cul_imatrix_free_struct(CulIMatrix *m) {
 	cul_slab_free(sizeof(CulIMatrix), m);
 }
 
@@ -172,4 +174,4 @@ static inline const int *cul_imatrixview_const_ptr(const CulIMatrixView *mv, siz
 	return (mv->data + mv->tda * y + x);
 }
 
-#endif /* CUL_IMATRIX_H */
+#endif /* __CUL_IMATRIX_H__ */

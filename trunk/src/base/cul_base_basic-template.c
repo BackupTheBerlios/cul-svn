@@ -1,3 +1,7 @@
+void FUNCTION(zero)(ATOM *data, size_t size) {
+	memset(data, 0, size*sizeof(ATOM));
+}
+
 #ifndef TEMPLATE_CUL_PTR
 #else /* TEMPLATE_CUL_PTR */
 	void FUNCTION(free)(ATOM *data, size_t size, cul_free_f *free_f) {

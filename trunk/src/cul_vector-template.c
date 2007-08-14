@@ -64,6 +64,10 @@ VIEW(Vector) *FUNCTION(vectorview_subvector)(VIEW(Vector) *vv, const TYPE(Vector
 	return FUNCTION(vectorview_init_struct)(vv, base_v->data + base_offset, base_size, base_stride);
 }
 
+void FUNCTION(vector_zero)(TYPE(Vector) *v) {
+	FUNCTION(zero)(v->data, v->size);
+}
+
 void FUNCTION(vector_set_all)(TYPE(Vector) *v, ATOM val) {
 	FUNCTION(set)(v->data, v->size, val);
 }

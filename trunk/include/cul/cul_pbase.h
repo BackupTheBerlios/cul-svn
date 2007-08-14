@@ -1,10 +1,11 @@
-#ifndef CUL_PBASE_H
-#define CUL_PBASE_H
+#ifndef __CUL_PBASE_H__
+#define __CUL_PBASE_H__
 
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
 void cul_pfree(cul_ptr *data, size_t size, cul_free_f *free);
+void cul_pzero(cul_ptr *data, size_t size);
 
 void cul_pcopy(cul_ptr *data_a, const cul_ptr *data_b, size_t size);
 void cul_pcopy_overlap(cul_ptr *data_a, const cul_ptr *data_b, size_t size);
@@ -39,4 +40,4 @@ void     cul_pforeach_stride(const cul_ptr *data, size_t size, size_t stride, cu
 
 /* implementations */
 
-#endif /* CUL_PBASE_H */
+#endif /* __CUL_PBASE_H__ */

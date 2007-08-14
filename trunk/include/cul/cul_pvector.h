@@ -1,5 +1,5 @@
-#ifndef CUL_PVECTOR_H
-#define CUL_PVECTOR_H
+#ifndef __CUL_PVECTOR_H__
+#define __CUL_PVECTOR_H__
 
 #include <cul/cul_global.h>
 
@@ -49,6 +49,8 @@ void            cul_pvectorview_free(CulPVectorView *vv);
 
 CulPVectorView *cul_pvectorview_vector(CulPVectorView *vv, const CulPVector *base_v);
 CulPVectorView *cul_pvectorview_subvector(CulPVectorView *vv, const CulPVector *base_v, size_t base_offset, size_t base_size, size_t base_stride);
+
+void      cul_pvector_zero(CulPVector *v);
 
 void      cul_pvector_set_all(CulPVector *v, cul_ptr val);
 void      cul_pvector_set_basis(CulPVector *v, size_t index, cul_ptr val, cul_ptr basis);
@@ -189,4 +191,4 @@ static inline cul_const_ptr *cul_pvectorview_const_next(const CulPVectorView *vv
 	return (cul_const_ptr *)(ptr + vv->stride);
 }
 
-#endif /* CUL_PVECTOR_H */
+#endif /* __CUL_PVECTOR_H__ */

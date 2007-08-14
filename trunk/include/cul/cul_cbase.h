@@ -1,5 +1,5 @@
-#ifndef CUL_CBASE_H
-#define CUL_CBASE_H
+#ifndef __CUL_CBASE_H__
+#define __CUL_CBASE_H__
 
 #include <cul/cul_base_global.h>
 #include <stdio.h>
@@ -17,6 +17,7 @@ void cul_cpermute_stride(char *data, const size_t *permutation, size_t size, siz
 void cul_creverse(char *data, size_t size);
 void cul_creverse_stride(char *data, size_t size, size_t stride);
 
+void cul_czero(char *data, size_t size);
 void cul_cset(char *data, size_t size, char value);
 void cul_cset_stride(char *data, size_t size, size_t stride, char value);
 void cul_cadd_scalar(char *data, size_t size, char value);
@@ -88,4 +89,4 @@ static inline char cul_cmax_pair(char a, char b) {
 	return a > b ? a : b;
 }
 
-#endif /* CUL_CBASE_H */
+#endif /* __CUL_CBASE_H__ */

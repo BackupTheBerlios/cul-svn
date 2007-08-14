@@ -1,8 +1,10 @@
-#ifndef CUL_UBASE_H
-#define CUL_UBASE_H
+#ifndef __CUL_UBASE_H__
+#define __CUL_UBASE_H__
 
 #include <cul/cul_base_global.h>
 #include <stdio.h>
+
+void cul_uzero(size_t *data, size_t size);
 
 void cul_ucopy(size_t *data_a, const size_t *data_b, size_t size);
 void cul_ucopy_overlap(size_t *data_a, const size_t *data_b, size_t size);

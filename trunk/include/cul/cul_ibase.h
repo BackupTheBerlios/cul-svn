@@ -1,8 +1,10 @@
-#ifndef CUL_IBASE_H
-#define CUL_IBASE_H
+#ifndef __CUL_IBASE_H__
+#define __CUL_IBASE_H__
 
 #include <cul/cul_base_global.h>
 #include <stdio.h>
+
+void cul_izero(int *data, size_t size);
 
 void cul_icopy(int *data_a, const int *data_b, size_t size);
 void cul_icopy_overlap(int *data_a, const int *data_b, size_t size);
@@ -88,4 +90,4 @@ static inline int cul_imax_pair(int a, int b) {
 	return a > b ? a : b;
 }
 
-#endif /* CUL_IBASE_H */
+#endif /* __CUL_IBASE_H__ */
