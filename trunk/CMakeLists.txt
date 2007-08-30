@@ -6,7 +6,7 @@ PROJECT(CUL)
 
 SET(CUL_MAJOR_VERSION 0)
 SET(CUL_MINOR_VERSION 0)
-SET(CUL_PATCH_VERSION 18)
+SET(CUL_PATCH_VERSION 20)
 SET(CUL_VERSION "${CUL_MAJOR_VERSION}.${CUL_MINOR_VERSION}.${CUL_PATCH_VERSION}")
 
 ###
@@ -44,28 +44,32 @@ ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 ###
 
 SET(CUL_SOURCES
-	src/cul_arg.c
-	src/cul_file.c
 	src/cul_error.c
-	src/cul_slist.c
-	src/cul_list.c
 	src/cul_log.c
-	src/cul_matrix.c
 	src/cul_mem.c
-	src/cul_permutation.c
-	src/cul_random.c
-	src/cul_rng.c
-	src/cul_tree.c
-	src/cul_bbtree.c
-	src/cul_vector.c
+	src/cul_stream.c
+
 	src/cul_str.c
 	src/cul_str_type.c
-	src/cul_stream.c
 	src/cul_string.c
+
+	src/cul_arg.c
+	src/cul_file.c
+	src/cul_slist.c
+	src/cul_list.c
+	src/cul_tree.c
+	src/cul_bbtree.c
 
 	src/base/cul_base_basic.c
 	src/base/cul_base_alg.c
 	src/base/cul_base_io.c
+
+	src/cul_rng.c
+	src/cul_random.c
+	src/cul_permutation.c
+
+	src/cul_vector.c
+	src/cul_matrix.c
 )
 
 # set output directories

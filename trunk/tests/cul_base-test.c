@@ -11,8 +11,6 @@ cul_bool test_permute(size_t *data, const size_t *permutation, size_t size);
 int main(int argc, char* argv[]) {
 	/* initialize standard random number generator */
 	srand(time(NULL));
-	/* get more verbose error messages */
-	cul_error_fatal_set(CUL_FALSE);
 
 	/* test permute */
 	size_t *permutation = malloc(size*sizeof(size_t));

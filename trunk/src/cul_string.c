@@ -84,12 +84,11 @@ CulString *cul_string_resize(CulString *s, size_t size) {
 	const size_t copy_size = s->size > size? size: s->size;
 	char *str;
 
-	if( size > 0 ) {
-		if( (str = malloc((size + 1)*sizeof(char))) == NULL )
-			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	}
-	else
+	if( size == 0 )
 		return cul_string_clear(s);
+
+	if( (str = malloc((size + 1)*sizeof(char))) == NULL )
+		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	/* copy old string */
 	memcpy(str, s->str, copy_size*sizeof(char));
@@ -117,11 +116,7 @@ CulString *cul_string_reserve(CulString *s, size_t size) {
 	memcpy(str, s->str, (s->size + 1)*sizeof(char));
 	free(s->str);
 
-	/* set new string contents */
-	s->reserved = size + 1;
-	s->str = str;
-
-	return s;
+	return cul_string_init_struct(s, s->size, size + 1, str);
 }
 
 CulString *cul_string_shrink(CulString *s) {

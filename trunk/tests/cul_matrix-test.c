@@ -4,19 +4,17 @@
 #include <stdlib.h>
 #include <time.h>
 
-const size_t size_x = 10;
-const size_t size_y = 10;
+const size_t size_x = 100;
+const size_t size_y = 100;
 
 cul_bool test_matrixview_equal(const CulDMatrixView *va, const CulDMatrixView *vb);
 
 int main(int argc, char* argv[]) {
-	CulDMatrix *m1, *m2, *merge;
-	CulDMatrixView *mv1 = NULL, *mv2 = NULL, *mergev = NULL;
-
 	/* initialize standard random number generator */
 	srand(time(NULL));
-	/* get more verbose error messages */
-	cul_error_fatal_set(CUL_FALSE);
+
+	CulDMatrix *m1, *m2, *merge;
+	CulDMatrixView *mv1 = NULL, *mv2 = NULL, *mergev = NULL;
 
 	/* allocate matrices and views */
 	m1 = cul_dmatrix_new(size_x, size_y);

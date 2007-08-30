@@ -23,155 +23,178 @@ struct _CulCMatrixView {
 	size_t tda;
 };
 
-static inline CulCMatrix     *cul_cmatrix_new_struct(void);
-static inline void            cul_cmatrix_free_struct(CulCMatrix *m);
-static inline CulCMatrix     *cul_cmatrix_init_struct(CulCMatrix *m, char *data, size_t size_x, size_t size_y);
+static inline CulCMatrix     *cul_cmatrix_new_struct     ();
+static inline void            cul_cmatrix_free_struct    (CulCMatrix *this);
+static inline CulCMatrix     *cul_cmatrix_init_struct    (CulCMatrix *this, char *data, size_t size_x, size_t size_y);
+static inline CulCMatrixView *cul_cmatrixview_new_struct ();
+static inline void            cul_cmatrixview_free_struct(CulCMatrixView *this);
+static inline CulCMatrixView *cul_cmatrixview_init_struct(CulCMatrixView *this, char *data, size_t size_x, size_t size_y, size_t tda);
 
-static inline CulCMatrixView *cul_cmatrixview_new_struct(void);
-static inline void            cul_cmatrixview_free_struct(CulCMatrixView *m);
-static inline CulCMatrixView *cul_cmatrixview_init_struct(CulCMatrixView *mv, char *data, size_t size_x, size_t size_y, size_t tda);
+static inline char            cul_cmatrix_get            (const CulCMatrix *this, size_t x, size_t y);
+static inline void            cul_cmatrix_set            (CulCMatrix *this, size_t x, size_t y, char value);
+static inline char           *cul_cmatrix_ptr            (CulCMatrix *this, size_t x, size_t y);
+static inline const char     *cul_cmatrix_const_ptr      (const CulCMatrix *this, size_t x, size_t y);
+static inline char            cul_cmatrixview_get        (const CulCMatrixView *this, size_t x, size_t y);
+static inline void            cul_cmatrixview_set        (CulCMatrixView *this, size_t x, size_t y, char value);
+static inline char           *cul_cmatrixview_ptr        (CulCMatrixView *this, size_t x, size_t y);
+static inline const char     *cul_cmatrixview_const_ptr  (const CulCMatrixView *this, size_t x, size_t y);
 
-static inline char            cul_cmatrix_get(const CulCMatrix *m, size_t x, size_t y);
-static inline void            cul_cmatrix_set(CulCMatrix *m, size_t x, size_t y, char val);
-static inline char           *cul_cmatrix_ptr(CulCMatrix *m, size_t x, size_t y);
-static inline const char     *cul_cmatrix_const_ptr(const CulCMatrix *m, size_t x, size_t y);
+CulCMatrix     *cul_cmatrix_new          (size_t x, size_t y);
+CulCMatrix     *cul_cmatrix_new_empty    ();
+CulCMatrix     *cul_cmatrix_clone        (CulCMatrix *this);
+CulCMatrix     *cul_cmatrix_clone_view   (CulCMatrixView *this);
+void            cul_cmatrix_free         (CulCMatrix *this);
+CulCMatrixView *cul_cmatrixview_new      ();
+void            cul_cmatrixview_free     (CulCMatrixView *this);
 
-static inline char            cul_cmatrixview_get(const CulCMatrixView *mv, size_t x, size_t y);
-static inline void            cul_cmatrixview_set(CulCMatrixView *mv, size_t x, size_t y, char val);
-static inline char           *cul_cmatrixview_ptr(CulCMatrixView *mv, size_t x, size_t y);
-static inline const char     *cul_cmatrixview_const_ptr(const CulCMatrixView *mv, size_t x, size_t y);
+CulCMatrixView *cul_cmatrixview_matrix   (CulCMatrixView *this, CulCMatrix *base);
+CulCMatrixView *cul_cmatrixview_submatrix(CulCMatrixView *this, CulCMatrix *base, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y);
+CulCVectorView *cul_cmatrixview_row      (CulCVectorView *this, const CulCMatrix *base, size_t base_row);
+CulCVectorView *cul_cmatrixview_col      (CulCVectorView *this, const CulCMatrix *base, size_t base_col);
+CulCVectorView *cul_cmatrixview_diag     (CulCVectorView *this, const CulCMatrix *base);
+CulCVectorView *cul_cmatrixview_subdiag  (CulCVectorView *this, const CulCMatrix *base, size_t base_k);
+CulCVectorView *cul_cmatrixview_superdiag(CulCVectorView *this, const CulCMatrix *base, size_t base_k);
 
-CulCMatrix     *cul_cmatrix_new(size_t x, size_t y);
-CulCMatrix     *cul_cmatrix_new_empty(void);
-void            cul_cmatrix_free(CulCMatrix *m);
-CulCMatrixView *cul_cmatrixview_new(void);
-void            cul_cmatrixview_free(CulCMatrixView *mv);
+cul_errno cul_cmatrix_copy            (CulCMatrix *this, const CulCMatrix *other);
+cul_errno cul_cmatrix_copy_offset     (CulCMatrix *this, const CulCMatrix *other, size_t offset_x, size_t offset_y);
+cul_errno cul_cmatrix_copy_submatrix  (CulCMatrix *this, const CulCMatrix *other, size_t other_offset_x, size_t other_offset_y);
+cul_errno cul_cmatrix_copy_row        (CulCMatrix *this, const CulCMatrix *other, size_t row, size_t other_row);
+cul_errno cul_cmatrix_copy_col        (CulCMatrix *this, const CulCMatrix *other, size_t col, size_t other_col);
+cul_errno cul_cmatrix_copy_view       (CulCMatrix *this, const CulCMatrixView *other);
+cul_errno cul_cmatrixview_copy        (CulCMatrixView *this, const CulCMatrixView *other);
 
-CulCMatrixView *cul_cmatrixview_matrix(CulCMatrixView *mv, CulCMatrix *base_m);
-CulCMatrixView *cul_cmatrixview_submatrix(CulCMatrixView *mv, CulCMatrix *base_m, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y);
-CulCVectorView *cul_cmatrixview_row(CulCVectorView *vv, const CulCMatrix *base_m, size_t base_row);
-CulCVectorView *cul_cmatrixview_col(CulCVectorView *vv, const CulCMatrix *base_m, size_t base_col);
-CulCVectorView *cul_cmatrixview_diag(CulCVectorView *vv, const CulCMatrix *base_m);
-CulCVectorView *cul_cmatrixview_subdiag(CulCVectorView *vv, const CulCMatrix *base_m, size_t base_k);
-CulCVectorView *cul_cmatrixview_superdiag(CulCVectorView *vv, const CulCMatrix *base_m, size_t base_k);
+cul_errno cul_cmatrix_swap            (CulCMatrix *this, CulCMatrix *other);
+cul_errno cul_cmatrix_swap_row        (CulCMatrix *this, CulCMatrix *other, size_t row, size_t other_row);
+cul_errno cul_cmatrix_swap_col        (CulCMatrix *this, CulCMatrix *other, size_t col, size_t other_col);
+cul_errno cul_cmatrixview_swap        (CulCMatrixView *this, CulCMatrixView *other);
+cul_errno cul_cmatrix_transpose       (CulCMatrix *this);
+cul_errno cul_cmatrixview_transpose   (CulCMatrixView *this);
 
-void      cul_cmatrix_zero(CulCMatrix *m);
+cul_errno cul_cmatrix_resize          (CulCMatrix *this, size_t x, size_t y);
+cul_errno cul_cmatrix_resize_empty    (CulCMatrix *this, size_t x, size_t y);
 
-cul_errno cul_cmatrix_copy(CulCMatrix *m, const CulCMatrix *base_m);
-cul_errno cul_cmatrix_copy_offset(CulCMatrix *m, const CulCMatrix *base_m, size_t offset_x, size_t offset_y);
-cul_errno cul_cmatrix_copy_submatrix(CulCMatrix *m, const CulCMatrix *base_m, size_t base_offset_x, size_t base_offset_y);
-cul_errno cul_cmatrix_copy_view(CulCMatrix *m, const CulCMatrixView *base_mv);
-cul_errno cul_cmatrixview_copy(CulCMatrixView *mv, const CulCMatrixView *base_mv);
+void      cul_cmatrix_set_all         (CulCMatrix *this, char value);
+void      cul_cmatrix_set_diag        (CulCMatrix *this, char value, char diag);
+void      cul_cmatrix_add_constant    (CulCMatrix *this, double value);
+void      cul_cmatrix_scale           (CulCMatrix *this, double value);
+void      cul_cmatrix_zero            (CulCMatrix *this);
+cul_errno cul_cmatrix_add             (CulCMatrix *this, const CulCMatrix *other);
+cul_errno cul_cmatrix_sub             (CulCMatrix *this, const CulCMatrix *other);
+cul_errno cul_cmatrix_mul             (CulCMatrix *this, const CulCMatrix *other);
+cul_errno cul_cmatrix_div             (CulCMatrix *this, const CulCMatrix *other);
+void      cul_cmatrixview_set_all     (CulCMatrixView *this, char value);
+void      cul_cmatrixview_set_diag    (CulCMatrixView *this, char value, char diag);
+void      cul_cmatrixview_add_constant(CulCMatrixView *this, double value);
+void      cul_cmatrixview_scale       (CulCMatrixView *this, double value);
+cul_errno cul_cmatrixview_add         (CulCMatrixView *this, const CulCMatrixView *other);
+cul_errno cul_cmatrixview_sub         (CulCMatrixView *this, const CulCMatrixView *other);
+cul_errno cul_cmatrixview_mul         (CulCMatrixView *this, const CulCMatrixView *other);
+cul_errno cul_cmatrixview_div         (CulCMatrixView *this, const CulCMatrixView *other);
 
-cul_errno cul_cmatrix_copy_row(CulCMatrix *m, const CulCMatrix *base_m, size_t row, size_t base_row);
-cul_errno cul_cmatrix_copy_col(CulCMatrix *m, const CulCMatrix *base_m, size_t col, size_t base_col);
+char      cul_cmatrix_min             (const CulCMatrix *this);
+size_t    cul_cmatrix_min_index       (const CulCMatrix *this);
+char      cul_cmatrix_max             (const CulCMatrix *this);
+size_t    cul_cmatrix_max_index       (const CulCMatrix *this);
+void      cul_cmatrix_minmax          (const CulCMatrix *this, char *min, char *max);
+void      cul_cmatrix_minmax_index    (const CulCMatrix *this, size_t *min_i, size_t *max_i);
 
-cul_errno cul_cmatrix_swap(CulCMatrix *ma, CulCMatrix *mb);
-cul_errno cul_cmatrix_swap_row(CulCMatrix *ma, CulCMatrix *mb, size_t row_a, size_t row_b);
-cul_errno cul_cmatrix_swap_col(CulCMatrix *ma, CulCMatrix *mb, size_t col_a, size_t col_b);
+double    cul_cmatrix_sum             (const CulCMatrix *this);
+double    cul_cmatrix_mean            (const CulCMatrix *this);
+double    cul_cmatrix_variance        (const CulCMatrix *this, double mean);
+double    cul_cmatrixview_sum         (const CulCMatrixView *this);
+double    cul_cmatrixview_mean        (const CulCMatrixView *this);
+double    cul_cmatrixview_variance    (const CulCMatrixView *this, double mean);
 
-cul_errno cul_cmatrix_resize(CulCMatrix *m, size_t x, size_t y);
-cul_errno cul_cmatrix_resize_empty(CulCMatrix *m, size_t x, size_t y);
-
-cul_errno cul_cmatrix_transpose(CulCMatrix *m);
-
-char      cul_cmatrix_min(const CulCMatrix *m);
-size_t    cul_cmatrix_min_index(const CulCMatrix *m);
-char      cul_cmatrix_max(const CulCMatrix *m);
-size_t    cul_cmatrix_max_index(const CulCMatrix *m);
-void      cul_cmatrix_minmax(const CulCMatrix *m, char *min, char *max);
-void      cul_cmatrix_minmax_index(const CulCMatrix *m, size_t *min_i, size_t *max_i);
-
-cul_errno cul_cmatrix_fprintf(FILE *stream, const CulCMatrix *m, const char *format, const char *separator, const char *begin, const char *end, const char *row);
-cul_errno cul_cmatrix_fscanf(FILE *stream, CulCMatrix *m, const char *format, const char *separator, const char *begin, const char *end, const char *row);
+cul_errno cul_cmatrix_fprintf         (FILE *stream, const CulCMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
+cul_errno cul_cmatrix_fscanf          (FILE *stream, CulCMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
 
 /* implementation */
 
-static inline CulCMatrix *cul_cmatrix_new_struct(void) {
+static inline CulCMatrix *cul_cmatrix_new_struct() {
 	return cul_slab_new(sizeof(CulCMatrix));
 }
 
-static inline void cul_cmatrix_free_struct(CulCMatrix *m) {
-	cul_slab_free(sizeof(CulCMatrix), m);
+static inline void cul_cmatrix_free_struct(CulCMatrix *this) {
+	cul_slab_free(sizeof(CulCMatrix), this);
 }
 
-static inline CulCMatrix *cul_cmatrix_init_struct(CulCMatrix *m, char *data, size_t size_x, size_t size_y) {
-	m->data = data;
-	m->size_x = size_x;
-	m->size_y = size_y;
-	return m;
+static inline CulCMatrix *cul_cmatrix_init_struct(CulCMatrix *this, char *data, size_t size_x, size_t size_y) {
+	this->data = data;
+	this->size_x = size_x;
+	this->size_y = size_y;
+	return this;
 }
 
-static inline CulCMatrixView *cul_cmatrixview_new_struct(void) {
+static inline CulCMatrixView *cul_cmatrixview_new_struct() {
 	return cul_slab_new(sizeof(CulCMatrixView));
 }
 
-static inline void cul_cmatrixview_free_struct(CulCMatrixView *m) {
-	cul_slab_free(sizeof(CulCMatrixView), m);
+static inline void cul_cmatrixview_free_struct(CulCMatrixView *this) {
+	cul_slab_free(sizeof(CulCMatrixView), this);
 }
 
-static inline CulCMatrixView *cul_cmatrixview_init_struct(CulCMatrixView *mv, char *data, size_t size_x, size_t size_y, size_t tda) {
-	mv->data = data;
-	mv->size_x = size_x;
-	mv->size_y = size_y;
-	mv->tda = tda;
-	return mv;
+static inline CulCMatrixView *cul_cmatrixview_init_struct(CulCMatrixView *this, char *data, size_t size_x, size_t size_y, size_t tda) {
+	this->data = data;
+	this->size_x = size_x;
+	this->size_y = size_y;
+	this->tda = tda;
+	return this;
 }
 
-static inline char cul_cmatrix_get(const CulCMatrix *m, size_t x, size_t y) {
+static inline char cul_cmatrix_get(const CulCMatrix *this, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
 #endif
-	return *(m->data + m->size_x * y + x);
+	return *(this->data + this->size_x * y + x);
 }
 
-static inline void cul_cmatrix_set(CulCMatrix *m, size_t x, size_t y, char value) {
+static inline void cul_cmatrix_set(CulCMatrix *this, size_t x, size_t y, char value) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
-	*(m->data + m->size_x * y + x) = value;
+	*(this->data + this->size_x * y + x) = value;
 }
 
-static inline char *cul_cmatrix_ptr(CulCMatrix *m, size_t x, size_t y) {
+static inline char *cul_cmatrix_ptr(CulCMatrix *this, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
-	return (m->data + m->size_x * y + x);
+	return (this->data + this->size_x * y + x);
 }
 
-static inline const char *cul_cmatrix_const_ptr(const CulCMatrix *m, size_t x, size_t y) {
+static inline const char *cul_cmatrix_const_ptr(const CulCMatrix *this, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= m->size_x || y >= m->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
-	return (m->data + m->size_x * y + x);
+	return (this->data + this->size_x * y + x);
 }
 
-static inline char cul_cmatrixview_get(const CulCMatrixView *mv, size_t x, size_t y) {
+static inline char cul_cmatrixview_get(const CulCMatrixView *this, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET(0, CUL_EBADPOS);
 #endif
-	return mv->data[mv->tda * y + x];
+	return this->data[this->tda * y + x];
 }
 
-static inline void cul_cmatrixview_set(CulCMatrixView *mv, size_t x, size_t y, char value) {
+static inline void cul_cmatrixview_set(CulCMatrixView *this, size_t x, size_t y, char value) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET_VOID(CUL_EBADPOS);
 #endif
-	mv->data[mv->tda * y + x] = value;
+	this->data[this->tda * y + x] = value;
 }
 
-static inline char *cul_cmatrixview_ptr(CulCMatrixView *mv, size_t x, size_t y) {
+static inline char *cul_cmatrixview_ptr(CulCMatrixView *this, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
-	return (mv->data + mv->tda * y + x);
+	return (this->data + this->tda * y + x);
 }
 
-static inline const char *cul_cmatrixview_const_ptr(const CulCMatrixView *mv, size_t x, size_t y) {
+static inline const char *cul_cmatrixview_const_ptr(const CulCMatrixView *this, size_t x, size_t y) {
 #ifdef CUL_RANGE_CHECK
-	if( x >= mv->size_x || y >= mv->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
+	if( x >= this->size_x || y >= this->size_y ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 #endif
-	return (mv->data + mv->tda * y + x);
+	return (this->data + this->tda * y + x);
 }
 
 #endif /* __CUL_CMATRIX_H__ */
