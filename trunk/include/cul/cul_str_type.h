@@ -1,5 +1,5 @@
-#ifndef CUL_STR_TYPE_H
-#define CUL_STR_TYPE_H
+#ifndef __CUL_STR_TYPE_H__
+#define __CUL_STR_TYPE_H__
 
 #include <cul/cul_global.h>
 #include <ctype.h>
@@ -51,11 +51,11 @@ static inline int cul_islower(int c) {
 }
 
 static inline int cul_tolower(int c) {
-	return cul_islower(c)? c - 'a' + 'A': c;
+	return cul_islower(c)? c: c - 'A' + 'a';
 }
 
 static inline int cul_toupper(int c) {
-	return cul_isupper(c)? c - 'A' + 'a': c;
+	return cul_isupper(c)? c: c - 'a' + 'A';
 }
 
-#endif /* CUL_STR_TYPE_H */
+#endif /* __CUL_STR_TYPE_H__ */
