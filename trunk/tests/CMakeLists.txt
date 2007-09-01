@@ -20,3 +20,7 @@ TARGET_LINK_LIBRARIES(cul_matrix-test cul)
 PROJECT(CUL_TEST_RNG)
 ADD_EXECUTABLE(cul_rng-test "cul_rng-test.c")
 TARGET_LINK_LIBRARIES(cul_rng-test cul "-lm")
+
+PROJECT(CUL_TEST_STR)
+ADD_EXECUTABLE(cul_str-test "cul_str-test.c")
+TARGET_LINK_LIBRARIES(cul_str-test cul)
