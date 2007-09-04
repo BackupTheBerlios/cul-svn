@@ -26,6 +26,16 @@ extern const uint16_t *const cul_str_type_ascii;
 static inline int cul_isspace(int c);
 static inline int cul_iswhite(int c);
 
+static inline int cul_isgraph(int c);
+static inline int cul_isprint(int c);
+static inline int cul_ispunct(int c);
+
+static inline int cul_isalnum(int c);
+static inline int cul_isalpha(int c);
+
+static inline int cul_isdigit(int c);
+static inline int cul_isxdigit(int c);
+
 static inline int cul_isupper(int c);
 static inline int cul_islower(int c);
 
@@ -40,6 +50,34 @@ static inline int cul_isspace(int c) {
 
 static inline int cul_iswhite(int c) {
 	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_WHITE) != 0 );
+}
+
+static inline int cul_isgraph(int c) {
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_GRAPH) != 0 );
+}
+
+static inline int cul_isprint(int c) {
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_PRINT) != 0 );
+}
+
+static inline int cul_ispunct(int c) {
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_PUNCT) != 0 );
+}
+
+static inline int cul_isalnum(int c) {
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_ALNUM) != 0 );
+}
+
+static inline int cul_isalpha(int c) {
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_ALPHA) != 0 );
+}
+
+static inline int cul_isdigit(int c) {
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_DIGIT) != 0 );
+}
+
+static inline int cul_isxdigit(int c) {
+	return ( (cul_str_type_ascii[ (uint8_t)c ] & CUL_STRT_XDIGIT) != 0 );
 }
 
 static inline int cul_isupper(int c) {
