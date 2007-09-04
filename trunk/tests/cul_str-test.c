@@ -14,8 +14,16 @@ int main(int argc, char* argv[]) {
 	CulRng *rng = cul_rng_new(CUL_RNG_MT19937);
 	cul_rng_seed(rng, cul_rng_seed_32(1));
 
-	{ /* test tolower and toupper functions */
-		char lower[length], upper[length], compare[length];
+	/* check islower */
+	for(size_t i = 0x60; i <= 0x80; ++i) {
+		printf("%c(%d)",i, cul_islower(i));
+	}
+	printf("\n");
+
+	{ /* test tolower, toupper and islower, isupper functions */
+		char lower[length], upper[length],
+			lower_lower[length], upper_upper[length],
+			lower_upper[length], upper_lower[length];
 
 		for(size_t i = 0, random; i < length - 1; ++i) {
 			random = (size_t)(cul_rng_get_real(rng) * alphabet);
@@ -26,10 +34,15 @@ int main(int argc, char* argv[]) {
 		lower[length - 1] = CUL_STR_NULL;
 		upper[length - 1] = CUL_STR_NULL;
 
-		strcpy(compare, lower);
-		CUL_ASSERT( strcmp(cul_strtoupper(compare), upper) == 0 );
-		strcpy(compare, upper);
-		CUL_ASSERT( strcmp(cul_strtolower(compare), lower) == 0 );
+		strcpy(lower_lower, lower);
+		strcpy(lower_upper, lower);
+		CUL_ASSERT( strcmp(cul_strtolower(lower_lower), lower) == 0 );
+		CUL_ASSERT( strcmp(cul_strtoupper(lower_upper), upper) == 0 );
+
+		strcpy(upper_upper, upper);
+		strcpy(upper_lower, upper);
+		CUL_ASSERT( strcmp(cul_strtoupper(upper_upper), upper) == 0 );
+		CUL_ASSERT( strcmp(cul_strtolower(upper_lower), lower) == 0 );
 	}
 
 	cul_rng_free(rng);
