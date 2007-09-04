@@ -6,7 +6,7 @@ PROJECT(CUL)
 
 SET(CUL_MAJOR_VERSION 0)
 SET(CUL_MINOR_VERSION 0)
-SET(CUL_PATCH_VERSION 20)
+SET(CUL_PATCH_VERSION 21)
 SET(CUL_VERSION "${CUL_MAJOR_VERSION}.${CUL_MINOR_VERSION}.${CUL_PATCH_VERSION}")
 
 ###
@@ -24,12 +24,9 @@ CHECK_FUNCTION_EXISTS(asprintf HAVE_ASPRINTF)
 # possibilities: Debug RelWithDebInfo MinSizeRel Release
 SET(CMAKE_BUILD_TYPE Debug)
 
-# set warning flags
-IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-	SET(CMAKE_C_FLAGS "-Wall -Wextra -Wmissing-declarations -Werror -std=c99")
-ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
-	SET(CMAKE_C_FLAGS "-std=c99")
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
+# set compiler cflags
+SET(CMAKE_C_FLAGS "-std=c99")
+SET(CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -Wmissing-declarations -Werror")
 
 # set one line errors from gcc
 IF(CMAKE_COMPILER_IS_GNUCC)
@@ -81,7 +78,8 @@ SET(CUL_HEADERS_PRIVATE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/private)
 SET(CUL_CONFIG_DIR ${PROJECT_BINARY_DIR}/include)
 
 # create configuration
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cul_config.h.in "${CUL_CONFIG_DIR}/cul/cul_config.h" ESCAPE_QUOTES)
+SET(CUL_CONFIG ${CUL_CONFIG_DIR}/cul/cul_config.h)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cul_config.h.in "${CUL_CONFIG}" ESCAPE_QUOTES)
 
 # set compiler variables
 INCLUDE_DIRECTORIES(${CUL_CONFIG_DIR} ${CUL_HEADERS_DIR} ${CUL_HEADERS_PRIVATE_DIR})
@@ -91,15 +89,23 @@ ADD_LIBRARY(cul SHARED ${CUL_SOURCES})
 SET_TARGET_PROPERTIES(cul PROPERTIES
 	LINKER_LANGUAGE C
 	VERSION ${CUL_VERSION}
+	SOVERSION ${CUL_MAJOR_VERSION}
 	DEFINE_SYMBOL CUL_MODULE=\\"cul\\"
 )
 
+# set sections for static library
 GET_TARGET_PROPERTY(CUL_BUILD_TYPE cul TYPE)
 IF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 	MESSAGE(STATUS "Building static library -- using data and function sections")
-	SET(CMAKE_C_FLAGS	"${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
 ENDIF("${CUL_BUILD_TYPE}" STREQUAL "STATIC_LIBRARY")
 
 # testing
 ENABLE_TESTING()
 INCLUDE(CMakeTests.txt)
+
+# install target
+FILE(GLOB CUL_HEADERS ${CUL_HEADERS_DIR}/cul/*h)
+INSTALL(FILES ${CUL_CONFIG} DESTINATION include/cul)
+INSTALL(FILES ${CUL_HEADERS} DESTINATION include/cul)
+INSTALL(TARGETS cul LIBRARY DESTINATION lib)
