@@ -12,7 +12,7 @@ FILE *cul_stream_get(void) {
 }
 
 FILE *cul_stream_get_default(void) {
-	/* TODO possible environment variable read in future */
+	/* TODO possible environment variable read */
 	return stderr;
 }
 

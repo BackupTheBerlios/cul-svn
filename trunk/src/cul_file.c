@@ -27,6 +27,7 @@ cul_bool cul_file_writeable(const char *filename) {
 
 size_t cul_file_lines(const char *filename) {
 	CUL_UNUSED(filename);
+	/* TODO cul_file_lines stub */
 	CUL_ERROR_ERRNO_RET(0, CUL_ESTUB);
 }
 

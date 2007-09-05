@@ -129,6 +129,7 @@ CulSList *cul_slist_reverse(CulSList *l) {
 CulSList *cul_slist_sort(CulSList *l, cul_cmp_f *cmp_f) {
 	CUL_UNUSED(l);
 	CUL_UNUSED(cmp_f);
+	/* TODO cul_slist_sort stub */
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 

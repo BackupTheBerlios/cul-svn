@@ -8,7 +8,7 @@ CulRngType _cul_rng_get_default(void);
 CulRngType _cul_rng_set_default(CulRngType type);
 
 CulRngType _cul_rng_get_default(void) {
-	/* TODO possible environment variable read in future */
+	/* TODO possible environment variable read */
 	if( cul_rng_default == CUL_RNG_DEFAULT )
 		_cul_rng_set_default(CUL_RNG_MT19937);
 	return cul_rng_default;

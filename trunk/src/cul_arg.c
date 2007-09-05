@@ -7,10 +7,12 @@
 #include <string.h>
 
 /* private functions */
-static inline void _cul_arg_cmd_next(int *argc, char ***argv);
-static cul_errno   _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *t, size_t pos);
-static cul_errno   _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *t, size_t pos);
-static cul_bool    _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos);
+static inline void _cul_arg_cmd_next       (int *argc, char ***argv);
+static cul_errno   _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t n);
+static cul_errno   _cul_arg_cmd_parse_long (int *argc, char ***argv, CulArg *table, size_t n);
+static cul_bool    _cul_arg_cmd_convert    (const char *arg, CulArg *entry, size_t n);
+static CulArg     *_cul_arg_end            (const CulArg *this);
+static CulArg     *_cul_arg_end_last       (const CulArg *this);
 
 /* Parse program arguments using argument tables */
 cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
@@ -64,110 +66,122 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 	return CUL_SUCCESS;
 }
 
-void cul_arg_connect(CulArg *t, CulArg *connect) {
-	/* find end of table */
-	for(; !(t->flags & CUL_ARG_END); t += 1) ;
+void cul_arg_connect(CulArg *this, CulArg *other) {
+	/* connect tables */
+	_cul_arg_end_last(this)->value = other;
+}
 
-	/* find last end of table */
-	while( t->value != NULL )
-		for(t = t->value; !(t->flags & CUL_ARG_END); t += 1) ;
+void cul_arg_connect_next(CulArg *this, CulArg *other) {
+	/* find end of table */
+	this = _cul_arg_end(this);
+
+	/* check if we have to modify other table */
+	if( this->value != NULL )
+		_cul_arg_end_last(other)->value = this->value;
 
 	/* connect tables */
-	t->value = connect;
+	this->value = other;
 }
 
-void cul_arg_disconnect(CulArg *t, CulArg *disconnect) {
-	/* find end of table */
-	for(; !(t->flags & CUL_ARG_END); t += 1) ;
+void cul_arg_disconnect(CulArg *this, CulArg *other) {
+	/* find other table */
+	while( CUL_TRUE ) {
+		this = _cul_arg_end(this);
 
-	/* find disconnect table */
-	while( t->value != NULL ) {
-		if( t->value == disconnect ) {
-			CulArg *connect = t->value;
+		if( this->value == NULL)
+			return;
 
-			/* find end of disconnect table */
-			for(; !(connect->flags & CUL_ARG_END); connect += 1) ;
-
-			/* connect next table */
-			t->value = connect->value;
-		} else
-			for(t = t->value; !(t->flags & CUL_ARG_END); t += 1) ;
+		if( this->value == other ) {
+			other = _cul_arg_end(other);
+			this->value = other->value;
+			other->value = NULL;
+		}
 	}
+	
 }
 
-/* Print all help string information from table */
-void cul_arg_print_help(CulArg *t) {
-	while( t != NULL ) switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+void cul_arg_print(CulArg *this) {
+	while( this != NULL ) {
+		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
 		case CUL_ARG_END:
-			t = t->value;
+			this = this->value;
 			break;
-		case CUL_ARG_HELP:
-			fprintf(cul_stream_get(), "%s\n", t->description);
-			t += 1;
+		case CUL_ARG_PRINT:
+			fprintf(cul_stream_get(), "%s\n", this->description);
+			this += 1;
 			break;
 		default:
-			if( t->short_name ) {
-				if( t->long_name )
-					fprintf(cul_stream_get(),"  -%c, --%-16s  %s\n", t->short_name, t->long_name, t->description);
+			if( this->short_name ) {
+				if( this->long_name )
+					fprintf(cul_stream_get(),"  -%c, --%-16s  %s\n",
+							this->short_name, this->long_name, this->description);
 				else
-					fprintf(cul_stream_get(),"  -%-21c  %s\n", t->short_name, t->description);
+					fprintf(cul_stream_get(),"  -%-21c  %s\n",
+							this->short_name, this->description);
 			}
-			else if( t->long_name )
-				fprintf(cul_stream_get(),  "  --%-20s  %s\n", t->long_name, t->description);
-			t += 1;
+			else if( this->long_name )
+				fprintf(cul_stream_get(), "  --%-20s  %s\n",
+						this->long_name, this->description);
+			this += 1;
 			break;
+		}
 	}
 }
 
-void cul_arg_free(CulArg *t, cul_bool is_free_value) {
-	while( t != NULL ) switch( t->flags & CUL_ARG_NTYPE_MASK ) {
-		case CUL_ARG_END:  t = t->value; break;
-		case CUL_ARG_HELP: t += 1; break;
+void cul_arg_free(CulArg *this, cul_bool free_values) {
+	while( this != NULL )
+		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END:  this = this->value; break;
+		case CUL_ARG_PRINT: this += 1; break;
 		default:
-			if( t->flags & CUL_ARG_FOUND ) switch( t->flags & CUL_ARG_TYPE_MASK ) {
+			if( this->flags & CUL_ARG_FOUND ) {
+				switch( this->flags & CUL_ARG_TYPE_MASK ) {
 				case CUL_ARG_STR:
-					if( is_free_value ) free(*(char **)t->value);
+					if( free_values ) free(*(char **)this->value);
 					break;
 				case CUL_ARG_STRV:
-					if( is_free_value ) cul_strv_free(*(char ***)t->value);
+					if( free_values ) cul_strv_free(*(char ***)this->value);
 					break;
 				default:
 					break;
+				}
 			}
-			t += 1;
+			this += 1;
 			break;
 	}
 }
 
-CulArg *cul_arg_check_required(CulArg *t) {
-	while( t != NULL ) switch( t->flags & CUL_ARG_NTYPE_MASK ) {
-		case CUL_ARG_END: t = t->value; break;
-		case CUL_ARG_HELP: t += 1; break;
+CulArg *cul_arg_check_required(const CulArg *this) {
+	while( this != NULL ) {
+		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END: this = this->value; break;
+		case CUL_ARG_PRINT: this += 1; break;
 		default:
-			if( t->flags & CUL_ARG_NEED && !(t->flags & CUL_ARG_FOUND) )
-				return t;
-			t += 1;
+			if( this->flags & CUL_ARG_NEED && !(this->flags & CUL_ARG_FOUND) )
+				return (CulArg *)this;
+			this += 1;
 			break;
+		}
 	}
 	return NULL;
 }
 
-/* Find and return specific short argument in argument table */
-CulArg *cul_arg_search_short(CulArg *t, char arg) {
-	while( t != NULL )  switch( t->flags & CUL_ARG_NTYPE_MASK ) {
-		case CUL_ARG_END: t = t->value; break;
-		case CUL_ARG_HELP: t += 1; break;
+CulArg *cul_arg_find_short(const CulArg *this, char arg) {
+	while( this != NULL ) {
+		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END: this = this->value; break;
+		case CUL_ARG_PRINT: this += 1; break;
 		default:
-			if( t->short_name == arg )
-				return t;
-			t += 1;
+			if( this->short_name == arg )
+				return (CulArg *)this;
+			this += 1;
 			break;
+		}
 	}
 	return NULL;
 }
 
-/* Find and return specific long argument in argument table */
-CulArg *cul_arg_search_long(CulArg *t, const char *arg) {
+CulArg *cul_arg_find_long(const CulArg *this, const char *arg) {
 	const char *pos;
 	size_t length;
 
@@ -176,16 +190,18 @@ CulArg *cul_arg_search_long(CulArg *t, const char *arg) {
 	else
 		length = strlen(arg);
 
-	while( t != NULL )  switch( t->flags & CUL_ARG_NTYPE_MASK ) {
-		case CUL_ARG_END: t = t->value; break;
-		case CUL_ARG_HELP: t += 1; break;
+	while( this != NULL ) {
+		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END: this = this->value; break;
+		case CUL_ARG_PRINT: this += 1; break;
 		default:
-			if( t->long_name != NULL &&
-					strncmp(arg, t->long_name, length) == 0 &&
-					t->long_name[length] == CUL_STR_NULL )
-				return t;
-			t += 1;
+			if( this->long_name != NULL &&
+					strncmp(arg, this->long_name, length) == 0 &&
+					this->long_name[length] == CUL_STR_NULL )
+				return (CulArg *)this;
+			this += 1;
 			break;
+		}
 	}
 	return NULL;
 }
@@ -195,17 +211,17 @@ static inline void _cul_arg_cmd_next(int *argc, char ***argv) {
 	++(*argv);
 }
 
-static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t pos) {
+static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t n) {
 	const char *arg_string = **argv + 1;
 	cul_bool is_multi_flag = CUL_FALSE;
-	CulArg *t;
+	CulArg *entry;
 
 	while( *arg_string ) {
 		/* find entry in options table */
-		if( !(t = cul_arg_search_short(table, *arg_string)) )
+		if( !(entry = cul_arg_find_short(table, *arg_string)) )
 			return CUL_EARGUNK;
 
-		const CulArgFlag flag = (t->flags & CUL_ARG_TYPE_MASK);
+		const CulArgFlag flag = (entry->flags & CUL_ARG_TYPE_MASK);
 		const cul_bool is_option_bool = (flag == CUL_ARG_BOOL);
 
 		/* we have more flags than one */
@@ -214,7 +230,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 				return CUL_EARGCONV;
 
 			/* convert flag option */
-			if( !_cul_arg_cmd_convert(arg_string, t, pos) )
+			if( !_cul_arg_cmd_convert(arg_string, entry, n) )
 				return CUL_EARGCONV;
 
 			/* end of multiple bool short flags */
@@ -255,7 +271,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 			}
 
 			/* convert flag option */
-			if( !_cul_arg_cmd_convert(arg_string, t, pos) )
+			if( !_cul_arg_cmd_convert(arg_string, entry, n) )
 				return CUL_EARGCONV;
 
 			if( size > 0 ) {
@@ -270,19 +286,19 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 	return CUL_FAILURE;
 }
 
-static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table, size_t pos) {
+static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table, size_t n) {
 	const char *arg_string = **argv + 2;
 	const char *arg_option = strchr(arg_string, '=');
-	CulArg *t;
+	CulArg *entry;
 
 	/* check if we have option */
 	if( *arg_string ) {
 		/* find entry in options table */
-		if( !(t = cul_arg_search_long(table, arg_string)) )
+		if( !(entry = cul_arg_find_long(table, arg_string)) )
 			return CUL_EARGUNK;
 
 		size_t size;
-		const CulArgFlag flag = (t->flags & CUL_ARG_TYPE_MASK);
+		const CulArgFlag flag = (entry->flags & CUL_ARG_TYPE_MASK);
 		const cul_bool is_option_bool = (flag == CUL_ARG_BOOL);
 
 		/* if not bool we have to move to flag option */
@@ -311,7 +327,7 @@ static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table,
 		}
 
 		/* convert flag option */
-		if( !_cul_arg_cmd_convert(arg_string, t, pos) )
+		if( !_cul_arg_cmd_convert(arg_string, entry, n) )
 			return CUL_EARGCONV;
 
 		/* move to next argument */
@@ -323,91 +339,107 @@ static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table,
 	return CUL_FAILURE;
 }
 
-static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *t, size_t pos) {
+static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 	char* end;
 
-	switch( t->flags & CUL_ARG_TYPE_MASK ) {
-		case CUL_ARG_BOOL:
-			*((cul_bool *)t->value) = CUL_TRUE;
-			break;
-		case CUL_ARG_INT:
-			if( *arg ) {
-				long tmp = strtol(arg, &end, 10);
-				if( !*end && tmp == (int)tmp ) {
-					*((int *)t->value) = (int)tmp;
-					break;
-				}
+	switch( entry->flags & CUL_ARG_TYPE_MASK ) {
+	case CUL_ARG_BOOL:
+		*((cul_bool *)entry->value) = CUL_TRUE;
+		break;
+	case CUL_ARG_INT:
+		if( *arg ) {
+			long tmp = strtol(arg, &end, 10);
+			if( !*end && tmp == (int)tmp ) {
+				*((int *)entry->value) = (int)tmp;
+				break;
 			}
-			return CUL_FALSE;
-		case CUL_ARG_DOUBLE:
-			if( *arg ) {
-				double tmp = strtod(arg, &end);
-				if( !*end ) {
-					*((double *)t->value) = tmp;
-					break;
-				}
+		}
+		return CUL_FALSE;
+	case CUL_ARG_DOUBLE:
+		if( *arg ) {
+			double tmp = strtod(arg, &end);
+			if( !*end ) {
+				*((double *)entry->value) = tmp;
+				break;
 			}
-			return CUL_FALSE;
-		case CUL_ARG_STR:
-			if( *arg ) {
+		}
+		return CUL_FALSE;
+	case CUL_ARG_STR:
+		if( *arg ) {
+			char *tmp = cul_strdup(arg);
+			if( tmp != NULL ) {
+				/* free old string, only if already found */
+				if( entry->flags & CUL_ARG_FOUND )
+					free(*(char **)entry->value);
+				*(char **)entry->value = tmp;
+				break;
+			}
+		}
+		return CUL_FALSE;
+	case CUL_ARG_STRV:
+		if( *arg ) {
+			char **strv = *(char ***)entry->value;
+			size_t size = strv == NULL? 0: cul_strv_size(strv);
+
+			char **tmpv = malloc( (size+2)*sizeof(char *) );
+			if( tmpv != NULL ) {
 				char *tmp = cul_strdup(arg);
 				if( tmp != NULL ) {
-					/* free old string, only if already found */
-					if( t->flags & CUL_ARG_FOUND )
-						free(*(char **)t->value);
-					*(char **)t->value = tmp;
-					break;
-				}
-			}
-			return CUL_FALSE;
-		case CUL_ARG_STRV:
-			if( *arg ) {
-				char **strv = *(char ***)t->value;
-				size_t size = strv == NULL? 0: cul_strv_size(strv);
 
-				char **tmpv = malloc( (size+2)*sizeof(char *) );
-				if( tmpv != NULL ) {
-					char *tmp = cul_strdup(arg);
-					if( tmp != NULL ) {
-
-						/* copy old strv and free previous content if needed */
-						if( strv != NULL ) {
-							if( t->flags & CUL_ARG_FOUND ) {
-								memcpy(tmpv, strv, size*sizeof(char **));
-								free(strv);
-							}	else {
-								/* we have to duplicate default values */
-								/* consitency requirement for free routine */
-								for( size_t i=0; i<size; ++i)
-									if( (tmpv[i] = cul_strdup(strv[i])) == NULL ) {
-										cul_strv_free(tmpv);
-										free(tmp);
-										return CUL_FALSE;
-									}
-							}
+					/* copy old strv and free previous content if needed */
+					if( strv != NULL ) {
+						if( entry->flags & CUL_ARG_FOUND ) {
+							memcpy(tmpv, strv, size*sizeof(char **));
+							free(strv);
+						}	else {
+							/* we have to duplicate default values */
+							/* consitency requirement for free routine */
+							for( size_t i=0; i<size; ++i)
+								if( (tmpv[i] = cul_strdup(strv[i])) == NULL ) {
+									cul_strv_free(tmpv);
+									free(tmp);
+									return CUL_FALSE;
+								}
 						}
+					}
 
-						/* add one string */
-						tmpv[size] = tmp;
-						tmpv[size+1] = NULL;
+					/* add one string */
+					tmpv[size] = tmp;
+					tmpv[size+1] = NULL;
 
-						*(char ***)t->value = tmpv;
-						break;
-					} else
-						free(tmpv);
-				}
+					*(char ***)entry->value = tmpv;
+					break;
+				} else
+					free(tmpv);
 			}
-			return CUL_FALSE;
-		default:
-			return CUL_FALSE;
+		}
+		return CUL_FALSE;
+	default:
+		return CUL_FALSE;
 	}
 
 	/* mark flag as found */
-	t->flags |= CUL_ARG_FOUND;
+	entry->flags |= CUL_ARG_FOUND;
 
 	/* clear and set position */
-	t->flags &= ~CUL_ARG_POS_MASK;
-	t->flags |= pos << 12;
+	entry->flags &= ~CUL_ARG_POS_MASK;
+	entry->flags |= n << 12;
 
 	return CUL_TRUE;
 }
+
+CulArg *_cul_arg_end(const CulArg *this) {
+	/* find end of table */
+	for(; !(this->flags & CUL_ARG_END); this += 1) ;
+	return (CulArg *)this;
+}
+
+CulArg *_cul_arg_end_last(const CulArg *this) {
+	/* find end of table */
+	for(; !(this->flags & CUL_ARG_END); this += 1) ;
+	/* find last end of table */
+	while( this->value != NULL )
+		for(this = this->value; !(this->flags & CUL_ARG_END); this += 1) ;
+	return (CulArg *)this;
+}
+

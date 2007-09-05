@@ -85,18 +85,21 @@ void cul_bbtree_free(CulBBTree *t, cul_free_f *free_f) {
 CulBBTreeNode *cul_bbtree_insert(CulBBTree *t, cul_ptr data) {
 	CUL_UNUSED(t);
 	CUL_UNUSED(data);
+	/* TODO cul_bbtree_insert stub */
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
 cul_bool cul_bbtree_remove(CulBBTree *t, cul_ptr data) {
 	CUL_UNUSED(t);
 	CUL_UNUSED(data);
+	/* TODO cul_bbtree_remove stub */
 	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
 
 cul_bool cul_bbtree_remove_node(CulBBTree *t, CulBBTreeNode *tn) {
 	CUL_UNUSED(t);
 	CUL_UNUSED(tn);
+	/* TODO cul_bbtree_remove_node stub */
 	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
 
