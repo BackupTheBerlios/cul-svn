@@ -367,8 +367,9 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *this, ATOM value) {
 			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 
 		this->size -= size;
+		if( free_f != NULL ) FUNCTION(free)(this->data + offset, size, free_f);
+
 		FUNCTION(copy_overlap)(this->data + offset, this->data + offset + size, this->size - offset);
-		if( free_f != NULL ) free_f(this->data[this->size]);
 		return CUL_SUCCESS;
 	}
 
