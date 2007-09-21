@@ -9,7 +9,6 @@ typedef void cul_log_f(const char *module, CulLogType type, const char *msg);
 enum _CulLogType {
 	CUL_LOG_FATAL,
 	CUL_LOG_ERROR,
-	CUL_LOG_CHECK_ERROR,
 	CUL_LOG_CHECK,
 	CUL_LOG_MESSAGE,
 	CUL_LOG_CLOCK,

@@ -1,7 +1,6 @@
 #include <cul/cul_error.h>
 
 cul_bool cul_error_fatal = CUL_TRUE;
-cul_bool cul_check_error_fatal = CUL_FALSE;
 
 const char *cul_error_string(CulErrno eid) {
 	switch( eid ) {
@@ -31,15 +30,5 @@ cul_bool cul_error_fatal_get(void) {
 cul_bool cul_error_fatal_set(cul_bool value) {
 	cul_bool old_value = cul_error_fatal;
 	cul_error_fatal = value;
-	return old_value;
-}
-
-cul_bool cul_check_error_fatal_get() {
-	return cul_check_error_fatal;
-}
-
-cul_bool cul_check_error_fatal_set(cul_bool value) {
-	cul_bool old_value = cul_check_error_fatal;
-	cul_check_error_fatal = value;
 	return old_value;
 }

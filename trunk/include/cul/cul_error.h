@@ -33,7 +33,5 @@ const char *cul_error_string         (CulErrno error);
 
 cul_bool    cul_error_fatal_get      ();
 cul_bool    cul_error_fatal_set      (cul_bool value);
-cul_bool    cul_check_error_fatal_get();
-cul_bool    cul_check_error_fatal_set(cul_bool value);
 
 #endif /* __CUL_ERROR_H__ */

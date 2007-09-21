@@ -82,26 +82,6 @@
 		}                                                                          \
 	} CUL_STMT_END
 
-#define CUL_CHECK_ERRNO(errno) CUL_STMT_START {                                \
-		if( !(errno == CUL_SUCCESS) ) {                                            \
-			cul_log(CUL_MODULE, CUL_LOG_CHECK_ERROR, "check error failed '%s'\n",    \
-					CUL_STRINGIFY(errno));                                               \
-		}                                                                          \
-	} CUL_STMT_END
-#define CUL_CHECK_ERRNO_RET(value, errno) CUL_STMT_START {                     \
-		if( !(errno == CUL_SUCCESS) ) {                                            \
-			cul_log(CUL_MODULE, CUL_LOG_CHECK_ERROR, "check error failed '%s'\n",    \
-					CUL_STRINGIFY(errno));                                               \
-			return (value);                                                          \
-		}                                                                          \
-	} CUL_STMT_END
-#define CUL_CHECK_ERRNO_RET_VOID(errno) CUL_STMT_START {                       \
-		if( !(errno == CUL_SUCCESS) ) {                                            \
-			cul_log(CUL_MODULE, CUL_LOG_CHECK_ERROR, "check error failed '%s'\n",    \
-					CUL_STRINGIFY(errno));                                               \
-			return;                                                                  \
-		}                                                                          \
-	} CUL_STMT_END
 
 #define CUL_ASSERT(expr) CUL_STMT_START {                                      \
 		if( !(expr) ) CUL_FATAL("assertion '%s' failed\n", #expr);                 \

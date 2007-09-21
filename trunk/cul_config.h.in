@@ -3,15 +3,6 @@
 
 /* auto generated header from build process. */
 
-/* provide additional debug information */
-#ifndef NDEBUG
-#  undef  CUL_DEBUG
-#  define CUL_RELEASE
-#else  /* NDEBUG */
-#  define CUL_DEBUG
-#  undef  CUL_RELEASE
-#endif /* NDEBUG */
-
 /* Version number.  */
 #define CUL_MAJOR_VERSION ${CUL_MAJOR_VERSION}
 #define CUL_MINOR_VERSION ${CUL_MINOR_VERSION}
