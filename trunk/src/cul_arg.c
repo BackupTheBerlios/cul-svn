@@ -31,8 +31,9 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 
 				/* long option */
 				switch( _cul_arg_cmd_parse_long(argc, argv, *table, position) ) {
+				case CUL_SUCCESS:  break;
 				case CUL_EARGCONV: return CUL_EARGCONV;
-				case CUL_EARGUNK:  
+				case CUL_EARGUNK:  return CUL_EARGUNK;
 				default:           return CUL_FAILURE;
 				}
 
@@ -48,8 +49,9 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 
 			/* short option */
 			switch( _cul_arg_cmd_parse_short(argc, argv, *table, position) ) {
+			case CUL_SUCCESS:  break;
 			case CUL_EARGCONV: return CUL_EARGCONV;
-			case CUL_EARGUNK:  
+			case CUL_EARGUNK:  return CUL_EARGUNK;
 			default:           return CUL_FAILURE;
 			}
 
