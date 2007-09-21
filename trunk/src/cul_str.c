@@ -78,6 +78,12 @@ char *cul_strtoupper(char *str) {
 	return begin;
 }
 
+cul_bool cul_strisspace(const char *str) {
+	for( ; *str; ++str) if( !cul_isspace(*str) )
+		return CUL_FALSE;
+	return CUL_TRUE;
+}
+
 char **cul_strsplit(const char *s, const char *delimiter) {
 	const size_t delimiter_size = strlen(delimiter);
 	const char *string = s;
