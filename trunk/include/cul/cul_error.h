@@ -1,9 +1,15 @@
-#ifndef CUL_ERROR_H
-#define CUL_ERROR_H
+#ifndef __CUL_ERROR_H__
+#define __CUL_ERROR_H__
 
 #include <cul/cul_base_global.h>
 
 typedef enum _CulErrno CulErrno;
+
+/**
+ * Error flag describing type of error.
+ * In cul library possible errors are passed *only* as a return result. No
+ * global errno flag is used.
+ */
 enum _CulErrno {
 	CUL_FAILURE  = -1,
 	CUL_SUCCESS  =  0,
@@ -16,16 +22,18 @@ enum _CulErrno {
 	CUL_EBADPOS,
 	CUL_EPRINTF,
 	CUL_ESCANF,
-	CUL_EARGMISS,
+	CUL_EARGNEED,
 	CUL_EARGUNK,
 	CUL_EARGCONV,
 	CUL_EFACCESS,
 	CUL_EFIO
 };
 
-const char *cul_error_string(CulErrno eid);
+const char *cul_error_string         (CulErrno error);
 
-cul_bool cul_error_fatal_get(void);
-cul_bool cul_error_fatal_set(cul_bool val);
+cul_bool    cul_error_fatal_get      ();
+cul_bool    cul_error_fatal_set      (cul_bool value);
+cul_bool    cul_check_error_fatal_get();
+cul_bool    cul_check_error_fatal_set(cul_bool value);
 
-#endif /* CUL_ERROR_H */
+#endif /* __CUL_ERROR_H__ */
