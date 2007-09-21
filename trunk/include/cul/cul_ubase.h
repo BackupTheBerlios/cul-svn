@@ -83,11 +83,6 @@ cul_bool cul_ufprintf_stride     (FILE *stream, const size_t *data, size_t size,
 cul_bool cul_ufscanf             (FILE *stream, const size_t *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
 cul_bool cul_ufscanf_stride      (FILE *stream, const size_t *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
 
-cul_bool cul_ufwrite             (FILE *stream, const size_t *data, size_t size);
-cul_bool cul_ufwrite_stride      (FILE *stream, const size_t *data, size_t size, size_t stride);
-cul_bool cul_ufread              (FILE *stream, const size_t *data, size_t size);
-cul_bool cul_ufread_stride       (FILE *stream, const size_t *data, size_t size, size_t stride);
-
 /* implementations */
 
 static inline size_t cul_umin_2(size_t value_a, size_t value_b) {

@@ -83,11 +83,6 @@ cul_bool cul_dfprintf_stride     (FILE *stream, const double *data, size_t size,
 cul_bool cul_dfscanf             (FILE *stream, const double *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
 cul_bool cul_dfscanf_stride      (FILE *stream, const double *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
 
-cul_bool cul_dfwrite             (FILE *stream, const double *data, size_t size);
-cul_bool cul_dfwrite_stride      (FILE *stream, const double *data, size_t size, size_t stride);
-cul_bool cul_dfread              (FILE *stream, const double *data, size_t size);
-cul_bool cul_dfread_stride       (FILE *stream, const double *data, size_t size, size_t stride);
-
 /* implementations */
 
 static inline double cul_dmin_2(double value_a, double value_b) {

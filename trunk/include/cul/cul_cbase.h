@@ -83,11 +83,6 @@ cul_bool cul_cfprintf_stride     (FILE *stream, const char *data, size_t size, s
 cul_bool cul_cfscanf             (FILE *stream, const char *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
 cul_bool cul_cfscanf_stride      (FILE *stream, const char *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
 
-cul_bool cul_cfwrite             (FILE *stream, const char *data, size_t size);
-cul_bool cul_cfwrite_stride      (FILE *stream, const char *data, size_t size, size_t stride);
-cul_bool cul_cfread              (FILE *stream, const char *data, size_t size);
-cul_bool cul_cfread_stride       (FILE *stream, const char *data, size_t size, size_t stride);
-
 /* implemenations */
 
 static inline char cul_cmin_2(char value_a, char value_b) {
