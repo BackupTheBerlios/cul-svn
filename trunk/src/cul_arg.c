@@ -7,23 +7,21 @@
 #include <string.h>
 
 /* private functions */
+static CulArg     *_cul_arg_need           (const CulArg *this);
 static inline void _cul_arg_cmd_next       (int *argc, char ***argv);
 static cul_errno   _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t n);
 static cul_errno   _cul_arg_cmd_parse_long (int *argc, char ***argv, CulArg *table, size_t n);
 static cul_bool    _cul_arg_cmd_convert    (const char *arg, CulArg *entry, size_t n);
-static CulArg     *_cul_arg_end            (const CulArg *this);
-static CulArg     *_cul_arg_end_last       (const CulArg *this);
 
 /* Parse program arguments using argument tables */
 cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
-	size_t pos = 0;
+	size_t position = 0;
 
 	/* omit first parameter */
 	_cul_arg_cmd_next(argc, argv);
 
 	while( *argc > 0 ) {
 		char *arg = **argv;
-		cul_errno result;
 
 		if( *arg == '-' ) {
 			if( *(++arg) == '-' ) {
@@ -32,72 +30,44 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 					break;
 
 				/* long option */
-				result = _cul_arg_cmd_parse_long(argc, argv, *table, pos);
-				if( result != CUL_SUCCESS )
-					return result;
-				else
-					pos += 1;
+				switch( _cul_arg_cmd_parse_long(argc, argv, *table, position) ) {
+				case CUL_EARGCONV: return CUL_EARGCONV;
+				case CUL_EARGUNK:  
+				default:           return CUL_FAILURE;
+				}
+
+				/* increment argument position */
+				position += 1;
 
 				/* parse next options */
 				continue;
 			}
+
 			if( *arg == CUL_STR_NULL )
 				return CUL_EARGUNK;
 
 			/* short option */
-			result = _cul_arg_cmd_parse_short(argc, argv, *table, pos);
-			if( result != CUL_SUCCESS )
-				return result;
-			else
-				pos += 1;
+			switch( _cul_arg_cmd_parse_short(argc, argv, *table, position) ) {
+			case CUL_EARGCONV: return CUL_EARGCONV;
+			case CUL_EARGUNK:  
+			default:           return CUL_FAILURE;
+			}
+
+			/* increment argument position */
+			position += 1;
 
 			/* parse next options */
 			continue;
-		}
-		else
+		} else
 			return CUL_EARGUNK;
 	}
 
 	CulArg *t;
-	if( (t = cul_arg_check_required(*table)) != NULL ) {
+	if( (t = _cul_arg_need(*table)) != NULL ) {
 		*table = t;
-		return CUL_EARGMISS;
+		return CUL_EARGNEED;
 	}
 	return CUL_SUCCESS;
-}
-
-void cul_arg_connect(CulArg *this, CulArg *other) {
-	/* connect tables */
-	_cul_arg_end_last(this)->value = other;
-}
-
-void cul_arg_connect_next(CulArg *this, CulArg *other) {
-	/* find end of table */
-	this = _cul_arg_end(this);
-
-	/* check if we have to modify other table */
-	if( this->value != NULL )
-		_cul_arg_end_last(other)->value = this->value;
-
-	/* connect tables */
-	this->value = other;
-}
-
-void cul_arg_disconnect(CulArg *this, CulArg *other) {
-	/* find other table */
-	while( CUL_TRUE ) {
-		this = _cul_arg_end(this);
-
-		if( this->value == NULL)
-			return;
-
-		if( this->value == other ) {
-			other = _cul_arg_end(other);
-			this->value = other->value;
-			other->value = NULL;
-		}
-	}
-	
 }
 
 void cul_arg_print(CulArg *this) {
@@ -129,7 +99,7 @@ void cul_arg_print(CulArg *this) {
 }
 
 void cul_arg_free(CulArg *this, cul_bool free_values) {
-	while( this != NULL )
+	while( this != NULL ) {
 		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
 		case CUL_ARG_END:  this = this->value; break;
 		case CUL_ARG_PRINT: this += 1; break;
@@ -139,31 +109,26 @@ void cul_arg_free(CulArg *this, cul_bool free_values) {
 				case CUL_ARG_STR:
 					if( free_values ) free(*(char **)this->value);
 					break;
-				case CUL_ARG_STRV:
-					if( free_values ) cul_strv_free(*(char ***)this->value);
-					break;
 				default:
 					break;
 				}
 			}
 			this += 1;
 			break;
+		}
 	}
 }
 
-CulArg *cul_arg_check_required(const CulArg *this) {
-	while( this != NULL ) {
-		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
-		case CUL_ARG_END: this = this->value; break;
-		case CUL_ARG_PRINT: this += 1; break;
-		default:
-			if( this->flags & CUL_ARG_NEED && !(this->flags & CUL_ARG_FOUND) )
-				return (CulArg *)this;
-			this += 1;
-			break;
-		}
-	}
-	return NULL;
+void cul_arg_connect(CulArg *this, CulArg *other) {
+	/* find end of table */
+	for(; !(this->flags & CUL_ARG_END); this += 1) ;
+
+	/* find last end of table */
+	while( this->value != NULL )
+		for(this = this->value; !(this->flags & CUL_ARG_END); this += 1) ;
+
+	/* connect tables */
+	this->value = other;
 }
 
 CulArg *cul_arg_find_short(const CulArg *this, char arg) {
@@ -198,6 +163,32 @@ CulArg *cul_arg_find_long(const CulArg *this, const char *arg) {
 			if( this->long_name != NULL &&
 					strncmp(arg, this->long_name, length) == 0 &&
 					this->long_name[length] == CUL_STR_NULL )
+				return (CulArg *)this;
+			this += 1;
+			break;
+		}
+	}
+	return NULL;
+}
+
+cul_bool cul_arg_after(const CulArg *this, const CulArg *other) {
+	const size_t this_position = (this->flags & CUL_ARG_POS_MASK) >> 12;
+	const size_t other_position = (other->flags & CUL_ARG_POS_MASK) >> 12;
+
+	return this_position > other_position;
+}
+
+cul_bool cul_arg_before(const CulArg *this, const CulArg *other) {
+	return cul_arg_after(other, this);
+}
+
+CulArg *_cul_arg_need(const CulArg *this) {
+	while( this != NULL ) {
+		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END: this = this->value; break;
+		case CUL_ARG_PRINT: this += 1; break;
+		default:
+			if( this->flags & CUL_ARG_NEED && !(this->flags & CUL_ARG_FOUND) )
 				return (CulArg *)this;
 			this += 1;
 			break;
@@ -376,44 +367,6 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 			}
 		}
 		return CUL_FALSE;
-	case CUL_ARG_STRV:
-		if( *arg ) {
-			char **strv = *(char ***)entry->value;
-			size_t size = strv == NULL? 0: cul_strv_size(strv);
-
-			char **tmpv = malloc( (size+2)*sizeof(char *) );
-			if( tmpv != NULL ) {
-				char *tmp = cul_strdup(arg);
-				if( tmp != NULL ) {
-
-					/* copy old strv and free previous content if needed */
-					if( strv != NULL ) {
-						if( entry->flags & CUL_ARG_FOUND ) {
-							memcpy(tmpv, strv, size*sizeof(char **));
-							free(strv);
-						}	else {
-							/* we have to duplicate default values */
-							/* consitency requirement for free routine */
-							for( size_t i=0; i<size; ++i)
-								if( (tmpv[i] = cul_strdup(strv[i])) == NULL ) {
-									cul_strv_free(tmpv);
-									free(tmp);
-									return CUL_FALSE;
-								}
-						}
-					}
-
-					/* add one string */
-					tmpv[size] = tmp;
-					tmpv[size+1] = NULL;
-
-					*(char ***)entry->value = tmpv;
-					break;
-				} else
-					free(tmpv);
-			}
-		}
-		return CUL_FALSE;
 	default:
 		return CUL_FALSE;
 	}
@@ -427,19 +380,3 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 
 	return CUL_TRUE;
 }
-
-CulArg *_cul_arg_end(const CulArg *this) {
-	/* find end of table */
-	for(; !(this->flags & CUL_ARG_END); this += 1) ;
-	return (CulArg *)this;
-}
-
-CulArg *_cul_arg_end_last(const CulArg *this) {
-	/* find end of table */
-	for(; !(this->flags & CUL_ARG_END); this += 1) ;
-	/* find last end of table */
-	while( this->value != NULL )
-		for(this = this->value; !(this->flags & CUL_ARG_END); this += 1) ;
-	return (CulArg *)this;
-}
-

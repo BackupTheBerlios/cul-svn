@@ -14,14 +14,13 @@ typedef enum   _CulArgFlag CulArgFlag;
  * 
  * NOTE: After argument parsing flag holds additional information, like if 
  * argument was found on command line or its position.  
- */ 
+ */
 enum _CulArgFlag {
 	/* type */
 	CUL_ARG_BOOL       = 1,  /* option is a switch, no additional parameter */
 	CUL_ARG_INT        = 2,  /* option has an integer number parameter (int) */
 	CUL_ARG_DOUBLE     = 3,  /* option has an floating point number parameter (double) */
 	CUL_ARG_STR        = 4,  /* option has an string parameter */
-	CUL_ARG_STRV       = 5,  /* option has a string array parameter, store all flag parameters */
 
 	/* type flags */
 	CUL_ARG_NEED       = 1 << 4,  /* option is required */
@@ -39,11 +38,12 @@ enum _CulArgFlag {
 	CUL_ARG_MASK       = 0xfffffff     /* maximal possible flag value */
 };
 
+/* utility macros */
 #define CUL_ARG_HELP(message) {CUL_ARG_PRINT, 0, NULL, message, NULL}
 #define CUL_ARG_NULL          {CUL_ARG_END,   0, NULL, NULL,    NULL}
 
-/** 
- * Structure describes single command line argument or additional 
+/** Command line argument entry
+ * Structure describes single accepted command line argument or additional 
  * help/description that should be printed as a help information.
  */
 struct _CulArg {
@@ -54,16 +54,15 @@ struct _CulArg {
 	cul_ptr value;             /* callback for value, if option is not found it is left unchanged */
 };
 
-cul_errno cul_arg_parse         (int *argc, char ***argv, CulArg **table);
-void      cul_arg_print         (CulArg *this);
-void      cul_arg_free          (CulArg *this, cul_bool free_values);
+cul_errno cul_arg_parse         (int *argc, char ***argv, CulArg **table);      /* parse command line arguments according to CulArg table */
+void      cul_arg_print         (CulArg *this);                                 /* print CulArg table help information */
+void      cul_arg_free          (CulArg *this, cul_bool free_values);           /* free data associated with CulArg table, including values */
 
 /* utility functions */
-void      cul_arg_connect       (CulArg *this, CulArg *other);
-void      cul_arg_connect_next  (CulArg *this, CulArg *other);
-void      cul_arg_disconnect    (CulArg *this, CulArg *other);
-CulArg   *cul_arg_check_required(const CulArg *this);
-CulArg   *cul_arg_find_short    (const CulArg *this, char arg);
-CulArg   *cul_arg_find_long     (const CulArg *this, const char *arg);
+void      cul_arg_connect       (CulArg *this, CulArg *other);                  /* connect together two CulArg tables */
+CulArg   *cul_arg_find_short    (const CulArg *this, char arg);                 /* find short argument entry in CulArg table */
+CulArg   *cul_arg_find_long     (const CulArg *this, const char *arg);          /* find long argument entry in CulArg table */
+cul_bool  cul_arg_after         (const CulArg *this, const CulArg *other);      /* check relative position of two different entries on command line */
+cul_bool  cul_arg_before        (const CulArg *this, const CulArg *other);      /* check relative position of two different entries on command line */
 
 #endif /* __CUL_ARG_H__ */
