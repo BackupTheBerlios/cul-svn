@@ -1,22 +1,23 @@
-#ifndef CUL_LOG_H
-#define CUL_LOG_H
+#ifndef __CUL_LOG_H__
+#define __CUL_LOG_H__
 
 #include <cul/cul_base_global.h>
 
 typedef enum _CulLogType CulLogType;
-typedef void cul_log_t(const char *module, CulLogType type, const char *msg);
+typedef void cul_log_f(const char *module, CulLogType type, const char *msg);
 
 enum _CulLogType {
-	CUL_LOG_CLOCK,
-	CUL_LOG_ERROR,
 	CUL_LOG_FATAL,
+	CUL_LOG_ERROR,
+	CUL_LOG_CHECK_ERROR,
+	CUL_LOG_CHECK,
 	CUL_LOG_MESSAGE,
-	CUL_LOG_WARNING
+	CUL_LOG_CLOCK,
 };
 
-cul_log_t *cul_log_handler_set(cul_log_t *handler);
-cul_log_t *cul_log_handler_get(void);
+cul_log_f *cul_log_handler_set(cul_log_f *handler);
+cul_log_f *cul_log_handler_get();
 
-void cul_log(const char *module, CulLogType type, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
+void       cul_log            (const char *module, CulLogType type, const char *format, ...);
 
-#endif
+#endif /* __CUL_LOG_H__ */

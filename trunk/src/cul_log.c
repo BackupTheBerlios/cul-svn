@@ -8,15 +8,15 @@
 
 #define CUL_LOG_MSG_SIZE 1024
 
-cul_log_t *cul_log_handler = NULL;
+cul_log_f *cul_log_handler = NULL;
 
-cul_log_t *cul_log_handler_set(cul_log_t *handler) {
-	cul_log_t *old_handler = cul_log_handler;
+cul_log_f *cul_log_handler_set(cul_log_f *handler) {
+	cul_log_f *old_handler = cul_log_handler;
 	cul_log_handler = handler;
 	return old_handler;
 }
 
-cul_log_t *cul_log_handler_get(void) {
+cul_log_f *cul_log_handler_get(void) {
 	return cul_log_handler;
 }
 
@@ -38,30 +38,31 @@ void cul_log(const char *module, CulLogType type, const char *format, ...) {
 
 	/* handle message */
 	switch( type ) {
-		case CUL_LOG_CLOCK:
-		case CUL_LOG_MESSAGE:
-			if( cul_log_handler_get() != NULL )
-				cul_log_handler_get()(module, type, message);
-			else
-				fprintf(cul_stream_get(), "%s", message);
-			break;
-		case CUL_LOG_WARNING:
-		case CUL_LOG_ERROR:
-		case CUL_LOG_FATAL:
-			if( cul_log_handler_get() != NULL )
-				cul_log_handler_get()(module, type, message);
-			else {
-				if( module != NULL ) fprintf(cul_stream_get(), "%s: %s", module, message);
-				else                 fprintf(cul_stream_get(), "%s", message);
-			}
+	case CUL_LOG_FATAL:
+	case CUL_LOG_ERROR:
+	case CUL_LOG_CHECK_ERROR:
+		if( cul_log_handler_get() == NULL ) {
+			if( module != NULL ) fprintf(cul_stream_get(), "%s: %s", module, message);
+			else                 fprintf(cul_stream_get(), "%s", message);
+		} else
+			cul_log_handler_get()(module, type, message);
+	case CUL_LOG_CHECK:
+	case CUL_LOG_MESSAGE:
+	case CUL_LOG_CLOCK:
+		if( cul_log_handler_get() == NULL )
+			fprintf(cul_stream_get(), "%s", message);
+		else
+			cul_log_handler_get()(module, type, message);
+		break;
 	}
 
 	/* handle abort */
 	switch( type ) {
-		case CUL_LOG_CLOCK:
-		case CUL_LOG_MESSAGE:
-		case CUL_LOG_WARNING: break;
-		case CUL_LOG_ERROR:   if( cul_error_fatal_get() ) abort(); break;
-		case CUL_LOG_FATAL:   abort(); break;
+	case CUL_LOG_FATAL:       abort(); break;
+	case CUL_LOG_ERROR:       if( cul_error_fatal_get() ) abort(); break;
+	case CUL_LOG_CHECK_ERROR: if( cul_check_error_fatal_get() ) abort(); break;
+	case CUL_LOG_CHECK:
+	case CUL_LOG_MESSAGE:
+	case CUL_LOG_CLOCK:       break;
 	}
 }
