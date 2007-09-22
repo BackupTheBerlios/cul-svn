@@ -15,6 +15,12 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 size_t _cul_strtrim_right_size(char *str, size_t size);
 size_t _cul_strtrim_left_size(char *str, size_t size);
 
+cul_bool cul_string_isspace(const CulString *this) {
+	if( cul_string_isnull(this) )
+		return CUL_TRUE;
+	return cul_strisspace(this->str);
+}
+
 CulString *cul_string_new(const CulString *string) {
 	return cul_string_new_block(string->str, string->size);
 }
