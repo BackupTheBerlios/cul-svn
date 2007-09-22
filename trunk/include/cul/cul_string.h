@@ -112,7 +112,7 @@ static inline CulString *cul_string_init_struct(CulString *this, size_t size, si
 }
 
 static inline char *cul_string_str(CulString *this) {
-	return this->str'
+	return this->str;
 }
 static inline const char *cul_string_const_str(const CulString *this) {
 	return this->str;
