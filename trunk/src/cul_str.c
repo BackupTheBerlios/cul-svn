@@ -27,6 +27,20 @@ size_t _cul_strtrim_left_size(char *str, size_t size) {
 	return copy_size;
 }
 
+char *cul_str_new(size_t size) {
+	char *str;
+
+	if( (str = malloc((size + 1)*sizeof(char))) == NULL )
+		return NULL;
+
+	str[0] = CUL_STR_NULL;
+	return str;
+}
+
+void cul_str_free(char *str) {
+	free(str);
+}
+
 char *cul_strdup(const char *str) {
 	return cul_strdup_size(str, strlen(str));
 }
@@ -34,7 +48,7 @@ char *cul_strdup(const char *str) {
 char *cul_strdup_size(const char *str, size_t size) {
 	char *dup;
 
-	if( (dup = malloc(size+1 * sizeof(char))) == NULL )
+	if( (dup = malloc((size + 1)*sizeof(char))) == NULL )
 		return NULL;
 
 	memcpy(dup, str, size);
@@ -42,7 +56,6 @@ char *cul_strdup_size(const char *str, size_t size) {
 	return dup;
 }
 
-char *cul_strndup(const char *str, size_t size);
 char *cul_strndup(const char *str, size_t size) {
 	const size_t len = strlen(str);
 	return cul_strdup_size(str, len > size? size: len);
@@ -132,22 +145,22 @@ char **cul_strsplit(const char *s, const char *delimiter) {
 	return strv;
 }
 
-size_t cul_strv_size(char **strv) {
-	size_t size = 0;
+char **cul_strv_new(size_t size) {
+	char **strv;
 
-	for(; *strv != NULL; ++strv)
-		++size;
-	return size;
+	if( (strv = malloc((size + 1)*sizeof(char *))) == NULL )
+		return NULL;
+
+	strv[0] = NULL;
+	return strv;
 }
 
-size_t cul_strv_find(char **strv, const char *key, cul_cmp_f *cmp_f) {
-	size_t find = 0;
-
-	for(; *strv != NULL; ++strv){
-		if( !cmp_f(*strv, key) ) break;
-		++find;
+void cul_strv_free(char **strv) {
+	if( strv != NULL ) {
+		for(char **itemv = strv; *itemv != NULL; ++itemv)
+			free(*itemv);
+		free(strv);
 	}
-	return find;
 }
 
 char **cul_strv_dup(char **strv) {
@@ -162,7 +175,7 @@ char **cul_strv_dup_size(char **strv, size_t size) {
 	 return NULL;
 
 	/* copy strings */
-	for( size_t i=0; i<size; ++i)
+	for(size_t i = 0; i < size; ++i)
 		if( (dupv[i] = cul_strdup(strv[i])) == NULL ) {
 			cul_strv_free(dupv);
 			return NULL;
@@ -174,12 +187,32 @@ char **cul_strv_dup_size(char **strv, size_t size) {
 	return dupv;
 }
 
-void cul_strv_free(char **strv) {
-	if( strv != NULL ) {
-		/* free items */
-		for( char **itemv = strv; *itemv != NULL; ++itemv)
-			free(*itemv);
-		/* free vector */
-		free(strv);
+size_t cul_strv_size(char **strv) {
+	size_t size = 0;
+
+	for(; *strv != NULL; ++strv)
+		++size;
+	return size;
+}
+
+void cul_strv_push(char **strv, char *str) {
+	const size_t size = cul_strv_size(strv);
+	strv[size] = str;
+	strv[size + 1] = NULL;
+}
+
+void cul_strv_pop(char **strv) {
+	const size_t size = cul_strv_size(strv);
+	free(strv[size - 1]);
+	strv[size - 1] = NULL;
+}
+
+size_t cul_strv_find(char **strv, const char *key, cul_cmp_f *cmp_f) {
+	size_t find = 0;
+
+	for(; *strv != NULL; ++strv){
+		if( !cmp_f(*strv, key) ) break;
+		++find;
 	}
+	return find;
 }
