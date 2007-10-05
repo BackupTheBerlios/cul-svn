@@ -21,11 +21,8 @@ CHECK_FUNCTION_EXISTS(asprintf HAVE_ASPRINTF)
 # Configure build type
 ###
 
-# possibilities: Debug RelWithDebInfo MinSizeRel Release
-SET(CMAKE_BUILD_TYPE Debug)
-
 # set compiler cflags
-SET(CMAKE_C_FLAGS "-std=c99")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra -Wmissing-declarations -Werror")
 
 # set one line errors from gcc
