@@ -41,6 +41,37 @@ void cul_str_free(char *str) {
 	free(str);
 }
 
+int cul_strcmp(const char *str, const char *other) {
+	return strcmp(str, other);
+}
+
+int cul_strcmp_size(const char *str, const char *other, size_t size) {
+	return memcmp(str, other, size*sizeof(char));
+}
+
+int cul_strncmp(const char *str, const char *other, size_t size) {
+	const size_t len = strlen(str);
+	return memcmp(str, other, (len > size? size: len)*sizeof(char));
+}
+
+int cul_stricmp(const char *str, const char *other) {
+	for(; cul_tolower(*str) == cul_tolower(*other); ++str, ++other)
+		if( *str == CUL_STR_NULL ) return 0;
+	return cul_tolower(*str) - cul_tolower(*other);
+}
+
+int cul_stricmp_size(const char *str, const char *other, size_t size) {
+	for(; cul_tolower(*str) == cul_tolower(*other); ++str, ++other, --size)
+		if( size == 0 ) return 0;
+	return cul_tolower(*str) - cul_tolower(*other);
+}
+
+int cul_strincmp(const char *str, const char *other, size_t size) {
+	for(; cul_tolower(*str) == cul_tolower(*other); ++str, ++other, --size)
+		if( *str == CUL_STR_NULL || size == 0 ) return 0;
+	return cul_tolower(*str) - cul_tolower(*other);
+}
+
 char *cul_strdup(const char *str) {
 	return cul_strdup_size(str, strlen(str));
 }
@@ -111,9 +142,6 @@ char **cul_strsplit(const char *s, const char *delimiter) {
 	if( (strv = malloc( (size+1)*sizeof(char **) )) == NULL )
 		return NULL;
 
-	/* set last position */
-	strv[size] = NULL;
-
 	size_t i = 0;
 	for(; (string = strstr(s, delimiter)) != NULL; ++i) {
 		/* size of item */
@@ -141,6 +169,9 @@ char **cul_strsplit(const char *s, const char *delimiter) {
 	/* copy last item */
 	memcpy(strv[i], s, size);
 	strv[i][size] = CUL_STR_NULL;
+
+	/* set last position */
+	strv[size] = NULL;
 
 	return strv;
 }

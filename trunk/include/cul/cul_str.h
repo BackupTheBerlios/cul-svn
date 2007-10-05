@@ -11,6 +11,13 @@
 char    *cul_str_new      (size_t size);
 void     cul_str_free     (char *str);
 
+int      cul_strcmp       (const char *str, const char *other);
+int      cul_strcmp_size  (const char *str, const char *other, size_t size);
+int      cul_strncmp      (const char *str, const char *other, size_t size);
+int      cul_stricmp      (const char *str, const char *other);
+int      cul_stricmp_size (const char *str, const char *other, size_t size);
+int      cul_strincmp     (const char *str, const char *other, size_t size);
+
 char    *cul_strdup       (const char *str);
 char    *cul_strdup_size  (const char *str, size_t size);
 char    *cul_strndup      (const char *str, size_t size);
