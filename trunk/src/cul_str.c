@@ -42,34 +42,61 @@ void cul_str_free(char *str) {
 }
 
 int cul_strcmp(const char *str, const char *other) {
-	return strcmp(str, other);
+	size_t i = 0;
+
+	for(; str[i] == other[i]; ++i)
+		if( str[i] == CUL_STR_NULL )
+			return 0;
+	return str[i] - other[i];
 }
 
 int cul_strcmp_size(const char *str, const char *other, size_t size) {
-	return memcmp(str, other, size*sizeof(char));
+	size_t i = 0;
+
+	for(; i < size; ++i)
+		if( str[i] != other[i] )
+			return str[i] - other[i];
+	return 0;
 }
 
 int cul_strncmp(const char *str, const char *other, size_t size) {
-	const size_t len = strlen(str);
-	return memcmp(str, other, (len > size? size: len)*sizeof(char));
+	size_t i = 0;
+
+	for(; i < size; ++i)
+		if( str[i] != other[i] )
+			return str[i] - other[i];
+		else if( str[i] == CUL_STR_NULL )
+			return 0;
+	return 0;
 }
 
 int cul_stricmp(const char *str, const char *other) {
-	for(; cul_tolower(*str) == cul_tolower(*other); ++str, ++other)
-		if( *str == CUL_STR_NULL ) return 0;
-	return cul_tolower(*str) - cul_tolower(*other);
+	size_t i = 0;
+
+	for(; cul_tolower(str[i]) == cul_tolower(other[i]); ++i)
+		if( str[i] == CUL_STR_NULL )
+			return 0;
+	return cul_tolower(str[i]) - cul_tolower(other[i]);
 }
 
 int cul_stricmp_size(const char *str, const char *other, size_t size) {
-	for(; cul_tolower(*str) == cul_tolower(*other); ++str, ++other, --size)
-		if( size == 0 ) return 0;
-	return cul_tolower(*str) - cul_tolower(*other);
+	size_t i = 0;
+
+	for(; i < size; ++i)
+		if( cul_tolower(str[i]) != cul_tolower(other[i]) )
+			return cul_tolower(str[i]) - cul_tolower(other[i]);
+	return 0;
 }
 
 int cul_strincmp(const char *str, const char *other, size_t size) {
-	for(; cul_tolower(*str) == cul_tolower(*other); ++str, ++other, --size)
-		if( *str == CUL_STR_NULL || size == 0 ) return 0;
-	return cul_tolower(*str) - cul_tolower(*other);
+	size_t i = 0;
+
+	for(; i < size; ++i)
+		if( cul_tolower(str[i]) != cul_tolower(other[i]) )
+			return cul_tolower(str[i]) - cul_tolower(other[i]);
+		else if( str[i] == CUL_STR_NULL )
+			return 0;
+	return 0;
 }
 
 char *cul_strdup(const char *str) {
