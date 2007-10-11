@@ -88,12 +88,12 @@ void      cul_pvector_sort           (CulPVector *this, cul_cmp_f *cmp_f);
 size_t    cul_pvector_unique         (CulPVector *this, cul_cmp_f *cmp_f);
 size_t    cul_pvector_find           (const CulPVector *this, size_t offset, cul_ptr key, cul_cmp_f *cmp_f);
 size_t    cul_pvector_bfind          (const CulPVector *this, cul_ptr key, cul_cmp_f *cmp_f);
-void      cul_pvector_foreach        (CulPVector *this, cul_foreach_f *foreach_f, cul_ptr user_data);
+void      cul_pvector_each           (CulPVector *this, cul_each_f *each_f, cul_ptr user_data);
 void      cul_pvectorview_sort       (CulPVectorView *this, cul_cmp_f *cmp_f);
 size_t    cul_pvectorview_unique     (CulPVectorView *this, cul_cmp_f *cmp_f);
 size_t    cul_pvectorview_find       (const CulPVectorView *this, size_t offset, cul_ptr key, cul_cmp_f *cmp_f);
 size_t    cul_pvectorview_bfind      (const CulPVectorView *this, cul_ptr key, cul_cmp_f *cmp_f);
-void      cul_pvectorview_foreach    (CulPVectorView *this, cul_foreach_f *foreach_f, cul_ptr user_data);
+void      cul_pvectorview_each       (CulPVectorView *this, cul_each_f *each_f, cul_ptr user_data);
 
 /* implementations */
 

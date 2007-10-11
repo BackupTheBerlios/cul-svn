@@ -672,8 +672,8 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 		return (size_t)(FUNCTION(bfind)(this->data, this->size, key, cmp_f) - this->data);
 	}
 
-	void FUNCTION(vector_foreach)(TYPE(Vector) *this, cul_foreach_f *foreach_f, cul_ptr user_data) {
-		FUNCTION(foreach)(this->data, this->size, foreach_f, user_data);
+	void FUNCTION(vector_each)(TYPE(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
+		FUNCTION(each)(this->data, this->size, each_f, user_data);
 	}
 
 	void FUNCTION(vectorview_sort)(VIEW(Vector) *this, cul_cmp_f *cmp_f) {
@@ -694,8 +694,8 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 		return (size_t)(FUNCTION(bfind_stride)(this->data, this->size, this->stride, key, cmp_f) - this->data)/this->stride;
 	}
 
-	void FUNCTION(vectorview_foreach)(VIEW(Vector) *this, cul_foreach_f *foreach_f, cul_ptr user_data) {
-		FUNCTION(foreach_stride)(this->data, this->size, this->stride, foreach_f, user_data);
+	void FUNCTION(vectorview_each)(VIEW(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
+		FUNCTION(each_stride)(this->data, this->size, this->stride, each_f, user_data);
 	}
 #endif /* TEMPLATE_CUL_PTR */
 

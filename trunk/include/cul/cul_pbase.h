@@ -35,8 +35,8 @@ cul_ptr *cul_pfind            (const cul_ptr *data, size_t size, cul_ptr key, cu
 cul_ptr *cul_pfind_stride     (const cul_ptr *data, size_t size, size_t stride, cul_ptr key, cul_cmp_f *cmp_f);
 cul_ptr *cul_pbfind           (const cul_ptr *data, size_t size, cul_ptr key, cul_cmp_f *cmp_f);
 cul_ptr *cul_pbfind_stride    (const cul_ptr *data, size_t size, size_t stride, cul_ptr key, cul_cmp_f *cmp_f);
-void     cul_pforeach         (const cul_ptr *data, size_t size, cul_foreach_f *foreach_f, cul_ptr user_data);
-void     cul_pforeach_stride  (const cul_ptr *data, size_t size, size_t stride, cul_foreach_f *foreach_f, cul_ptr user_data);
+void     cul_peach            (const cul_ptr *data, size_t size, cul_each_f *each_f, cul_ptr user_data);
+void     cul_peach_stride     (const cul_ptr *data, size_t size, size_t stride, cul_each_f *each_f, cul_ptr user_data);
 
 /* implementations */
 

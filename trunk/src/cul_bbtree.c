@@ -16,169 +16,166 @@ struct _CulBBTreeNode {
 	uint16_t is_right : 1;
 };
 
-static inline CulBBTree     *_cul_bbtree_new_struct(void);
-static inline void           _cul_bbtree_free_struct(CulBBTree *t);
-static inline CulBBTree     *_cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth);
+static inline CulBBTree     *_cul_bbtree_new_struct      ();
+static inline void           _cul_bbtree_free_struct     (CulBBTree *this);
+static inline CulBBTree     *_cul_bbtree_init_struct     (CulBBTree *this, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth);
 
-static inline CulBBTreeNode *_cul_bbtree_node_new_struct(void);
-static inline void           _cul_bbtree_node_free_struct(CulBBTreeNode *tn);
-static inline CulBBTreeNode *_cul_bbtree_node_init_struct(CulBBTreeNode *tn, cul_ptr data, CulBBTreeNode *left, CulBBTreeNode *right, uint16_t depth, cul_bool is_left, cul_bool is_right);
+static inline CulBBTreeNode *_cul_bbtree_node_new_struct ();
+static inline void           _cul_bbtree_node_free_struct(CulBBTreeNode *node);
+static inline CulBBTreeNode *_cul_bbtree_node_init_struct(CulBBTreeNode *node, cul_ptr data, CulBBTreeNode *left, CulBBTreeNode *right, uint16_t depth, cul_bool is_left, cul_bool is_right);
 
-static inline CulBBTree *_cul_bbtree_new_struct(void) {
+static inline CulBBTree *_cul_bbtree_new_struct() {
 	return cul_slab_new(sizeof(CulBBTree));
 }
 
-static inline void _cul_bbtree_free_struct(CulBBTree *t) {
-	cul_slab_free(sizeof(CulBBTree), t);
+static inline void _cul_bbtree_free_struct(CulBBTree *this) {
+	cul_slab_free(sizeof(CulBBTree), this);
 }
 
-static inline CulBBTree *_cul_bbtree_init_struct(CulBBTree *t, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth) {
-	t->root = root;
-	t->cmp = cmp;
-	t->nodes = nodes;
-	t->depth = depth;
-	return t;
+static inline CulBBTree *_cul_bbtree_init_struct(CulBBTree *this, CulBBTreeNode *root, cul_cmp_f *cmp, size_t nodes, uint16_t depth) {
+	this->root = root;
+	this->cmp = cmp;
+	this->nodes = nodes;
+	this->depth = depth;
+	return this;
 }
 
-static inline CulBBTreeNode *_cul_bbtree_node_new_struct(void) {
+static inline CulBBTreeNode *_cul_bbtree_node_new_struct() {
 	return cul_slab_new(sizeof(CulBBTreeNode));
 }
 
-static inline void _cul_bbtree_node_free_struct(CulBBTreeNode *tn) {
-	cul_slab_free(sizeof(CulBBTreeNode), tn);
+static inline void _cul_bbtree_node_free_struct(CulBBTreeNode *node) {
+	cul_slab_free(sizeof(CulBBTreeNode), node);
 }
 
-static inline CulBBTreeNode *_cul_bbtree_node_init_struct(CulBBTreeNode *tn, cul_ptr data, CulBBTreeNode *left, CulBBTreeNode *right, uint16_t depth, cul_bool is_left, cul_bool is_right) {
-	tn->data = data;
-	tn->left = left;
-	tn->right = right;
-	tn->depth = depth;
-	tn->is_left = is_left;
-	tn->is_right = is_right;
-	return tn;
+static inline CulBBTreeNode *_cul_bbtree_node_init_struct(CulBBTreeNode *node, cul_ptr data, CulBBTreeNode *left, CulBBTreeNode *right, uint16_t depth, cul_bool is_left, cul_bool is_right) {
+	node->data = data;
+	node->left = left;
+	node->right = right;
+	node->depth = depth;
+	node->is_left = is_left;
+	node->is_right = is_right;
+	return node;
 }
 
-CulBBTree *cul_bbtree_new(cul_cmp_f *cmp) {
-	CulBBTree *t;
-	if( (t = _cul_bbtree_new_struct()) == NULL )
+CulBBTree *cul_bbtree_new(cul_cmp_f *cmp_f) {
+	CulBBTree *this;
+	if( (this = _cul_bbtree_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	return _cul_bbtree_init_struct(t, NULL, cmp, 0, 0);
+	return _cul_bbtree_init_struct(this, NULL, cmp_f, 0, 0);
 }
 
-void cul_bbtree_free(CulBBTree *t, cul_free_f *free_f) {
-	CulBBTreeNode *tn, *tn_next;
+void cul_bbtree_free(CulBBTree *this, cul_free_f *free_f) {
+	CulBBTreeNode *node, *next;
 
-	if( t != NULL ) {
-		tn = cul_bbtree_node_first(t);
+	if( this != NULL ) {
+		node = cul_bbtree_first(this);
 
-		for( ; tn != NULL; tn = tn_next) {
-			tn_next = cul_bbtree_node_next(tn);
+		for( ; node != NULL; node = next) {
+			next = cul_bbtree_node_next(node);
 			if( free_f != NULL )
-				free_f(tn->data);
-			_cul_bbtree_node_free_struct(tn);
+				free_f(node->data);
+			_cul_bbtree_node_free_struct(node);
 		}
 
-		_cul_bbtree_free_struct(t);
+		_cul_bbtree_free_struct(this);
 	}
 }
 
-CulBBTreeNode *cul_bbtree_insert(CulBBTree *t, cul_ptr data) {
-	CUL_UNUSED(t);
+CulBBTreeNode *cul_bbtree_insert(CulBBTree *this, cul_ptr data) {
+	CUL_UNUSED(this);
 	CUL_UNUSED(data);
 	/* TODO cul_bbtree_insert stub */
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
-cul_bool cul_bbtree_remove(CulBBTree *t, cul_ptr data) {
-	CUL_UNUSED(t);
+cul_bool cul_bbtree_remove(CulBBTree *this, cul_ptr data, cul_free_f *free_f) {
+	CUL_UNUSED(this);
 	CUL_UNUSED(data);
 	/* TODO cul_bbtree_remove stub */
 	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
 
-cul_bool cul_bbtree_remove_node(CulBBTree *t, CulBBTreeNode *tn) {
-	CUL_UNUSED(t);
-	CUL_UNUSED(tn);
+cul_bool cul_bbtree_remove_node(CulBBTree *this, CulBBTreeNode *node, cul_free_f *free_f) {
+	CUL_UNUSED(this);
+	CUL_UNUSED(node);
 	/* TODO cul_bbtree_remove_node stub */
 	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
 
-CulBBTreeNode *cul_bbtree_find(const CulBBTree *t, cul_ptr data) {
-	CulBBTreeNode *tn = t->root;
-	cul_cmp_f *cmp = t->cmp;
-	int cmp_result;
+CulBBTreeNode *cul_bbtree_find(const CulBBTree *this, cul_ptr data) {
+	CulBBTreeNode *node = this->root;
+	cul_cmp_f *cmp_f = this->cmp;
+	int cmp;
 
 	while( CUL_TRUE ) {
-		if( (cmp_result = cmp(tn->data, data)) == 0 )
-			return tn;
-		else if( cmp_result < 0 ) {
-			if( !tn->is_right )
+		if( (cmp = cmp_f(node->data, data)) == 0 )
+			return node;
+		else if( cmp < 0 ) {
+			if( !node->is_right )
 				return NULL;
-			tn = tn->right;
-		}
-		else {
-			if( !tn->is_left )
+			node = node->right;
+		} else {
+			if( !node->is_left )
 				return NULL;
-			tn = tn->left;
+			node = node->left;
 		}
 	}
 	return NULL;
 }
 
-void cul_bbtree_foreach(CulBBTree *t, cul_foreach_f *foreach_f, cul_ptr user_data) {
-	CulBBTreeNode *tn = cul_bbtree_node_first(t);
-	for(; tn != NULL; tn = cul_bbtree_node_next(tn))
-		foreach_f(tn->data, user_data);
+void cul_bbtree_each(CulBBTree *this, cul_each_f *each_f, cul_ptr user_data) {
+	CulBBTreeNode *node = cul_bbtree_first(this);
+	for(; node != NULL; node = cul_bbtree_node_next(node))
+		each_f(node->data, user_data);
 }
 
-CulBBTreeNode *cul_bbtree_node_first(CulBBTree *t) {
-	CulBBTreeNode *tn = t->root;
+CulBBTreeNode *cul_bbtree_node_first(CulBBTree *this) {
+	CulBBTreeNode *node = this->root;
 
-	if( tn == NULL )
+	if( node == NULL )
 		return NULL;
 
-	while( tn->is_left )
-		tn = tn->left;
+	while( node->is_left )
+		node = node->left;
 
-	return tn;
+	return node;
 }
 
-CulBBTreeNode *cul_bbtree_node_last(CulBBTree *t) {
-	CulBBTreeNode *tn = t->root;
+CulBBTreeNode *cul_bbtree_node_last(CulBBTree *this) {
+	CulBBTreeNode *node = this->root;
 
-	if( tn == NULL )
+	if( node == NULL )
 		return NULL;
 
-	while( tn->is_right )
-		tn = tn->right;
+	while( node->is_right )
+		node = node->right;
 
-	return tn;
+	return node;
 }
 
-CulBBTreeNode *cul_bbtree_node_next(CulBBTreeNode *tn) {
-	if( tn->is_right ) {
-		tn = tn->right;
-		while( tn->is_left )
-			tn = tn->left;
-	}
-	else
-		tn = tn->right;
+CulBBTreeNode *cul_bbtree_node_next(CulBBTreeNode *node) {
+	if( node->is_right ) {
+		node = node->right;
+		while( node->is_left )
+			node = node->left;
+	} else
+		node = node->right;
 
-	return tn;
+	return node;
 }
 
-CulBBTreeNode *cul_bbtree_node_prev(CulBBTreeNode *tn) {
-	if( tn->is_left ) {
-		tn = tn->left;
-		while( tn->is_right )
-			tn = tn->right;
-	}
-	else
-		tn = tn->left;
+CulBBTreeNode *cul_bbtree_node_prev(CulBBTreeNode *node) {
+	if( node->is_left ) {
+		node = node->left;
+		while( node->is_right )
+			node = node->right;
+	} else
+		node = node->left;
 
-	return tn;
+	return node;
 }
 
-cul_ptr *cul_bbtree_node_data(CulBBTreeNode *tn) {
-	return tn->data;
+cul_ptr *cul_bbtree_node_data(CulBBTreeNode *node) {
+	return node->data;
 }
