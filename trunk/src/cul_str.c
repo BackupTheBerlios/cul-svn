@@ -169,6 +169,9 @@ char **cul_strsplit(const char *s, const char *delimiter) {
 	if( (strv = malloc( (size+1)*sizeof(char **) )) == NULL )
 		return NULL;
 
+	/* set last position */
+	strv[size] = NULL;
+
 	size_t i = 0;
 	for(; (string = strstr(s, delimiter)) != NULL; ++i) {
 		/* size of item */
@@ -196,9 +199,6 @@ char **cul_strsplit(const char *s, const char *delimiter) {
 	/* copy last item */
 	memcpy(strv[i], s, size);
 	strv[i][size] = CUL_STR_NULL;
-
-	/* set last position */
-	strv[size] = NULL;
 
 	return strv;
 }
