@@ -92,6 +92,7 @@ CulBBTreeNode *cul_bbtree_insert(CulBBTree *this, cul_ptr data) {
 cul_bool cul_bbtree_remove(CulBBTree *this, cul_ptr data, cul_free_f *free_f) {
 	CUL_UNUSED(this);
 	CUL_UNUSED(data);
+	CUL_UNUSED(free_f);
 	/* TODO cul_bbtree_remove stub */
 	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
@@ -99,6 +100,7 @@ cul_bool cul_bbtree_remove(CulBBTree *this, cul_ptr data, cul_free_f *free_f) {
 cul_bool cul_bbtree_remove_node(CulBBTree *this, CulBBTreeNode *node, cul_free_f *free_f) {
 	CUL_UNUSED(this);
 	CUL_UNUSED(node);
+	CUL_UNUSED(free_f);
 	/* TODO cul_bbtree_remove_node stub */
 	CUL_ERROR_ERRNO_RET(CUL_FALSE, CUL_ESTUB);
 }
