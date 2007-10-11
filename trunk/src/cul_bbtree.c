@@ -132,7 +132,7 @@ void cul_bbtree_each(CulBBTree *this, cul_each_f *each_f, cul_ptr user_data) {
 		each_f(node->data, user_data);
 }
 
-CulBBTreeNode *cul_bbtree_node_first(CulBBTree *this) {
+CulBBTreeNode *cul_bbtree_first(CulBBTree *this) {
 	CulBBTreeNode *node = this->root;
 
 	if( node == NULL )
@@ -144,7 +144,7 @@ CulBBTreeNode *cul_bbtree_node_first(CulBBTree *this) {
 	return node;
 }
 
-CulBBTreeNode *cul_bbtree_node_last(CulBBTree *this) {
+CulBBTreeNode *cul_bbtree_last(CulBBTree *this) {
 	CulBBTreeNode *node = this->root;
 
 	if( node == NULL )
