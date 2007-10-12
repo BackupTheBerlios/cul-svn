@@ -1,4 +1,4 @@
-#define _GNU_SOURCE         /* for asprintf if present */
+#define _GNU_SOURCE         /* for asprintf */
 
 #include <cul/cul_string.h>
 #include <cul/cul_str.h>
@@ -18,7 +18,7 @@ size_t _cul_strtrim_left_size(char *str, size_t size);
 cul_bool cul_string_isspace(const CulString *this) {
 	if( cul_string_isnull(this) )
 		return CUL_TRUE;
-	return cul_strisspace(this->str);
+	return cul_str_isspace(this->str);
 }
 
 CulString *cul_string_new(const CulString *string) {
@@ -76,7 +76,7 @@ void cul_string_free(CulString *s) {
 
 CulString *cul_string_clean(CulString *s) {
 	s->size = 0;
-	s->str[0] = CUL_STR_NULL;
+	s->str[0] = '\0';
 	return s;
 }
 
@@ -98,7 +98,7 @@ CulString *cul_string_resize(CulString *s, size_t size) {
 
 	/* copy old string */
 	memcpy(str, s->str, copy_size*sizeof(char));
-	str[copy_size] = CUL_STR_NULL;
+	str[copy_size] = '\0';
 	free(s->str);
 
 	return cul_string_init_struct(s, copy_size, size + 1, str);
@@ -156,7 +156,7 @@ CulString *cul_string_copy_block(CulString *s, const char *copy, size_t size) {
 
 	/* copy block */
 	memcpy(s->str, copy, size*sizeof(char));
-	s->str[size] = CUL_STR_NULL;
+	s->str[size] = '\0';
 
 	return s;
 }
@@ -286,7 +286,7 @@ CulString *cul_string_insert_block(CulString *s, size_t pos, const char *insert,
 
 	/* insert string and update length */
 	memcpy(s->str + s_pos, insert, size*sizeof(char));
-	s->str[s->size] = CUL_STR_NULL;
+	s->str[s->size] = '\0';
 	return s;
 }
 
@@ -315,7 +315,7 @@ CulString *cul_string_cut_end(CulString *s, size_t size) {
 		return cul_string_clean(s);
 
 	s->size -= size;
-	s->str[s->size] = CUL_STR_NULL;
+	s->str[s->size] = '\0';
 	return s;
 }
 

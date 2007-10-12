@@ -72,7 +72,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		}
 
-		is_token = (next = memchr(token, CUL_STR_NEWLINE, buffer_size)) != NULL;
+		is_token = (next = memchr(token, '\n', buffer_size)) != NULL;
 		size = is_token? (size_t)(next - token): buffer_size;
 
 		if( (string = malloc((data_size + size + 1)*sizeof(char))) == NULL ) {
@@ -83,7 +83,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 
 		memcpy(string, data, data_size);         /* copy previous data */
 		memcpy(string+data_size, token, size);   /* copy token */
-		string[data_size+size] = CUL_STR_NULL;
+		string[data_size+size] = '\0';
 		free(data);                              /* free previous data */
 
 		if( is_token || is_eof ) {
@@ -106,7 +106,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 		token = next + 1;
 
 		while( CUL_TRUE ) {
-			is_token = (next = memchr(token, CUL_STR_NEWLINE, buffer_size)) != NULL;
+			is_token = (next = memchr(token, '\n', buffer_size)) != NULL;
 			size = is_token? (size_t)(next - token): buffer_size;
 
 			if( (string = malloc((size + 1)*sizeof(char))) == NULL ) {
@@ -116,7 +116,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 			}
 
 			memcpy(string, token, size);    /* copy token */
-			string[size] = CUL_STR_NULL;
+			string[size] = '\0';
 
 			if( is_token || is_eof ) {
 				if( (node = cul_list_insert_next(line, string)) == NULL ) {
@@ -178,7 +178,7 @@ cul_errno cul_file_write_strv(const char *filename, char **contents) {
 		for( size_t i=0; i<lines; ++i) {
 			if( fputs(contents[i], stream) < 0 )
 				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
-			if( fputc(CUL_STR_NEWLINE, stream) == EOF )
+			if( fputc('\n', stream) == EOF )
 				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		}
 	}

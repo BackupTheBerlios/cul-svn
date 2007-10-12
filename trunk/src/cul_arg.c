@@ -25,7 +25,7 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 
 		if( *arg == '-' ) {
 			if( *(++arg) == '-' ) {
-				if( *(++arg) == CUL_STR_NULL )
+				if( *(++arg) == '\0' )
 					/* finish parsing */
 					break;
 
@@ -44,7 +44,7 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 				continue;
 			}
 
-			if( *arg == CUL_STR_NULL )
+			if( *arg == '\0' )
 				return CUL_EARGUNK;
 
 			/* short option */
@@ -164,7 +164,7 @@ CulArg *cul_arg_find_long(const CulArg *this, const char *arg) {
 		default:
 			if( this->long_name != NULL &&
 					strncmp(arg, this->long_name, length) == 0 &&
-					this->long_name[length] == CUL_STR_NULL )
+					this->long_name[length] == '\0' )
 				return (CulArg *)this;
 			this += 1;
 			break;
@@ -227,7 +227,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 				return CUL_EARGCONV;
 
 			/* end of multiple bool short flags */
-			if( *(++arg_string) == CUL_STR_NULL ) {
+			if( *(++arg_string) == '\0' ) {
 				_cul_arg_cmd_next(argc, argv);
 				return CUL_SUCCESS;
 			}
@@ -238,7 +238,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 			/* if not bool we have to move to flag option */
 			if( !is_option_bool ) {
 				/* check if there is something after flag */
-				if( *(arg_string+1) != CUL_STR_NULL ) {
+				if( *(arg_string+1) != '\0' ) {
 					/* option is right after flag */
 					++arg_string;
 					size = 1;
@@ -256,7 +256,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 				/* this is first of possible multiple bool options */
 
 				/* check if we have more flags */
-				if( *(++arg_string) != CUL_STR_NULL ) {
+				if( *(++arg_string) != '\0' ) {
 					is_multi_flag = CUL_TRUE;
 					size = 0;
 				} else
