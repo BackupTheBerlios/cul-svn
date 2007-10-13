@@ -399,8 +399,12 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 		return FUNCTION(mean)(this->data, this->size_x * this->size_y);
 	}
 
-	double FUNCTION(matrix_variance)(const TYPE(Matrix) *this, double mean) {
-		return FUNCTION(variance)(this->data, this->size_x * this->size_y, mean);
+	double FUNCTION(matrix_variance)(const TYPE(Matrix) *this) {
+		return FUNCTION(variance)(this->data, this->size_x * this->size_y);
+	}
+
+	double FUNCTION(matrix_variance_mean)(const TYPE(Matrix) *this, double mean) {
+		return FUNCTION(variance_mean)(this->data, this->size_x * this->size_y, mean);
 	}
 
 	double FUNCTION(matrixview_sum)(const VIEW(Matrix) *this) {
@@ -411,8 +415,12 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 		return FUNCTION(mean_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda);
 	}
 	
-	double FUNCTION(matrixview_variance)(const VIEW(Matrix) *this, double mean) {
-		return FUNCTION(variance_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda, mean);
+	double FUNCTION(matrixview_variance)(const VIEW(Matrix) *this) {
+		return FUNCTION(variance_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda);
+	}
+
+	double FUNCTION(matrixview_variance_mean)(const VIEW(Matrix) *this, double mean) {
+		return FUNCTION(variance_mean_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda, mean);
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */

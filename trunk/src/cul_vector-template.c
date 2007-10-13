@@ -575,8 +575,12 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 		return FUNCTION(mean)(this->data, this->size);
 	}
 
-	double FUNCTION(vector_variance)(const TYPE(Vector) *this, double mean) {
-		return FUNCTION(variance)(this->data, this->size, mean);
+	double FUNCTION(vector_variance)(const TYPE(Vector) *this) {
+		return FUNCTION(variance)(this->data, this->size);
+	}
+
+	double FUNCTION(vector_variance_mean)(const TYPE(Vector) *this, double mean) {
+		return FUNCTION(variance_mean)(this->data, this->size, mean);
 	}
 
 	double FUNCTION(vectorview_sum)(const VIEW(Vector) *this) {
@@ -587,8 +591,12 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 		return FUNCTION(mean_stride)(this->data, this->size, this->stride);
 	}
 	
-	double FUNCTION(vectorview_variance)(const VIEW(Vector) *this, double mean) {
-		return FUNCTION(variance_stride)(this->data, this->size, this->stride, mean);
+	double FUNCTION(vectorview_variance)(const VIEW(Vector) *this) {
+		return FUNCTION(variance_stride)(this->data, this->size, this->stride);
+	}
+
+	double FUNCTION(vectorview_variance_mean)(const VIEW(Vector) *this, double mean) {
+		return FUNCTION(variance_mean_stride)(this->data, this->size, this->stride, mean);
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */

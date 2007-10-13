@@ -55,58 +55,60 @@ CulUVectorView *cul_umatrixview_diag     (CulUVectorView *this, const CulUMatrix
 CulUVectorView *cul_umatrixview_subdiag  (CulUVectorView *this, const CulUMatrix *base, size_t base_k);
 CulUVectorView *cul_umatrixview_superdiag(CulUVectorView *this, const CulUMatrix *base, size_t base_k);
 
-cul_errno cul_umatrix_copy          (CulUMatrix *this, const CulUMatrix *other);
-cul_errno cul_umatrix_copy_offset   (CulUMatrix *this, const CulUMatrix *other, size_t offset_x, size_t offset_y);
-cul_errno cul_umatrix_copy_submatrix(CulUMatrix *this, const CulUMatrix *other, size_t other_offset_x, size_t other_offset_y);
-cul_errno cul_umatrix_copy_row      (CulUMatrix *this, const CulUMatrix *other, size_t row, size_t other_row);
-cul_errno cul_umatrix_copy_col      (CulUMatrix *this, const CulUMatrix *other, size_t col, size_t other_col);
-cul_errno cul_umatrix_copy_view     (CulUMatrix *this, const CulUMatrixView *other);
-cul_errno cul_umatrixview_copy      (CulUMatrixView *this, const CulUMatrixView *other);
+cul_errno cul_umatrix_copy             (CulUMatrix *this, const CulUMatrix *other);
+cul_errno cul_umatrix_copy_offset      (CulUMatrix *this, const CulUMatrix *other, size_t offset_x, size_t offset_y);
+cul_errno cul_umatrix_copy_submatrix   (CulUMatrix *this, const CulUMatrix *other, size_t other_offset_x, size_t other_offset_y);
+cul_errno cul_umatrix_copy_row         (CulUMatrix *this, const CulUMatrix *other, size_t row, size_t other_row);
+cul_errno cul_umatrix_copy_col         (CulUMatrix *this, const CulUMatrix *other, size_t col, size_t other_col);
+cul_errno cul_umatrix_copy_view        (CulUMatrix *this, const CulUMatrixView *other);
+cul_errno cul_umatrixview_copy         (CulUMatrixView *this, const CulUMatrixView *other);
 
-cul_errno cul_umatrix_swap          (CulUMatrix *this, CulUMatrix *other);
-cul_errno cul_umatrix_swap_row      (CulUMatrix *this, CulUMatrix *other, size_t row, size_t other_row);
-cul_errno cul_umatrix_swap_col      (CulUMatrix *this, CulUMatrix *other, size_t col, size_t other_col);
-cul_errno cul_umatrixview_swap      (CulUMatrixView *this, CulUMatrixView *other);
-cul_errno cul_umatrix_transpose     (CulUMatrix *this);
-cul_errno cul_umatrixview_transpose (CulUMatrixView *this);
+cul_errno cul_umatrix_swap             (CulUMatrix *this, CulUMatrix *other);
+cul_errno cul_umatrix_swap_row         (CulUMatrix *this, CulUMatrix *other, size_t row, size_t other_row);
+cul_errno cul_umatrix_swap_col         (CulUMatrix *this, CulUMatrix *other, size_t col, size_t other_col);
+cul_errno cul_umatrixview_swap         (CulUMatrixView *this, CulUMatrixView *other);
+cul_errno cul_umatrix_transpose        (CulUMatrix *this);
+cul_errno cul_umatrixview_transpose    (CulUMatrixView *this);
 
-cul_errno cul_umatrix_resize        (CulUMatrix *this, size_t x, size_t y);
-cul_errno cul_umatrix_resize_empty  (CulUMatrix *this, size_t x, size_t y);
+cul_errno cul_umatrix_resize           (CulUMatrix *this, size_t x, size_t y);
+cul_errno cul_umatrix_resize_empty     (CulUMatrix *this, size_t x, size_t y);
 
-void      cul_umatrix_set_all         (CulUMatrix *this, size_t value);
-void      cul_umatrix_set_diag        (CulUMatrix *this, size_t value, size_t diag);
-void      cul_umatrix_add_constant    (CulUMatrix *this, double value);
-void      cul_umatrix_scale           (CulUMatrix *this, double value);
-void      cul_umatrix_zero            (CulUMatrix *this);
-cul_errno cul_umatrix_add             (CulUMatrix *this, const CulUMatrix *other);
-cul_errno cul_umatrix_sub             (CulUMatrix *this, const CulUMatrix *other);
-cul_errno cul_umatrix_mul             (CulUMatrix *this, const CulUMatrix *other);
-cul_errno cul_umatrix_div             (CulUMatrix *this, const CulUMatrix *other);
-void      cul_umatrixview_set_all     (CulUMatrixView *this, size_t value);
-void      cul_umatrixview_set_diag    (CulUMatrixView *this, size_t value, size_t diag);
-void      cul_umatrixview_add_constant(CulUMatrixView *this, double value);
-void      cul_umatrixview_scale       (CulUMatrixView *this, double value);
-cul_errno cul_umatrixview_add         (CulUMatrixView *this, const CulUMatrixView *other);
-cul_errno cul_umatrixview_sub         (CulUMatrixView *this, const CulUMatrixView *other);
-cul_errno cul_umatrixview_mul         (CulUMatrixView *this, const CulUMatrixView *other);
-cul_errno cul_umatrixview_div         (CulUMatrixView *this, const CulUMatrixView *other);
+void      cul_umatrix_set_all          (CulUMatrix *this, size_t value);
+void      cul_umatrix_set_diag         (CulUMatrix *this, size_t value, size_t diag);
+void      cul_umatrix_add_constant     (CulUMatrix *this, double value);
+void      cul_umatrix_scale            (CulUMatrix *this, double value);
+void      cul_umatrix_zero             (CulUMatrix *this);
+cul_errno cul_umatrix_add              (CulUMatrix *this, const CulUMatrix *other);
+cul_errno cul_umatrix_sub              (CulUMatrix *this, const CulUMatrix *other);
+cul_errno cul_umatrix_mul              (CulUMatrix *this, const CulUMatrix *other);
+cul_errno cul_umatrix_div              (CulUMatrix *this, const CulUMatrix *other);
+void      cul_umatrixview_set_all      (CulUMatrixView *this, size_t value);
+void      cul_umatrixview_set_diag     (CulUMatrixView *this, size_t value, size_t diag);
+void      cul_umatrixview_add_constant (CulUMatrixView *this, double value);
+void      cul_umatrixview_scale        (CulUMatrixView *this, double value);
+cul_errno cul_umatrixview_add          (CulUMatrixView *this, const CulUMatrixView *other);
+cul_errno cul_umatrixview_sub          (CulUMatrixView *this, const CulUMatrixView *other);
+cul_errno cul_umatrixview_mul          (CulUMatrixView *this, const CulUMatrixView *other);
+cul_errno cul_umatrixview_div          (CulUMatrixView *this, const CulUMatrixView *other);
 
-size_t    cul_umatrix_min           (const CulUMatrix *this);
-size_t    cul_umatrix_min_index     (const CulUMatrix *this);
-size_t    cul_umatrix_max           (const CulUMatrix *this);
-size_t    cul_umatrix_max_index     (const CulUMatrix *this);
-void      cul_umatrix_minmax        (const CulUMatrix *this, size_t *min, size_t *max);
-void      cul_umatrix_minmax_index  (const CulUMatrix *this, size_t *min_i, size_t *max_i);
+size_t    cul_umatrix_min              (const CulUMatrix *this);
+size_t    cul_umatrix_min_index        (const CulUMatrix *this);
+size_t    cul_umatrix_max              (const CulUMatrix *this);
+size_t    cul_umatrix_max_index        (const CulUMatrix *this);
+void      cul_umatrix_minmax           (const CulUMatrix *this, size_t *min, size_t *max);
+void      cul_umatrix_minmax_index     (const CulUMatrix *this, size_t *min_i, size_t *max_i);
 
-double    cul_umatrix_sum           (const CulUMatrix *this);
-double    cul_umatrix_mean          (const CulUMatrix *this);
-double    cul_umatrix_variance      (const CulUMatrix *this, double mean);
-double    cul_umatrixview_sum       (const CulUMatrixView *this);
-double    cul_umatrixview_mean      (const CulUMatrixView *this);
-double    cul_umatrixview_variance  (const CulUMatrixView *this, double mean);
+double    cul_umatrix_sum              (const CulUMatrix *this);
+double    cul_umatrix_mean             (const CulUMatrix *this);
+double    cul_umatrix_variance         (const CulUMatrix *this);
+double    cul_umatrix_variance_mean    (const CulUMatrix *this, double mean);
+double    cul_umatrixview_sum          (const CulUMatrixView *this);
+double    cul_umatrixview_mean         (const CulUMatrixView *this);
+double    cul_umatrixview_variance     (const CulUMatrixView *this);
+double    cul_umatrixview_variance_mean(const CulUMatrixView *this, double mean);
 
-cul_errno cul_umatrix_fprintf       (FILE *stream, const CulUMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
-cul_errno cul_umatrix_fscanf        (FILE *stream, CulUMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
+cul_errno cul_umatrix_fprintf          (FILE *stream, const CulUMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
+cul_errno cul_umatrix_fscanf           (FILE *stream, CulUMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
 
 /* implementation */
 

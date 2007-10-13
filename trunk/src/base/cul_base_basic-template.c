@@ -742,7 +742,22 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 		return mean / (double)(rows * (tda_size - tda) );
 	}
 
-	double FUNCTION(variance)(const ATOM *data, size_t size, double mean) {
+	double FUNCTION(variance)(const ATOM *data, size_t size) {
+		double mean = FUNCTION(mean)(data, size);
+		return FUNCTION(variance_mean)(data, size, mean);
+	}
+
+	double FUNCTION(variance_stride)(const ATOM *data, size_t size, size_t stride) {
+		double mean = FUNCTION(mean_stride)(data, size, stride);
+		return FUNCTION(variance_mean_stride)(data, size, stride, mean);
+	}
+
+	double FUNCTION(variance_tda)(const ATOM *data, size_t size, size_t tda_size, size_t tda) {
+		double mean = FUNCTION(mean_tda)(data, size, tda_size, tda);
+		return FUNCTION(variance_mean_tda)(data, size, tda_size, tda, mean);
+	}
+
+	double FUNCTION(variance_mean)(const ATOM *data, size_t size, double mean) {
 		const ATOM *last = data + size;
 		double variance = 0.0;
 		for(; data < last; ++data)
@@ -750,7 +765,7 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 		return variance /= size;
 	}
 
-	double FUNCTION(variance_stride)(const ATOM *data, size_t size, size_t stride, double mean) {
+	double FUNCTION(variance_mean_stride)(const ATOM *data, size_t size, size_t stride, double mean) {
 		const ATOM *last = data + size * stride;
 		double variance = 0.0;
 		for(; data < last; data += stride)
@@ -758,7 +773,7 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 		return variance /= size;
 	}
 
-	double FUNCTION(variance_tda)(const ATOM *data, size_t size, size_t tda_size, size_t tda, double mean) {
+	double FUNCTION(variance_mean_tda)(const ATOM *data, size_t size, size_t tda_size, size_t tda, double mean) {
 		const ATOM *const last = data + size, *tda_last = data + tda_size;
 		double variance = 0.0;
 		size_t rows = 0;
