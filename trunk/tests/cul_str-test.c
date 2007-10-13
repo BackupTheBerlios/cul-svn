@@ -26,18 +26,18 @@ int main(int argc, char* argv[]) {
 			upper[i] = 'A' + random;
 		}
 
-		lower[length - 1] = CUL_STR_NULL;
-		upper[length - 1] = CUL_STR_NULL;
+		lower[length - 1] = '\0';
+		upper[length - 1] = '\0';
 
 		strcpy(lower_lower, lower);
 		strcpy(lower_upper, lower);
-		CUL_ASSERT( strcmp(cul_strtolower(lower_lower), lower) == 0 );
-		CUL_ASSERT( strcmp(cul_strtoupper(lower_upper), upper) == 0 );
+		CUL_ASSERT( strcmp(cul_str_tolower(lower_lower), lower) == 0 );
+		CUL_ASSERT( strcmp(cul_str_toupper(lower_upper), upper) == 0 );
 
 		strcpy(upper_upper, upper);
 		strcpy(upper_lower, upper);
-		CUL_ASSERT( strcmp(cul_strtoupper(upper_upper), upper) == 0 );
-		CUL_ASSERT( strcmp(cul_strtolower(upper_lower), lower) == 0 );
+		CUL_ASSERT( strcmp(cul_str_toupper(upper_upper), upper) == 0 );
+		CUL_ASSERT( strcmp(cul_str_tolower(upper_lower), lower) == 0 );
 	}
 
 	{ /* test cul_strdup and cul_strndup */
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 			base[i] = character;
 		}
 
-		base[length - 1] = CUL_STR_NULL;
+		base[length - 1] = '\0';
 
 		dup = cul_strdup(base);
 		CUL_ASSERT( strcmp(base, dup) == 0 );
