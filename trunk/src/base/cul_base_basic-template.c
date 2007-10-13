@@ -428,7 +428,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 #ifndef TEMPLATE_CUL_PTR
 	ATOM FUNCTION(min)(const ATOM *data, size_t size) {
 		const ATOM *last = data + size;
-		ATOM min = *data;
+		ATOM min;
+
+		if( data < last )
+			min = *data;
+		else
+			return EMPTY;
 
 		for( ++data; data < last; ++data) {
 			if( *data < min )
@@ -439,7 +444,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	ATOM FUNCTION(min_stride)(const ATOM *data, size_t size, size_t stride) {
 		const ATOM *last = data + size * stride;
-		ATOM min = *data;
+		ATOM min;
+
+		if( data < last )
+			min = *data;
+		else
+			return EMPTY;
 
 		for( data += stride; data < last; data += stride) {
 			if( *data < min )
@@ -450,7 +460,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	size_t FUNCTION(min_index)(const ATOM *data, size_t size) {
 		const ATOM *begin = data, *last = data + size, *index = data;
-		ATOM min = *data;
+		ATOM min;
+
+		if( data < last )
+			min = *data;
+		else
+			return 0;
 
 		for( ++data; data < last; ++data) {
 			if( *data < min ) {
@@ -463,7 +478,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	size_t FUNCTION(min_index_stride)(const ATOM *data, size_t size, size_t stride) {
 		const ATOM *begin = data, *last = data + size * stride, *index = data;
-		ATOM min = *data;
+		ATOM min;
+
+		if( data < last )
+			min = *data;
+		else
+			return 0;
 
 		for( data += stride; data < last; data += stride) {
 			if( *data < min ) {
@@ -479,7 +499,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 #ifndef TEMPLATE_CUL_PTR
 	ATOM FUNCTION(max)(const ATOM *data, size_t size) {
 		const ATOM *last = data + size;
-		ATOM max = *data;
+		ATOM max;
+
+		if( data < last )
+			max = *data;
+		else
+			return EMPTY;
 
 		for( ++data; data < last; ++data) {
 			if( *data > max )
@@ -490,7 +515,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	ATOM FUNCTION(max_stride)(const ATOM *data, size_t size, size_t stride) {
 		const ATOM *last = data + size * stride;
-		ATOM max = *data;
+		ATOM max;
+
+		if( data < last )
+			max = *data;
+		else
+			return EMPTY;
 
 		for( data += stride; data < last; data += stride) {
 			if( *data > max )
@@ -501,7 +531,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	size_t FUNCTION(max_index)(const ATOM *data, size_t size) {
 		const ATOM *begin = data, *last = data + size, *index = data;
-		ATOM max = *data;
+		ATOM max;
+
+		if( data < last )
+			max = *data;
+		else
+			return 0;
 
 		for( ++data; data < last; ++data) {
 			if( *data > max ) {
@@ -514,7 +549,12 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	size_t FUNCTION(max_index_stride)(const ATOM *data, size_t size, size_t stride) {
 		const ATOM *begin = data, *last = data + size * stride, *index = data;
-		ATOM max = *data;
+		ATOM max;
+
+		if( data < last )
+			max = *data;
+		else
+			return 0;
 
 		for( data += stride; data < last; data += stride) {
 			if( *data > max ) {
@@ -530,7 +570,15 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(minmax)(const ATOM *data, size_t size, ATOM *min_out, ATOM *max_out) {
 		const ATOM *last = data + size;
-		ATOM min = *data, max = *data;
+		ATOM min, max;
+
+		if( data < last )
+			min = max = *data;
+		else {
+			*min_out = EMPTY;
+			*max_out = EMPTY;
+			return;
+		}
 
 		for( ++data; data < last; ++data) {
 			if( *data < min )
@@ -545,7 +593,15 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	void FUNCTION(minmax_stride)(const ATOM *data, size_t size, size_t stride, ATOM *min_out, ATOM *max_out) {
 		const ATOM *last = data + size * stride;
-		ATOM min = *data, max = *data;
+		ATOM min, max;
+
+		if( data < last )
+			min = max = *data;
+		else {
+			*min_out = EMPTY;
+			*max_out = EMPTY;
+			return;
+		}
 
 		for( data += stride; data < last; data += stride) {
 			if( *data < min )
@@ -560,7 +616,15 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	void FUNCTION(minmax_index)(const ATOM *data, size_t size, size_t *min_index_out, size_t *max_index_out) {
 		const ATOM *begin = data, *last = data + size, *min_index = data, *max_index = data;
-		ATOM min = *data, max = *data;
+		ATOM min, max;
+
+		if( data < last )
+			min = max = *data;
+		else {
+			*min_index_out = 0;
+			*max_index_out = 0;
+			return;
+		}
 
 		for( ++data; data < last; ++data) {
 			if( *data < min ) {
@@ -579,7 +643,15 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 
 	void FUNCTION(minmax_index_stride)(const ATOM *data, size_t size, size_t stride, size_t *min_index_out, size_t *max_index_out) {
 		const ATOM *begin = data, *last = data + size * stride, *min_index = data, *max_index = data;
-		ATOM min = *data, max = *data;
+		ATOM min, max;
+
+		if( data < last )
+			min = max = *data;
+		else {
+			*min_index_out = 0;
+			*max_index_out = 0;
+			return;
+		}
 
 		for( data += stride; data < last; data += stride) {
 			if( *data < min ) {

@@ -1,6 +1,7 @@
 #undef FUNC_GEN
 #undef TYPE_GEN
 #undef ATOM
+#undef EMPTY
 
 #undef CONCAT2
 #undef CONCAT2x

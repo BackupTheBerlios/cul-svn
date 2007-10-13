@@ -2,6 +2,7 @@
 #include <cul/cul_base.h>
 
 #include <string.h>
+#include <math.h>
 
 #define TEMPLATE_CUL_CHAR
 #include "templates_on.h"

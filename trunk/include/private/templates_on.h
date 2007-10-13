@@ -2,22 +2,27 @@
 	#define FUNC_GEN  c
 	#define TYPE_GEN  C
 	#define ATOM      char
+	#define EMPTY     0
 #elif defined(TEMPLATE_CUL_INT)
 	#define FUNC_GEN  i
 	#define TYPE_GEN  I
 	#define ATOM      int
+	#define EMPTY     0
 #elif defined(TEMPLATE_CUL_DOUBLE)
 	#define FUNC_GEN  d
 	#define TYPE_GEN  D
 	#define ATOM      double
+	#define EMPTY     NAN
 #elif defined(TEMPLATE_CUL_SIZE)
 	#define FUNC_GEN  u
 	#define TYPE_GEN  U
 	#define ATOM      size_t
+	#define EMPTY     0
 #elif defined(TEMPLATE_CUL_PTR)
 	#define FUNC_GEN  p
 	#define TYPE_GEN  P
 	#define ATOM      cul_ptr
+	#define EMPTY     NULL
 #else
 	#error TEMPLATE_* directive undifined!
 #endif
