@@ -7,11 +7,12 @@
 #include <string.h>
 
 /* private functions */
-static CulArg     *_cul_arg_need           (const CulArg *this);
-static inline void _cul_arg_cmd_next       (int *argc, char ***argv);
-static cul_errno   _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t n);
-static cul_errno   _cul_arg_cmd_parse_long (int *argc, char ***argv, CulArg *table, size_t n);
-static cul_bool    _cul_arg_cmd_convert    (const char *arg, CulArg *entry, size_t n);
+static CulArg         *_cul_arg_need           (const CulArg *this);
+static inline void     _cul_arg_cmd_next       (int *argc, char ***argv);
+static cul_errno       _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t n);
+static cul_errno       _cul_arg_cmd_parse_long (int *argc, char ***argv, CulArg *table, size_t n);
+static cul_bool        _cul_arg_cmd_convert    (const char *arg, CulArg *entry, size_t n);
+static inline cul_bool _cul_arg_flag_is_switch (CulArgFlag flag);
 
 /* Parse program arguments using argument tables */
 cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
@@ -215,11 +216,11 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 			return CUL_EARGUNK;
 
 		const CulArgFlag flag = (entry->flags & CUL_ARG_TYPE_MASK);
-		const cul_bool is_option_bool = (flag == CUL_ARG_BOOL);
+		const cul_bool is_switch = _cul_arg_flag_is_switch(flag);
 
 		/* we have more flags than one */
 		if( is_multi_flag ) {
-			if( !is_option_bool )
+			if( !is_switch )
 				return CUL_EARGCONV;
 
 			/* convert flag option */
@@ -235,8 +236,8 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 		}	else {
 			size_t size;
 
-			/* if not bool we have to move to flag option */
-			if( !is_option_bool ) {
+			/* if not switch we have to move to flag option */
+			if( !is_switch ) {
 				/* check if there is something after flag */
 				if( *(arg_string+1) != '\0' ) {
 					/* option is right after flag */
@@ -292,10 +293,10 @@ static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table,
 
 		size_t size;
 		const CulArgFlag flag = (entry->flags & CUL_ARG_TYPE_MASK);
-		const cul_bool is_option_bool = (flag == CUL_ARG_BOOL);
+		const cul_bool is_switch = _cul_arg_flag_is_switch(flag);
 
 		/* if not bool we have to move to flag option */
-		if( !is_option_bool ) {
+		if( !is_switch ) {
 			/* check if there is something after flag */
 			if( arg_option ) {
 				/* option is right after flag */
@@ -336,8 +337,14 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 	char* end;
 
 	switch( entry->flags & CUL_ARG_TYPE_MASK ) {
-	case CUL_ARG_BOOL:
+	case CUL_ARG_TRUE:
 		*((cul_bool *)entry->value) = CUL_TRUE;
+		break;
+	case CUL_ARG_FALSE:
+		*((cul_bool *)entry->value) = CUL_FALSE;
+		break;
+	case CUL_ARG_COUNT:
+		*((int *)entry->value) += 1;
 		break;
 	case CUL_ARG_INT:
 		if( *arg ) {
@@ -382,3 +389,13 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 
 	return CUL_TRUE;
 }
+
+static inline cul_bool _cul_arg_flag_is_switch (CulArgFlag flag) {
+	switch( flag ) {
+	case CUL_ARG_TRUE:
+	case CUL_ARG_FALSE:
+	case CUL_ARG_COUNT: return CUL_TRUE;
+	default:            return CUL_FALSE;
+	}
+}
+
