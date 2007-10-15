@@ -45,6 +45,7 @@ void cul_log(const char *module, CulLogType type, const char *format, ...) {
 			else                 fprintf(cul_stream_get(), "%s", message);
 		} else
 			cul_log_handler_get()(module, type, message);
+		break;
 	case CUL_LOG_CHECK:
 	case CUL_LOG_MESSAGE:
 	case CUL_LOG_CLOCK:
@@ -57,10 +58,10 @@ void cul_log(const char *module, CulLogType type, const char *format, ...) {
 
 	/* handle abort */
 	switch( type ) {
-	case CUL_LOG_FATAL:       abort(); break;
-	case CUL_LOG_ERROR:       if( cul_error_fatal_get() ) abort(); break;
+	case CUL_LOG_FATAL:   abort(); break;
+	case CUL_LOG_ERROR:   if( cul_error_fatal_get() ) abort(); break;
 	case CUL_LOG_CHECK:
 	case CUL_LOG_MESSAGE:
-	case CUL_LOG_CLOCK:       break;
+	case CUL_LOG_CLOCK:   break;
 	}
 }
