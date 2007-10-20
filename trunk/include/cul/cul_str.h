@@ -29,8 +29,6 @@ char    *cul_strndup       (const char *str, size_t size);
 char   **cul_strv_new      (size_t size);
 void     cul_strv_free     (char **strv);
 
-char   **cul_strv_cpy      (char **strv, char **other);
-char   **cul_strv_cpy_size (char **strv, char **other, size_t size);
 char   **cul_strv_dup      (char **strv);
 char   **cul_strv_dup_size (char **strv, size_t size);
 

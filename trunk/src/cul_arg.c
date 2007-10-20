@@ -13,6 +13,7 @@ static cul_errno       _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg 
 static cul_errno       _cul_arg_cmd_parse_long (int *argc, char ***argv, CulArg *table, size_t n);
 static cul_bool        _cul_arg_cmd_convert    (const char *arg, CulArg *entry, size_t n);
 static inline cul_bool _cul_arg_flag_is_switch (CulArgFlag flag);
+static inline cul_bool _cul_arg_flag_is_found  (CulArgFlag flag);
 
 /* Parse program arguments using argument tables */
 cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
@@ -368,12 +369,50 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 		if( *arg ) {
 			char *tmp = cul_strdup(arg);
 			if( tmp != NULL ) {
-				/* free old string, only if already found */
-				if( entry->flags & CUL_ARG_FOUND )
+				/* free old value, if already found */
+				if( _cul_arg_flag_is_found(entry->flags) )
 					free(*(char **)entry->value);
 				*(char **)entry->value = tmp;
 				break;
 			}
+		}
+		return CUL_FALSE;
+	case CUL_ARG_STRV:
+		if( *arg ) {
+			char *tmp, **tmpv;
+			size_t size;
+
+			/* initialize current state  */
+			if( _cul_arg_flag_is_found(entry->flags) )
+				size = cul_strv_size(*(char ***)entry->value);
+			else
+				size = 0;
+
+			/* allocate all needed space */
+			tmp = cul_strdup(arg);
+			tmpv = cul_strv_new(size + 1);
+
+			if( tmp != NULL && tmpv != NULL ) {
+				/* copy all old strings to tmpv */
+				char **strv = *(char ***)entry->value;
+				for(size_t i = 0; i < size; ++i)
+					tmpv[i] = strv[i];
+
+				/* add new string and NULL end */
+				tmpv[size] = tmp;
+				tmpv[size+1] = NULL;
+
+				/* free old value, if already found */
+				if( _cul_arg_flag_is_found(entry->flags) )
+					cul_strv_free(*(char ***)entry->value);
+				*(char ***)entry->value = tmpv;
+
+				break;
+			}
+
+			/* free allocated memory if present */
+			free(tmp);
+			free(tmpv);
 		}
 		return CUL_FALSE;
 	default:
@@ -390,12 +429,16 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 	return CUL_TRUE;
 }
 
-static inline cul_bool _cul_arg_flag_is_switch (CulArgFlag flag) {
+static inline cul_bool _cul_arg_flag_is_switch(CulArgFlag flag) {
 	switch( flag ) {
 	case CUL_ARG_TRUE:
 	case CUL_ARG_FALSE:
 	case CUL_ARG_COUNT: return CUL_TRUE;
 	default:            return CUL_FALSE;
 	}
+}
+
+static inline cul_bool _cul_arg_flag_is_found(CulArgFlag flag) {
+	return flag & CUL_ARG_FOUND;
 }
 

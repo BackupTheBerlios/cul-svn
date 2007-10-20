@@ -20,9 +20,10 @@ enum _CulArgFlag {
 	CUL_ARG_TRUE       = 1,  /* option is a switch, value is set to true (cul_bool) */
 	CUL_ARG_FALSE      = 2,  /* option is a switch, value is set to false (cul_bool) */
 	CUL_ARG_COUNT      = 3,  /* option is a switch, value is increased by number of occurences (int) */
-	CUL_ARG_INT        = 4,  /* option has an integer number parameter (int) */
-	CUL_ARG_DOUBLE     = 5,  /* option has an floating point number parameter (double) */
-	CUL_ARG_STR        = 6,  /* option has an string parameter */
+	CUL_ARG_INT        = 4,  /* option has integer number parameter (int) */
+	CUL_ARG_DOUBLE     = 5,  /* option has floating point number parameter (double) */
+	CUL_ARG_STR        = 6,  /* option has string parameter */
+	CUL_ARG_STRV       = 7,  /* option has string parameter, multiple occurrences are added */
 
 	/* type flags */
 	CUL_ARG_NEED       = 1 << 4,  /* option is required */
