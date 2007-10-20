@@ -222,10 +222,29 @@ void cul_strv_free(char **strv) {
 	}
 }
 
+char **cul_strv_cpy(char **strv, char **other) {
+	return cul_strv_cpy_size(strv, other, cul_strv_size(other));
+}
+
+char **cul_strv_cpy_size(char **strv, char **other, size_t size) {
+	/* copy other */
+	for(size_t i = 0; i < size; ++i)
+		if( (strv[i] = cul_strdup(other[i])) == NULL ) {
+			/* free allocated strings */
+			for(--i; i > 0; --i) free(strv[i]);
+			/* set strv end */
+			free(strv[0]);
+			strv[0] = NULL;
+			return NULL;
+		}
+	/* set strv end */
+	strv[size] = NULL;
+	return strv;
+}
+
 char **cul_strv_dup(char **strv) {
 	return cul_strv_dup_size(strv, cul_strv_size(strv));
 }
-
 
 char **cul_strv_dup_size(char **strv, size_t size) {
 	char **dupv;
