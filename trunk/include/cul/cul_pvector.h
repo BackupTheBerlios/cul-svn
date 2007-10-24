@@ -50,50 +50,51 @@ void            cul_pvectorview_free     (CulPVectorView *this);
 CulPVectorView *cul_pvectorview_vector   (CulPVectorView *this, const CulPVector *base);
 CulPVectorView *cul_pvectorview_subvector(CulPVectorView *this, const CulPVector *base, size_t base_offset, size_t base_size, size_t base_stride);
 
-cul_errno cul_pvector_copy           (CulPVector *this, const CulPVector *other);
-cul_errno cul_pvector_copy_offset    (CulPVector *this, const CulPVector *other, size_t offset);
-cul_errno cul_pvector_copy_subvector (CulPVector *this, const CulPVector *other, size_t other_offset);
-cul_errno cul_pvector_copy_view      (CulPVector *this, const CulPVectorView *other);
-cul_errno cul_pvectorview_copy       (CulPVectorView *this, const CulPVectorView *other);
-cul_errno cul_pvectorview_copy_vector(CulPVectorView *this, const CulPVector *other);
+cul_errno cul_pvector_copy            (CulPVector *this, const CulPVector *other);
+cul_errno cul_pvector_copy_offset     (CulPVector *this, const CulPVector *other, size_t offset);
+cul_errno cul_pvector_copy_subvector  (CulPVector *this, const CulPVector *other, size_t other_offset);
+cul_errno cul_pvector_copy_view       (CulPVector *this, const CulPVectorView *other);
+cul_errno cul_pvector_copy_view_offset(CulPVector *this, const CulPVectorView *other, size_t offset);
+cul_errno cul_pvectorview_copy        (CulPVectorView *this, const CulPVectorView *other);
+cul_errno cul_pvectorview_copy_vector (CulPVectorView *this, const CulPVector *other);
 
-cul_errno cul_pvector_swap           (CulPVector *this, CulPVector *other);
-cul_errno cul_pvectorview_swap       (CulPVectorView *this, CulPVectorView *other);
-void      cul_pvector_reverse        (CulPVector *this);
-void      cul_pvectorview_reverse    (CulPVectorView *this);
+cul_errno cul_pvector_swap            (CulPVector *this, CulPVector *other);
+cul_errno cul_pvectorview_swap        (CulPVectorView *this, CulPVectorView *other);
+void      cul_pvector_reverse         (CulPVector *this);
+void      cul_pvectorview_reverse     (CulPVectorView *this);
 
-cul_errno cul_pvector_resize         (CulPVector *this, size_t size, cul_free_f *free_f);
-cul_errno cul_pvector_resize_empty   (CulPVector *this, size_t size);
-cul_errno cul_pvector_reserve        (CulPVector *this, size_t size);
-cul_errno cul_pvector_shrink         (CulPVector *this);
-cul_errno cul_pvector_insert         (CulPVector *this, size_t offset, cul_ptr value);
-cul_errno cul_pvector_insert_vector  (CulPVector *this, size_t offset, const CulPVector *other);
-cul_errno cul_pvector_insert_view    (CulPVector *this, size_t offset, const CulPVectorView *other);
-cul_errno cul_pvector_push_back      (CulPVector *this, cul_ptr value);
-cul_errno cul_pvector_remove         (CulPVector *this, size_t offset, cul_free_f *free_f);
-cul_errno cul_pvector_remove_range   (CulPVector *this, size_t offset, size_t size, cul_free_f *free_f);
-cul_errno cul_pvector_pop_back       (CulPVector *this, cul_free_f *free_f);
+cul_errno cul_pvector_resize          (CulPVector *this, size_t size, cul_free_f *free_f);
+cul_errno cul_pvector_resize_empty    (CulPVector *this, size_t size);
+cul_errno cul_pvector_reserve         (CulPVector *this, size_t size);
+cul_errno cul_pvector_shrink          (CulPVector *this);
+cul_errno cul_pvector_insert          (CulPVector *this, size_t offset, cul_ptr value);
+cul_errno cul_pvector_insert_vector   (CulPVector *this, size_t offset, const CulPVector *other);
+cul_errno cul_pvector_insert_view     (CulPVector *this, size_t offset, const CulPVectorView *other);
+cul_errno cul_pvector_push_back       (CulPVector *this, cul_ptr value);
+cul_errno cul_pvector_remove          (CulPVector *this, size_t offset, cul_free_f *free_f);
+cul_errno cul_pvector_remove_range    (CulPVector *this, size_t offset, size_t size, cul_free_f *free_f);
+cul_errno cul_pvector_pop_back        (CulPVector *this, cul_free_f *free_f);
 
-cul_errno cul_pvector_detach         (CulPVector *this, cul_cpy_f *cpy_f);
-cul_errno cul_pvector_detach_range   (CulPVector *this, size_t offset, size_t size, cul_cpy_f *cpy_f);
-cul_errno cul_pvectorview_detach     (CulPVectorView *this, cul_cpy_f *cpy_f);
+cul_errno cul_pvector_detach          (CulPVector *this, cul_cpy_f *cpy_f);
+cul_errno cul_pvector_detach_range    (CulPVector *this, size_t offset, size_t size, cul_cpy_f *cpy_f);
+cul_errno cul_pvectorview_detach      (CulPVectorView *this, cul_cpy_f *cpy_f);
 
-void      cul_pvector_set_all        (CulPVector *this, cul_ptr value);
-void      cul_pvector_set_basis      (CulPVector *this, size_t index, cul_ptr value, cul_ptr basis);
-void      cul_pvector_zero           (CulPVector *this);
-void      cul_pvectorview_set_all    (CulPVectorView *this, cul_ptr value);
-void      cul_pvectorview_set_basis  (CulPVectorView *this, size_t index, cul_ptr value, cul_ptr basis);
+void      cul_pvector_set_all         (CulPVector *this, cul_ptr value);
+void      cul_pvector_set_basis       (CulPVector *this, size_t index, cul_ptr value, cul_ptr basis);
+void      cul_pvector_zero            (CulPVector *this);
+void      cul_pvectorview_set_all     (CulPVectorView *this, cul_ptr value);
+void      cul_pvectorview_set_basis   (CulPVectorView *this, size_t index, cul_ptr value, cul_ptr basis);
 
-void      cul_pvector_sort           (CulPVector *this, cul_cmp_f *cmp_f);
-size_t    cul_pvector_unique         (CulPVector *this, cul_cmp_f *cmp_f);
-size_t    cul_pvector_find           (const CulPVector *this, size_t offset, cul_ptr key, cul_cmp_f *cmp_f);
-size_t    cul_pvector_bfind          (const CulPVector *this, cul_ptr key, cul_cmp_f *cmp_f);
-void      cul_pvector_each           (CulPVector *this, cul_each_f *each_f, cul_ptr user_data);
-void      cul_pvectorview_sort       (CulPVectorView *this, cul_cmp_f *cmp_f);
-size_t    cul_pvectorview_unique     (CulPVectorView *this, cul_cmp_f *cmp_f);
-size_t    cul_pvectorview_find       (const CulPVectorView *this, size_t offset, cul_ptr key, cul_cmp_f *cmp_f);
-size_t    cul_pvectorview_bfind      (const CulPVectorView *this, cul_ptr key, cul_cmp_f *cmp_f);
-void      cul_pvectorview_each       (CulPVectorView *this, cul_each_f *each_f, cul_ptr user_data);
+void      cul_pvector_sort            (CulPVector *this, cul_cmp_f *cmp_f);
+size_t    cul_pvector_unique          (CulPVector *this, cul_cmp_f *cmp_f);
+size_t    cul_pvector_find            (const CulPVector *this, size_t offset, cul_ptr key, cul_cmp_f *cmp_f);
+size_t    cul_pvector_bfind           (const CulPVector *this, cul_ptr key, cul_cmp_f *cmp_f);
+void      cul_pvector_each            (CulPVector *this, cul_each_f *each_f, cul_ptr user_data);
+void      cul_pvectorview_sort        (CulPVectorView *this, cul_cmp_f *cmp_f);
+size_t    cul_pvectorview_unique      (CulPVectorView *this, cul_cmp_f *cmp_f);
+size_t    cul_pvectorview_find        (const CulPVectorView *this, size_t offset, cul_ptr key, cul_cmp_f *cmp_f);
+size_t    cul_pvectorview_bfind       (const CulPVectorView *this, cul_ptr key, cul_cmp_f *cmp_f);
+void      cul_pvectorview_each        (CulPVectorView *this, cul_each_f *each_f, cul_ptr user_data);
 
 /* implementations */
 

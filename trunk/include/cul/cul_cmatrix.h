@@ -61,7 +61,9 @@ cul_errno cul_cmatrix_copy_submatrix   (CulCMatrix *this, const CulCMatrix *othe
 cul_errno cul_cmatrix_copy_row         (CulCMatrix *this, const CulCMatrix *other, size_t row, size_t other_row);
 cul_errno cul_cmatrix_copy_col         (CulCMatrix *this, const CulCMatrix *other, size_t col, size_t other_col);
 cul_errno cul_cmatrix_copy_view        (CulCMatrix *this, const CulCMatrixView *other);
+cul_errno cul_cmatrix_copy_view_offset (CulCMatrix *this, const CulCMatrixView *other, size_t offset_x, size_t offset_y);
 cul_errno cul_cmatrixview_copy         (CulCMatrixView *this, const CulCMatrixView *other);
+cul_errno cul_cmatrixview_copy_matrix  (CulCMatrixView *this, const CulCMatrix *other);
 
 cul_errno cul_cmatrix_swap             (CulCMatrix *this, CulCMatrix *other);
 cul_errno cul_cmatrix_swap_row         (CulCMatrix *this, CulCMatrix *other, size_t row, size_t other_row);

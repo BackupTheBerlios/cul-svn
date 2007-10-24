@@ -55,6 +55,7 @@ cul_errno cul_ivector_copy             (CulIVector *this, const CulIVector *othe
 cul_errno cul_ivector_copy_offset      (CulIVector *this, const CulIVector *other, size_t offset);
 cul_errno cul_ivector_copy_subvector   (CulIVector *this, const CulIVector *other, size_t other_offset);
 cul_errno cul_ivector_copy_view        (CulIVector *this, const CulIVectorView *other);
+cul_errno cul_ivector_copy_view_offset (CulIVector *this, const CulIVectorView *other, size_t offset);
 cul_errno cul_ivectorview_copy         (CulIVectorView *this, const CulIVectorView *other);
 cul_errno cul_ivectorview_copy_vector  (CulIVectorView *this, const CulIVector *other);
 

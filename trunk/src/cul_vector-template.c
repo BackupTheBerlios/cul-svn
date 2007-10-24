@@ -149,6 +149,16 @@ cul_errno FUNCTION(vector_copy_view)(TYPE(Vector) *this, const VIEW(Vector) *oth
 	return CUL_SUCCESS;
 }
 
+cul_errno FUNCTION(vector_copy_view_offset)(TYPE(Vector) *this, const VIEW(Vector) *other, size_t offset) {
+	if( this->size - offset < other->size )
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+	if( other->stride == 1 )
+		FUNCTION(copy)(this->data + offset, other->data, other->size);
+	else
+		FUNCTION(copy_stride)(this->data + offset, other->data, other->size, 1, other->stride);
+	return CUL_SUCCESS;
+}
+
 cul_errno FUNCTION(vectorview_copy)(VIEW(Vector) *this, const VIEW(Vector) *other) {
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);

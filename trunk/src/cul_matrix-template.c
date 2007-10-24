@@ -168,10 +168,24 @@ cul_errno FUNCTION(matrix_copy_view)(TYPE(Matrix) *this, const VIEW(Matrix) *oth
 	return CUL_SUCCESS;
 }
 
+cul_errno FUNCTION(matrix_copy_view_offset)(TYPE(Matrix) *this, const VIEW(Matrix) *other, size_t offset_x, size_t offset_y) {
+	if( this->size_x - offset_x < other->size_x || this->size_y - offset_y < other->size_y )
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+	FUNCTION(copy_tda)(this->data + offset_x + this->size_x * offset_y, other->data, other->tda * other->size_y, other->size_x, this->size_x, other->tda);
+	return CUL_SUCCESS;
+}
+
 cul_errno FUNCTION(matrixview_copy)(VIEW(Matrix) *this, const VIEW(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y == other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(copy_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->tda, other->tda);
+	return CUL_SUCCESS;
+}
+
+cul_errno FUNCTION(matrixview_copy_matrix)(VIEW(Matrix) *this, const TYPE(Matrix) *other) {
+	if( this->size_x != other->size_x || this->size_y == other->size_y )
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+	FUNCTION(copy_tda)(this->data, other->data, other->size_x * other->size_y, other->size_x, this->tda, other->size_x);
 	return CUL_SUCCESS;
 }
 
