@@ -5,14 +5,14 @@ TYPE(Matrix) *FUNCTION(matrix_new)(size_t x, size_t y) {
 	if( (this = FUNCTION(matrix_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
-	const size_t size = x*y;
-	if( size == 0 )
-		FUNCTION(matrix_init_struct)(this, NULL, 0, 0);
+	if( x == 0 || y == 0 )
+		FUNCTION(matrix_init_struct)(this, NULL, x, y);
 	else {
-		if( (data = malloc(size * sizeof(ATOM))) == NULL  )
+		if( (data = malloc((x*y) * sizeof(ATOM))) == NULL  )
 			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 		FUNCTION(matrix_init_struct)(this, data, x, y);
 	}
+
 	return this;
 }
 
