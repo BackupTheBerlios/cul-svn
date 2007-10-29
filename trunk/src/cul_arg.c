@@ -113,6 +113,9 @@ void cul_arg_free(CulArg *this, cul_bool free_values) {
 				case CUL_ARG_STR:
 					if( free_values ) free(*(char **)this->value);
 					break;
+				case CUL_ARG_STRV:
+					if( free_values ) cul_strv_free(*(char ***)this->value);
+					break;
 				default:
 					break;
 				}
