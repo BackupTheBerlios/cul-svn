@@ -2,8 +2,8 @@
 
 FILE *cul_stream_default = NULL;
 
-static void init_cul_stream_init(void) __attribute__ ((constructor));
-static void init_cul_stream_init(void) {
+static void cul_stream_init(void) __attribute__ ((constructor));
+static void cul_stream_init(void) {
 	cul_stream_default = cul_stream_get_default();
 }
 
