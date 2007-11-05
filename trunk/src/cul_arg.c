@@ -6,6 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* global variables to control CulArg memory management */
+cul_bool cul_arg_auto = CUL_FALSE;
+CulArg *cul_arg_auto_table = NULL;
+
+static void cul_arg_finalize(void) __attribute__ ((destructor));
+static void cul_arg_finalize(void) {
+	if( cul_arg_auto_get() ) cul_arg_free(cul_arg_auto_table);
+}
+
 /* private functions */
 static CulArg         *_cul_arg_need           (const CulArg *this);
 static inline void     _cul_arg_cmd_next       (int *argc, char ***argv);
@@ -17,6 +26,9 @@ static inline cul_bool _cul_arg_flag_is_found  (CulArgFlag flag);
 
 /* Parse program arguments using argument tables */
 cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
+	/* set auto erase property */
+	cul_arg_auto_table = *table;
+
 	size_t position = 0;
 
 	/* omit first parameter */
@@ -102,7 +114,10 @@ void cul_arg_print(CulArg *this) {
 	}
 }
 
-void cul_arg_free(CulArg *this, cul_bool free_values) {
+void cul_arg_free(CulArg *this) {
+	/* cache table */
+	CulArg *table = this;
+
 	while( this != NULL ) {
 		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
 		case CUL_ARG_END:  this = this->value; break;
@@ -111,10 +126,12 @@ void cul_arg_free(CulArg *this, cul_bool free_values) {
 			if( this->flags & CUL_ARG_FOUND ) {
 				switch( this->flags & CUL_ARG_TYPE_MASK ) {
 				case CUL_ARG_STR:
-					if( free_values ) free(*(char **)this->value);
+					free(*(char **)this->value);
+					this->value = NULL;
 					break;
 				case CUL_ARG_STRV:
-					if( free_values ) cul_strv_free(*(char ***)this->value);
+					cul_strv_free(*(char ***)this->value);
+					this->value = NULL;
 					break;
 				default:
 					break;
@@ -124,6 +141,23 @@ void cul_arg_free(CulArg *this, cul_bool free_values) {
 			break;
 		}
 	}
+
+	/* free data associated with argument table */
+	cul_arg_free_table(table);
+}
+
+void cul_arg_free_table(CulArg *this) {
+	CUL_UNUSED(this);
+}
+
+cul_bool cul_arg_auto_get() {
+	return cul_arg_auto;
+}
+
+cul_bool cul_arg_auto_set(cul_bool value) {
+	cul_bool old_value = cul_arg_auto;
+	cul_arg_auto = value;
+	return old_value;
 }
 
 void cul_arg_connect(CulArg *this, CulArg *other) {

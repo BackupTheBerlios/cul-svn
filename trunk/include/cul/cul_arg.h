@@ -41,9 +41,17 @@ enum _CulArgFlag {
 	CUL_ARG_MASK       = 0xfffffff     /* maximal possible flag value */
 };
 
-/* utility macros */
+/* argument utility macros */
 #define CUL_ARG_HELP(message) {CUL_ARG_PRINT, 0, NULL, message, NULL}
 #define CUL_ARG_NULL          {CUL_ARG_END,   0, NULL, NULL,    NULL}
+/* type helpers macros */
+#define CUL_ARG_TRUE_NEED     (CUL_ARG_TRUE   | CUL_ARG_NEED)
+#define CUL_ARG_FALSE_NEED    (CUL_ARG_FALSE  | CUL_ARG_NEED)
+#define CUL_ARG_COUNT_NEED    (CUL_ARG_COUNT  | CUL_ARG_NEED)
+#define CUL_ARG_INT_NEED      (CUL_ARG_INT    | CUL_ARG_NEED)
+#define CUL_ARG_DOUBLE_NEED   (CUL_ARG_DOUBLE | CUL_ARG_NEED)
+#define CUL_ARG_STR_NEED      (CUL_ARG_STR    | CUL_ARG_NEED)
+#define CUL_ARG_STRV_NEED     (CUL_ARG_STRV   | CUL_ARG_NEED)
 
 /** Command line argument entry
  * Structure describes single accepted command line argument or additional 
@@ -57,15 +65,21 @@ struct _CulArg {
 	cul_ptr value;             /* callback for value, if option is not found it is left unchanged */
 };
 
-cul_errno cul_arg_parse         (int *argc, char ***argv, CulArg **table);      /* parse command line arguments according to CulArg table */
-void      cul_arg_print         (CulArg *this);                                 /* print CulArg table help information */
-void      cul_arg_free          (CulArg *this, cul_bool free_values);           /* free data associated with CulArg table, including values */
+cul_errno cul_arg_parse         (int *argc, char ***argv, CulArg **table); /* parse command line arguments according to CulArg table */
+void      cul_arg_print         (CulArg *this);                            /* print CulArg table help information */
+void      cul_arg_free          (CulArg *this);                            /* free data associated with CulArg table, including values */
+void      cul_arg_free_table    (CulArg *this);                            /* free data associated with CulArg table, excluding values */
+
+/* automatically manage CulArg table memory management */
+cul_bool  cul_arg_auto_get      ();                                        /* check if CulArg table would be automatically freed */
+cul_bool  cul_arg_auto_set      (cul_bool value);                          /* set CulArg table memory automatic management */
 
 /* utility functions */
-void      cul_arg_connect       (CulArg *this, CulArg *other);                  /* connect together two CulArg tables */
-CulArg   *cul_arg_find_short    (const CulArg *this, char arg);                 /* find short argument entry in CulArg table */
-CulArg   *cul_arg_find_long     (const CulArg *this, const char *arg);          /* find long argument entry in CulArg table */
-cul_bool  cul_arg_after         (const CulArg *this, const CulArg *other);      /* check relative position of two different entries on command line */
-cul_bool  cul_arg_before        (const CulArg *this, const CulArg *other);      /* check relative position of two different entries on command line */
+void      cul_arg_connect       (CulArg *this, CulArg *other);             /* connect together two CulArg tables */
+CulArg   *cul_arg_find_short    (const CulArg *this, char arg);            /* find short argument entry in CulArg table */
+CulArg   *cul_arg_find_long     (const CulArg *this, const char *arg);     /* find long argument entry in CulArg table */
+cul_bool  cul_arg_after         (const CulArg *this, const CulArg *other); /* check relative position of two different entries on command line */
+cul_bool  cul_arg_before        (const CulArg *this, const CulArg *other); /* check relative position of two different entries on command line */
 
 #endif /* __CUL_ARG_H__ */
+
