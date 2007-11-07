@@ -6,14 +6,14 @@
 typedef struct _CulArg     CulArg;
 typedef enum   _CulArgFlag CulArgFlag;
 
-/**
- * Argument flag describe how to interpret specific argument, if it take 
+/** Command line argument flag.
+ * Argument flag describe how to interpret specific argument, if it take
  * additional option or is only switch. Argument could be marked as required.
- * It is also possible to use specific argument entry only as additional 
+ * It is also possible to use specific argument entry only as additional
  * description.
- * 
- * NOTE: After argument parsing flag holds additional information, like if 
- * argument was found on command line or its position.  
+ *
+ * NOTE: After argument parsing flag holds additional information, like if
+ * argument was found on command line or its position.
  */
 enum _CulArgFlag {
 	/* type */
