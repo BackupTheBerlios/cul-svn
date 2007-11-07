@@ -60,6 +60,7 @@ CulRng *cul_rng_new(CulRngType type) {
 		case CUL_RNG_RAND:       rng = cul_rng_rand_new(); break;
 		case CUL_RNG_MT19937:    rng = cul_rng_mt19937_new(); break;
 		case CUL_RNG_MT19937_64: rng = cul_rng_mt19937_64_new(); break;
+		default:                 rng = NULL; break;
 	}
 	if( rng == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
@@ -79,6 +80,10 @@ static inline size_t _cul_rng_size(const CulRng *rng);
 
 void cul_rng_seed(CulRng *rng, CulRngSeed seed) {
 	rng->seed(rng->state, seed);
+}
+
+CulRngType cul_rng_type(const CulRng *rng) {
+	return rng->type;
 }
 
 size_t cul_rng_max(const CulRng *rng) {
