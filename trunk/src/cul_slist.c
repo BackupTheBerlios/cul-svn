@@ -126,14 +126,64 @@ CulSList *cul_slist_reverse(CulSList *this) {
 	return prev;
 }
 
-CulSList *cul_slist_sort(CulSList *this, cul_cmp_f *cmp_f) {
-	CUL_UNUSED(this);
-	CUL_UNUSED(cmp_f);
-	/* TODO cul_slist_sort stub */
-	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
+CulSList *_cul_slist_sort(CulSList *this, cul_cmp_f *cmp, size_t size);
+CulSList *_cul_slist_merge(CulSList *l1, CulSList *l2, cul_cmp_f *cmp_f);
+
+CulSList *_cul_slist_merge(CulSList *l1, CulSList *l2, cul_cmp_f *cmp_f) {
+	CulSList *l_prev, *this, *result;
+
+	/* initialize result (head of return list) */
+	if( cmp_f(l1->data, l2->data) <= 0 ) {
+		result = l1;
+		l1 = cul_slist_next(l1);
+	} else {
+		result = l2;
+		l2 = cul_slist_next(l2);
+	}
+
+	/* initialize processing */
+	this = result;
+
+	/* process rest */
+	while( l1 != NULL && l2 != NULL ) {
+		if( cmp_f(l1->data, l2->data) <= 0 ) {
+			this->next = l1;
+			l1 = cul_slist_next(l1);
+		} else {
+			this->next = l2;
+			l2 = cul_slist_next(l2);
+		}
+		this = cul_slist_next(this);
+	}
+
+	/* merge last item */
+	this->next = l1 != NULL? l1: l2;
+
+	return result;
 }
 
-size_t cul_slist_unique_free(CulSList *this, cul_cmp_f *cmp_f, cul_free_f *free_f) {
+CulSList *_cul_slist_sort(CulSList *this, cul_cmp_f *cmp_f, size_t size) {
+	CulSList *l_half, *l_half_prev;
+
+	if( size == 1 )
+		return this;
+
+	const size_t i_half = size >> 1;
+	l_half_prev = cul_slist_nth(this, i_half - 1);
+	l_half = cul_slist_next(l_half_prev);
+	l_half_prev->next = NULL;
+
+	return _cul_slist_merge(_cul_slist_sort(this, cmp_f, i_half), _cul_slist_sort(l_half, cmp_f, size - i_half), cmp_f);
+}
+
+CulSList *cul_slist_sort(CulSList *this, cul_cmp_f *cmp_f) {
+	if( this == NULL )
+		return NULL;
+
+	return _cul_slist_sort(this, cmp_f, cul_slist_size(this));
+}
+
+size_t cul_slist_unique(CulSList *this, cul_cmp_f *cmp_f, cul_free_f *free_f) {
 	if( this == NULL )
 		return 0;
 
