@@ -166,13 +166,13 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp_f) {
 	if( cmp_f(l1->data, l2->data) <= 0 ) {
 		result = l1;
 		l1 = cul_list_next(l1);
-	}
-	else {
+	} else {
 		result = l2;
 		l2 = cul_list_next(l2);
 	}
 	result->prev = NULL;
 
+	/* initialize processing */
 	this = result;
 	l_prev = this;
 
@@ -181,8 +181,7 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp_f) {
 		if( cmp_f(l1->data, l2->data) <= 0 ) {
 			this->next = l1;
 			l1 = cul_list_next(l1);
-		}
-		else {
+		} else {
 			this->next = l2;
 			l2 = cul_list_next(l2);
 		}
@@ -191,6 +190,7 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp_f) {
 		l_prev = this;
 	}
 
+	/* merge last item */
 	this->next = l1 != NULL? l1: l2;
 	cul_list_next(this)->prev = this;
 
@@ -198,12 +198,12 @@ CulList *_cul_list_merge(CulList *l1, CulList *l2, cul_cmp_f *cmp_f) {
 }
 
 CulList *_cul_list_sort(CulList *this, cul_cmp_f *cmp_f, size_t size) {
-	const size_t i_half = size >> 1;
 	CulList *l_half;
 
 	if( size == 1 )
 		return this;
 
+	const size_t i_half = size >> 1;
 	l_half = cul_list_nth(this, i_half);
 	cul_list_prev(l_half)->next = NULL;
 
@@ -217,7 +217,7 @@ CulList *cul_list_sort(CulList *this, cul_cmp_f *cmp_f) {
 	return _cul_list_sort(this, cmp_f, cul_list_size(this));
 }
 
-size_t cul_list_unique_free(CulList *this, cul_cmp_f *cmp_f, cul_free_f *free_f) {
+size_t cul_list_unique(CulList *this, cul_cmp_f *cmp_f, cul_free_f *free_f) {
 	if( this == NULL )
 		return 0;
 

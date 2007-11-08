@@ -13,7 +13,7 @@ struct _CulList {
 	CulList *prev;    /* previous element in the list */
 };
 
-static inline CulList *cul_list_new_struct (void);
+static inline CulList *cul_list_new_struct ();
 static inline void     cul_list_free_struct(CulList *this);
 static inline CulList *cul_list_init_struct(CulList *this, CulList *next, CulList *prev, cul_ptr data);
 static inline CulList *cul_list_next       (CulList *this);
@@ -39,7 +39,7 @@ CulList *cul_list_detach     (CulList *this, cul_cpy_f *cpy_f);
 CulList *cul_list_reverse    (CulList *this);
 
 CulList *cul_list_sort       (CulList *this, cul_cmp_f *cmp_f);
-size_t   cul_list_unique_free(CulList *this, cul_cmp_f *cmp_f, cul_free_f *free_f);
+size_t   cul_list_unique     (CulList *this, cul_cmp_f *cmp_f, cul_free_f *free_f);
 CulList *cul_list_find       (CulList *this, cul_ptr data, cul_cmp_f *cmp_f);
 void     cul_list_each       (CulList *this, cul_each_f *each_f, cul_ptr user_data);
 
@@ -75,3 +75,4 @@ static inline CulList *cul_list_prev(CulList *this) {
 }
 
 #endif /* __CUL_LIST_H__ */
+
