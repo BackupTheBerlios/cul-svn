@@ -430,7 +430,7 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 			tmpv = cul_strv_new(size + 1);
 
 			if( tmp != NULL && tmpv != NULL ) {
-				/* copy all old strings to tmpv */
+				/* copy all old strings to tmpv (only pointers) */
 				char **strv = *(char ***)entry->value;
 				for(size_t i = 0; i < size; ++i)
 					tmpv[i] = strv[i];
@@ -439,9 +439,9 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 				tmpv[size] = tmp;
 				tmpv[size+1] = NULL;
 
-				/* free old value, if already found */
+				/* free old value, if already found (only strv pointer) */
 				if( _cul_arg_flag_is_found(entry->flags) )
-					cul_strv_free(*(char ***)entry->value);
+					free(*(char ***)entry->value);
 				*(char ***)entry->value = tmpv;
 
 				break;
