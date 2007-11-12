@@ -204,6 +204,54 @@ char *cul_strndup(const char *str, size_t size) {
 	return cul_strdup_size(str, len > size? size: len);
 }
 
+cul_errno cul_strtou(const char *str, size_t base, size_t *value) {
+	unsigned long tmp;
+	char *end;
+
+	/* convert and check for errors */
+	tmp = strtoul(str, &end, base);
+	if( !(*end == '\0') && tmp == (size_t)tmp ) {
+		*value = tmp;
+		return CUL_SUCCESS;
+	} else
+		*value = 0;
+
+	/* TODO Error checking and conversion errors */
+	return CUL_FAILURE;
+}
+
+cul_errno cul_strtoi(const char *str, size_t base, int *value) {
+	long tmp;
+	char *end;
+
+	/* convert and check for errors */
+	tmp = strtol(str, &end, base);
+	if( !(*end == '\0') && tmp == (int)tmp ) {
+		*value = tmp;
+		return CUL_SUCCESS;
+	} else
+		*value = 0;
+
+	/* TODO Error checking and conversion errors */
+	return CUL_FAILURE;
+}
+
+cul_errno cul_strtod(const char *str, double *value) {
+	double tmp;
+	char *end;
+
+	/* convert and check for errors */
+	tmp = strtod(str, &end);
+	if( !(*end == '\0') && tmp == (double)tmp ) {
+		*value = tmp;
+		return CUL_SUCCESS;
+	} else
+		*value = 0.0;
+
+	/* TODO Error checking and conversion errors */
+	return CUL_FAILURE;
+}
+
 char **cul_strv_new(size_t size) {
 	char **strv;
 
@@ -309,3 +357,31 @@ size_t cul_strv_find(char **strv, const char *key, cul_cmp_f *cmp_f) {
 	}
 	return find;
 }
+
+cul_errno cul_strv_tou(char **strv, size_t base, size_t *value) {
+	const size_t size = cul_strv_size(strv);
+	for(size_t i = 0; i < size; ++i) if( cul_strtou(strv[i], base, &value[i]) ) {
+		while( i < size ) value[i++] = 0;
+		return CUL_FAILURE;
+	}
+	return CUL_SUCCESS;
+}
+
+cul_errno cul_strv_toi(char **strv, size_t base, int *value) {
+	const size_t size = cul_strv_size(strv);
+	for(size_t i = 0; i < size; ++i) if( cul_strtoi(strv[i], base, &value[i]) ) {
+		while( i < size ) value[i++] = 0;
+		return CUL_FAILURE;
+	}
+	return CUL_SUCCESS;
+}
+
+cul_errno cul_strv_tod(char **strv, double *value) {
+	const size_t size = cul_strv_size(strv);
+	for(size_t i = 0; i < size; ++i) if( cul_strtod(strv[i], &value[i]) ) {
+		while( i < size ) value[i++] = 0.0;
+		return CUL_FAILURE;
+	}
+	return CUL_SUCCESS;
+}
+
