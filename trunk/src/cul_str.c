@@ -270,6 +270,34 @@ void cul_strv_free(char **strv) {
 	}
 }
 
+int cul_strv_cmp(char **strv, char **otherv) {
+	return cul_strv_cmp_size(strv, otherv, cul_strv_size(strv));
+}
+
+int cul_strv_cmp_size (char **strv, char **otherv, size_t size) {
+	int result;
+
+	for(size_t i = 0; i < size; ++i)
+		if( !(result = cul_strcmp(strv[i], otherv[i])) == 0 )
+			return result;
+
+	return result;
+}
+
+int cul_strv_icmp(char **strv, char **otherv) {
+	return cul_strv_icmp_size(strv, otherv, cul_strv_size(strv));
+}
+
+int cul_strv_icmp_size(char **strv, char **otherv, size_t size) {
+	int result;
+
+	for(size_t i = 0; i < size; ++i)
+		if( !(result = cul_stricmp(strv[i], otherv[i])) == 0 )
+			return result;
+
+	return result;
+}
+
 char **cul_strv_dup(char **strv) {
 	return cul_strv_dup_size(strv, cul_strv_size(strv));
 }
