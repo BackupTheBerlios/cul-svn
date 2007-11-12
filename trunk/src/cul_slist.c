@@ -130,7 +130,7 @@ CulSList *_cul_slist_sort(CulSList *this, cul_cmp_f *cmp, size_t size);
 CulSList *_cul_slist_merge(CulSList *l1, CulSList *l2, cul_cmp_f *cmp_f);
 
 CulSList *_cul_slist_merge(CulSList *l1, CulSList *l2, cul_cmp_f *cmp_f) {
-	CulSList *l_prev, *this, *result;
+	CulSList *this, *result;
 
 	/* initialize result (head of return list) */
 	if( cmp_f(l1->data, l2->data) <= 0 ) {
