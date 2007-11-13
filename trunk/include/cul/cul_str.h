@@ -32,6 +32,7 @@ cul_errno cul_strtod        (const char *str, double *value);
 
 char    **cul_strv_new      (size_t size);
 void      cul_strv_free     (char **strv);
+void      cul_strv_free_size(char **strv, size_t size);
 
 int       cul_strv_cmp      (char **strv, char **otherv);
 int       cul_strv_cmp_size (char **strv, char **otherv, size_t size);

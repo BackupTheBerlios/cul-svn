@@ -1,9 +1,12 @@
 #include <cul/cul_str.h>
 #include <cul/cul_str_type.h>
 
+#include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <math.h>
 
 /* private functions */
 /* used in other cul modules */
@@ -208,48 +211,113 @@ cul_errno cul_strtou(const char *str, size_t base, size_t *value) {
 	unsigned long tmp;
 	char *end;
 
+	/* init errno */
+	int old_errno = errno;
+	errno = 0;
+
 	/* convert and check for errors */
 	tmp = strtoul(str, &end, base);
-	if( !(*end == '\0') && tmp == (size_t)tmp ) {
-		*value = tmp;
-		return CUL_SUCCESS;
-	} else
-		*value = 0;
 
-	/* TODO Error checking and conversion errors */
-	return CUL_FAILURE;
+	switch( errno ) {
+	case EINVAL:
+		*value = 0;
+		errno = old_errno;
+		return CUL_ECONVINVAL;
+	case ERANGE:
+		*value = SIZE_MAX;
+		errno = old_errno;
+		return CUL_ECONVRANGE;
+	default:
+		/* restore old errno */
+		errno = old_errno;
+	}
+
+	if( !(*end == '\0' ) ) {
+		*value = 0;
+		return CUL_ECONVINVAL;
+	} else if( tmp != (size_t)tmp ) {
+		*value = SIZE_MAX;
+		return CUL_ECONVRANGE;
+	}
+
+	*value = tmp;
+	return CUL_SUCCESS;
 }
 
 cul_errno cul_strtoi(const char *str, size_t base, int *value) {
 	long tmp;
 	char *end;
 
+	/* init errno */
+	int old_errno = errno;
+	errno = 0;
+
 	/* convert and check for errors */
 	tmp = strtol(str, &end, base);
-	if( !(*end == '\0') && tmp == (int)tmp ) {
-		*value = tmp;
-		return CUL_SUCCESS;
-	} else
-		*value = 0;
 
-	/* TODO Error checking and conversion errors */
-	return CUL_FAILURE;
+	switch( errno ) {
+	case EINVAL:
+		*value = 0;
+		errno = old_errno;
+		return CUL_ECONVINVAL;
+	case ERANGE:
+		if( tmp > 0 ) *value = INT_MAX;
+		else          *value = INT_MIN;
+		errno = old_errno;
+		return CUL_ECONVRANGE;
+	default:
+		/* restore old errno */
+		errno = old_errno;
+	}
+
+	if( !(*end == '\0' ) ) {
+		*value = 0;
+		return CUL_ECONVINVAL;
+	} else if( tmp != (int)tmp ) {
+		if( tmp > 0 ) *value = INT_MAX;
+		else          *value = INT_MIN;
+		return CUL_ECONVRANGE;
+	}
+
+	*value = tmp;
+	return CUL_SUCCESS;
 }
 
 cul_errno cul_strtod(const char *str, double *value) {
 	double tmp;
 	char *end;
 
+	/* init errno */
+	int old_errno = errno;
+	errno = 0;
+
 	/* convert and check for errors */
 	tmp = strtod(str, &end);
-	if( !(*end == '\0') && tmp == (double)tmp ) {
-		*value = tmp;
-		return CUL_SUCCESS;
-	} else
-		*value = 0.0;
 
-	/* TODO Error checking and conversion errors */
-	return CUL_FAILURE;
+	switch( errno ) {
+	case EINVAL:
+		*value = 0.0;
+		errno = old_errno;
+		return CUL_ECONVINVAL;
+	case ERANGE:
+		*value = tmp;
+		errno = old_errno;
+		return CUL_ECONVRANGE;
+	default:
+		/* restore old errno */
+		errno = old_errno;
+	}
+
+	if( !(*end == '\0' ) ) {
+		*value = NAN;
+		return CUL_ECONVINVAL;
+	} else if( tmp != (double)tmp ) {
+		*value = NAN;
+		return CUL_ECONVRANGE;
+	}
+
+	*value = tmp;
+	return CUL_SUCCESS;
 }
 
 char **cul_strv_new(size_t size) {
@@ -270,31 +338,47 @@ void cul_strv_free(char **strv) {
 	}
 }
 
+void cul_strv_free_size(char **strv, size_t size) {
+	if( strv != NULL ) {
+		for(size_t i = 0; i < size; ++i)
+			free(strv[i]);
+		free(strv);
+	}
+}
+
 int cul_strv_cmp(char **strv, char **otherv) {
-	return cul_strv_cmp_size(strv, otherv, cul_strv_size(strv));
+	int result;
+
+	for(; *strv != NULL; ++strv, ++otherv)
+		if( (result = cul_strcmp(*strv, *otherv)) != 0 )
+			return result;
+	return result;
 }
 
 int cul_strv_cmp_size (char **strv, char **otherv, size_t size) {
 	int result;
 
 	for(size_t i = 0; i < size; ++i)
-		if( !(result = cul_strcmp(strv[i], otherv[i])) == 0 )
+		if( (result = cul_strcmp(strv[i], otherv[i])) != 0 )
 			return result;
-
 	return result;
 }
 
 int cul_strv_icmp(char **strv, char **otherv) {
-	return cul_strv_icmp_size(strv, otherv, cul_strv_size(strv));
+	int result;
+
+	for(; *strv != NULL; ++strv, ++otherv)
+		if( (result = cul_stricmp(*strv, *otherv)) != 0 )
+			return result;
+	return result;
 }
 
 int cul_strv_icmp_size(char **strv, char **otherv, size_t size) {
 	int result;
 
 	for(size_t i = 0; i < size; ++i)
-		if( !(result = cul_stricmp(strv[i], otherv[i])) == 0 )
+		if( (result = cul_stricmp(strv[i], otherv[i])) != 0 )
 			return result;
-
 	return result;
 }
 

@@ -5,10 +5,16 @@
 
 typedef enum _CulErrno CulErrno;
 
-/**
- * Error flag describing type of error.
- * In cul library possible errors are passed *only* as a return result. No
- * global errno flag is used.
+/** Error flag describing type of error.
+ * Error flag describes error situation in cul library. Possible errors are
+ * passed _only_ as a return result. No global flag like errno is used. All
+ * non base functions additionally would call cul_log function to log error
+ * situation. By default it would cause application abort, but this behaviour
+ * could be customized.
+ *
+ * NOTE: Exception to errno non-usage are functions, wrappers that make use
+ * of standard library calls (i.e. cul_strtol). In these cases errno value is
+ * used, but its previous value is restored.
  */
 enum _CulErrno {
 	CUL_FAILURE  = -1,
@@ -26,12 +32,14 @@ enum _CulErrno {
 	CUL_EARGUNK,
 	CUL_EARGCONV,
 	CUL_EFACCESS,
-	CUL_EFIO
+	CUL_EFIO,
+	CUL_ECONVINVAL,
+	CUL_ECONVRANGE
 };
 
 const char *cul_error_string         (CulErrno error);
 
 cul_bool    cul_error_fatal_get      ();
-cul_bool    cul_error_fatal_set      (cul_bool value);
+cul_bool    cul_error_fatal_set      (cul_bool is_fatal);
 
 #endif /* __CUL_ERROR_H__ */
