@@ -34,7 +34,8 @@ enum _CulErrno {
 	CUL_EFACCESS,
 	CUL_EFIO,
 	CUL_ECONVINVAL,
-	CUL_ECONVRANGE
+	CUL_ECONVRANGE,
+	CUL_ECONVPART
 };
 
 const char *cul_error_string         (CulErrno error);

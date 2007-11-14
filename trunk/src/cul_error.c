@@ -21,6 +21,7 @@ const char *cul_error_string(CulErrno eid) {
 	case CUL_EFIO:       return "input/output error";
 	case CUL_ECONVINVAL: return "invalid converion";
 	case CUL_ECONVRANGE: return "conversion range error";
+	case CUL_ECONVPART:  return "partial conversion error";
 	}
 	return "unknown error code";
 }

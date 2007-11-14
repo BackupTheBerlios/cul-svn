@@ -372,8 +372,6 @@ static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table,
 }
 
 static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
-	char* end;
-
 	switch( entry->flags & CUL_ARG_TYPE_MASK ) {
 	case CUL_ARG_TRUE:
 		*((cul_bool *)entry->value) = CUL_TRUE;
@@ -385,22 +383,12 @@ static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {
 		*((int *)entry->value) += 1;
 		break;
 	case CUL_ARG_INT:
-		if( *arg ) {
-			long tmp = strtol(arg, &end, 10);
-			if( !*end && tmp == (int)tmp ) {
-				*((int *)entry->value) = (int)tmp;
-				break;
-			}
-		}
+		if( *arg ) if( !cul_strtoi(arg, 0, entry->value) )
+			break;
 		return CUL_FALSE;
 	case CUL_ARG_DOUBLE:
-		if( *arg ) {
-			double tmp = strtod(arg, &end);
-			if( !*end ) {
-				*((double *)entry->value) = tmp;
-				break;
-			}
-		}
+		if( *arg ) if( !cul_strtod(arg, entry->value) )
+			break;
 		return CUL_FALSE;
 	case CUL_ARG_STR:
 		if( *arg ) {

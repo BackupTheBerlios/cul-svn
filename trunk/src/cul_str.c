@@ -220,22 +220,22 @@ cul_errno cul_strtou(const char *str, size_t base, size_t *value) {
 
 	switch( errno ) {
 	case EINVAL:
-		*value = 0;
 		errno = old_errno;
+		*value = 0;
 		return CUL_ECONVINVAL;
 	case ERANGE:
-		*value = SIZE_MAX;
 		errno = old_errno;
+		*value = SIZE_MAX;
 		return CUL_ECONVRANGE;
 	default:
-		/* restore old errno */
 		errno = old_errno;
+		break;
 	}
 
 	if( !(*end == '\0' ) ) {
-		*value = 0;
-		return CUL_ECONVINVAL;
-	} else if( tmp != (size_t)tmp ) {
+		*value = tmp;
+		return CUL_ECONVPART;
+	} else if( tmp != (unsigned long)(size_t)tmp ) {
 		*value = SIZE_MAX;
 		return CUL_ECONVRANGE;
 	}
@@ -257,23 +257,23 @@ cul_errno cul_strtoi(const char *str, size_t base, int *value) {
 
 	switch( errno ) {
 	case EINVAL:
-		*value = 0;
 		errno = old_errno;
+		*value = 0;
 		return CUL_ECONVINVAL;
-	case ERANGE:
+	case ERANGE: 
+		errno = old_errno;
 		if( tmp > 0 ) *value = INT_MAX;
 		else          *value = INT_MIN;
-		errno = old_errno;
 		return CUL_ECONVRANGE;
 	default:
-		/* restore old errno */
 		errno = old_errno;
+		break;
 	}
 
 	if( !(*end == '\0' ) ) {
-		*value = 0;
-		return CUL_ECONVINVAL;
-	} else if( tmp != (int)tmp ) {
+		*value = tmp;
+		return CUL_ECONVPART;
+	} else if( tmp != (long)(int)tmp ) {
 		if( tmp > 0 ) *value = INT_MAX;
 		else          *value = INT_MIN;
 		return CUL_ECONVRANGE;
@@ -296,21 +296,21 @@ cul_errno cul_strtod(const char *str, double *value) {
 
 	switch( errno ) {
 	case EINVAL:
-		*value = 0.0;
 		errno = old_errno;
+		*value = NAN;
 		return CUL_ECONVINVAL;
 	case ERANGE:
-		*value = tmp;
 		errno = old_errno;
+		*value = tmp;
 		return CUL_ECONVRANGE;
 	default:
-		/* restore old errno */
 		errno = old_errno;
+		break;
 	}
 
 	if( !(*end == '\0' ) ) {
-		*value = NAN;
-		return CUL_ECONVINVAL;
+		*value = tmp;
+		return CUL_ECONVPART;
 	} else if( tmp != (double)tmp ) {
 		*value = NAN;
 		return CUL_ECONVRANGE;
