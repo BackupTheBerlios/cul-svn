@@ -14,12 +14,13 @@ const char *cul_error_string(CulErrno eid) {
 	case CUL_EBADPOS:    return "position out of range";
 	case CUL_EPRINTF:    return "write data error";
 	case CUL_ESCANF:     return "read data error";
-	case CUL_EARGNEED:   return "missing needed argument";
 	case CUL_EARGUNK:    return "unknown argument";
 	case CUL_EARGCONV:   return "argument conversion failed";
+	case CUL_EARGNEED:   return "missing needed argument";
+	case CUL_EARGEX:     return "ambiguous exclusive argument";
 	case CUL_EFACCESS:   return "file access error";
 	case CUL_EFIO:       return "input/output error";
-	case CUL_ECONVINVAL: return "invalid converion";
+	case CUL_ECONVINVAL: return "invalid conversion";
 	case CUL_ECONVRANGE: return "conversion range error";
 	case CUL_ECONVPART:  return "partial conversion error";
 	}

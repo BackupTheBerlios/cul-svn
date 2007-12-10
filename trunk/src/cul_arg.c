@@ -16,19 +16,21 @@ static void cul_arg_finalize(void) {
 }
 
 /* private functions */
-static CulArg         *_cul_arg_need           (const CulArg *this);
 static inline void     _cul_arg_cmd_next       (int *argc, char ***argv);
 static cul_errno       _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table, size_t n);
 static cul_errno       _cul_arg_cmd_parse_long (int *argc, char ***argv, CulArg *table, size_t n);
 static cul_bool        _cul_arg_cmd_convert    (const char *arg, CulArg *entry, size_t n);
 static inline cul_bool _cul_arg_flag_is_switch (CulArgFlag flag);
 static inline cul_bool _cul_arg_flag_is_found  (CulArgFlag flag);
+static inline CulArg  *_cul_arg_process_ex     (CulArg *table);
+static inline CulArg  *_cul_arg_process_need   (CulArg *table);
 
 /* Parse program arguments using argument tables */
 cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 	/* set auto erase property */
 	cul_arg_auto_table = *table;
 
+	CulArg *entry = NULL;
 	size_t position = 0;
 
 	/* omit first parameter */
@@ -78,11 +80,18 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 			return CUL_EARGUNK;
 	}
 
-	CulArg *t;
-	if( (t = _cul_arg_need(*table)) != NULL ) {
-		*table = t;
+	/* check and process EX arguments */
+	if( (entry = _cul_arg_process_ex(*table)) == NULL ) {
+		*table = entry;
+		return CUL_EARGEX;
+	}
+
+	/* check NEED arguments */
+	if( (entry = _cul_arg_process_need(*table)) == NULL ) {
+		*table = entry;
 		return CUL_EARGNEED;
 	}
+
 	return CUL_SUCCESS;
 }
 
@@ -213,29 +222,14 @@ CulArg *cul_arg_find_long(const CulArg *this, const char *arg) {
 }
 
 cul_bool cul_arg_after(const CulArg *this, const CulArg *other) {
-	const size_t this_position = (this->flags & CUL_ARG_POS_MASK) >> 12;
-	const size_t other_position = (other->flags & CUL_ARG_POS_MASK) >> 12;
+	const size_t this_position = CUL_ARG_FLAG_POS(this->flags);
+	const size_t other_position = CUL_ARG_FLAG_POS(other->flags);
 
 	return this_position > other_position;
 }
 
 cul_bool cul_arg_before(const CulArg *this, const CulArg *other) {
 	return cul_arg_after(other, this);
-}
-
-CulArg *_cul_arg_need(const CulArg *this) {
-	while( this != NULL ) {
-		switch( this->flags & CUL_ARG_NTYPE_MASK ) {
-		case CUL_ARG_END: this = this->value; break;
-		case CUL_ARG_PRINT: this += 1; break;
-		default:
-			if( this->flags & CUL_ARG_NEED && !(this->flags & CUL_ARG_FOUND) )
-				return (CulArg *)this;
-			this += 1;
-			break;
-		}
-	}
-	return NULL;
 }
 
 static inline void _cul_arg_cmd_next(int *argc, char ***argv) {
@@ -465,5 +459,71 @@ static inline cul_bool _cul_arg_flag_is_switch(CulArgFlag flag) {
 
 static inline cul_bool _cul_arg_flag_is_found(CulArgFlag flag) {
 	return flag & CUL_ARG_FOUND;
+}
+
+static inline CulArg *_cul_arg_process_ex(CulArg *table) {
+	const size_t size = (CUL_ARG_EX_MASK >> CUL_ARG_EX_SHIFT) + 1;
+	cul_bool is_ex_found[size], is_ex_present[size];
+
+	for(size_t i = 0; i < size; ++i) {
+		is_ex_found[i] = CUL_FALSE;
+		is_ex_present[i] = CUL_FALSE;
+	}
+
+	/* initialize EX flags */
+	for(CulArg *t = table; t != NULL; ) {
+		switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END:   t = t->value; break;
+		case CUL_ARG_PRINT: t += 1; break;
+		default:
+			if( (t->flags & CUL_ARG_EX) ) {
+				size_t index = CUL_ARG_FLAG_EX(t->flags);
+
+				/* check if EX was already found */
+				if( is_ex_present[index] )
+					return t;
+
+				/* modify EX state */
+				is_ex_present[index] = CUL_TRUE;
+				if( t->flags & CUL_ARG_FOUND )
+					is_ex_found[index] = CUL_TRUE;
+			}
+
+			t += 1;
+			break;
+		}
+	}
+
+	/* extend FOUND flag for each EX item */
+	for(CulArg *t = table; t != NULL; ) {
+		switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END:   t = t->value; break;
+		case CUL_ARG_PRINT: t += 1; break;
+		default:
+			if( (t->flags & CUL_ARG_EX) && is_ex_found[ CUL_ARG_FLAG_EX(t->flags) ] )
+				t->flags |= CUL_ARG_FOUND;
+			t += 1;
+			break;
+		}
+	}
+
+	return NULL;
+}
+
+static inline CulArg *_cul_arg_process_need(CulArg *table) {
+	/* check for NEED arguments */
+	for(CulArg *t = table; t != NULL; ) {
+		switch( t->flags & CUL_ARG_NTYPE_MASK ) {
+		case CUL_ARG_END:   t = t->value; break;
+		case CUL_ARG_PRINT: t += 1; break;
+		default:
+			if( (t->flags & CUL_ARG_NEED) && !(t->flags & CUL_ARG_FOUND) )
+				return t;
+
+			t += 1;
+			break;
+		}
+	}
+	return NULL;
 }
 
