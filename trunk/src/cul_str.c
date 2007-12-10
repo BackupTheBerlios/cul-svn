@@ -34,10 +34,11 @@ size_t _cul_strtrim_left_size(char *str, size_t size) {
 char *cul_str_new(size_t size) {
 	char *str;
 
+	/* allocate and initialize to empty string */
 	if( (str = malloc((size + 1)*sizeof(char))) == NULL )
 		return NULL;
-
 	str[0] = '\0';
+
 	return str;
 }
 
@@ -81,52 +82,171 @@ char *cul_str_trim_left(char *str) {
 	return str;
 }
 
-char **cul_str_split(const char *s, const char *delimiter) {
+char **cul_str_split(const char *str, const char *delimiter) {
 	const size_t delimiter_size = strlen(delimiter);
-	const char *string = s;
+	const char *string = str;
+	char **strv;
 
 	size_t size = 1;
-	while( (string = strstr(string, delimiter)) != NULL ) {
-		string += delimiter_size;
+	/* compute number of strings */
+	for(; (string = strstr(string, delimiter)) != NULL; string += delimiter_size)
 		++size;
-	}
 
-	char **strv;
-	if( (strv = malloc( (size+1)*sizeof(char **) )) == NULL )
+	if( (strv = malloc((size+1)*sizeof(char **))) == NULL )
 		return NULL;
 
 	/* set last position */
 	strv[size] = NULL;
 
 	size_t i = 0;
-	for(; (string = strstr(s, delimiter)) != NULL; ++i) {
+	for(; (string = strstr(str, delimiter)) != NULL; ++i) {
 		/* size of item */
-		size = string - s;
-		if( (strv[i] = malloc( (size+1)*sizeof(char) )) == NULL ) {
+		size = string - str;
+		
+		/* copy string */
+		if( (strv[i] = cul_strdup_size(str, size)) == NULL ) {
 			cul_strv_free(strv);
 			return NULL;
 		}
 
-		/* copy item */
-		memcpy(strv[i], s, size);
-		strv[i][size] = '\0';
-
 		/* update current position */
-		s = string + delimiter_size;
+		str = string + delimiter_size;
 	}
 
-	/* size of last item */
-	size = strlen(s);
-	if( (strv[i] = malloc( (size+1)*sizeof(char) )) == NULL ) {
+	/* copy last item */
+	if( (strv[i] = cul_strdup(str)) == NULL ) {
 		cul_strv_free(strv);
 		return NULL;
 	}
 
+	return strv;
+}
+
+char **cul_str_splits(const char *str, const char *delimiters) {
+	const char *string = str;
+	char **strv;
+
+	size_t size = 1;
+	/* compute number of strings */
+	for(; (string = strpbrk(string, delimiters)) != NULL; string += 1)
+		++size;
+
+	if( (strv = malloc((size+1)*sizeof(char **))) == NULL )
+		return NULL;
+
+	/* set last position */
+	strv[size] = NULL;
+
+	size_t i = 0;
+	for(; (string = strpbrk(str, delimiters)) != NULL; ++i) {
+		/* size of item */
+		size = string - str;
+		
+		/* copy string */
+		if( (strv[i] = cul_strdup_size(str, size)) == NULL ) {
+			cul_strv_free(strv);
+			return NULL;
+		}
+
+		/* update current position */
+		str = string + 1;
+	}
+
 	/* copy last item */
-	memcpy(strv[i], s, size);
-	strv[i][size] = '\0';
+	if( (strv[i] = cul_strdup(str)) == NULL ) {
+		cul_strv_free(strv);
+		return NULL;
+	}
 
 	return strv;
+}
+
+char *cul_str_join(const char *separator, const char *str, ...) {
+	va_list args;
+	const size_t separator_size = strlen(separator);
+	const char *string;
+	size_t size = 0;
+	char *join;
+
+	/* check initial conditions */
+	if( separator == NULL )
+		separator = "";
+	if( str == NULL )
+		return NULL;
+
+	/* initialize size with first string */
+	size = strlen(str);
+
+	/* compute total size of string */
+	va_start(args, str);
+	while( (string = va_arg(args, const char *)) != NULL )
+		size += separator_size + strlen(string);
+	/* remove last separator */
+	va_end(args);
+
+	/* allocate space */
+	if( (join = malloc((size + 1)*sizeof(char))) == NULL )
+		return NULL;
+
+	/* initialize join with first string */
+	for(string = str; *string != '\0'; ++join, ++string)
+		*join = *string;
+
+	/* copy strings and separators */
+	va_start(args, str);
+	while( (string = va_arg(args, const char *)) != NULL ) {
+		for(const char *sep = separator; *sep != '\0'; ++join, ++sep)
+			*join = *sep;
+		for(; *string != '\0'; ++join, ++string)
+			*join = *string;
+	}
+	va_end(args);
+
+	/* end the string */
+	*join = '\0';
+
+	/* return string */
+	return join - size;
+}
+
+char *cul_str_cat(const char *str, ...) {
+	va_list args;
+	const char *string;
+	size_t size;
+	char *cat;
+
+	if( str == NULL )
+	 return NULL;
+
+	/* initialize size with first string */
+	size = strlen(str);
+
+	/* compute total size of string */
+	va_start(args, str);
+	while( (string = va_arg(args, const char *)) != NULL )
+		size += strlen(string);
+	va_end(args);
+
+	/* allocate cat storage */
+	if( (cat = malloc((size + 1)*sizeof(char *))) == NULL )
+		return NULL;
+
+	/* initialize cat with first string */
+	for(string = str; *string != '\0'; ++cat, ++string)
+		*cat = *string;
+
+	/* copy strings */
+	va_start(args, str);
+	while( (string = va_arg(args, const char *)) != NULL )
+		for(; *string != '\0'; ++cat, ++string)
+			*cat = *string;
+	va_end(args);
+
+	/* end the string */
+	*cat = '\0';
+
+	/* return string */
+	return cat - size;
 }
 
 int cul_strcmp(const char *str, const char *other) {
@@ -413,13 +533,13 @@ size_t cul_strv_size(char **strv) {
 	return size;
 }
 
-void cul_strv_push(char **strv, char *str) {
+void cul_strv_push_back(char **strv, char *str) {
 	const size_t size = cul_strv_size(strv);
 	strv[size] = str;
 	strv[size + 1] = NULL;
 }
 
-void cul_strv_pop(char **strv) {
+void cul_strv_pop_back(char **strv) {
 	const size_t size = cul_strv_size(strv);
 	free(strv[size - 1]);
 	strv[size - 1] = NULL;
@@ -440,9 +560,11 @@ char *cul_strv_join(char *separator, char **strv) {
 		size += strlen(strv[i]);
 	size += separator_size * (i - 2);
 
-	/* allocate string and provide temporary strings for copying */
-	char *string = cul_str_new(size);
-	char *str = string, *other;
+	char *string, *str, *other;
+	/* allocate string and initialize temporary strings for copying */
+	if( (string = malloc((size + 1)*sizeof(char))) == NULL )
+		return NULL;
+	str = string;
 
 	/* set size to strv size */
 	size = i - 1;
@@ -468,6 +590,85 @@ size_t cul_strv_find(char **strv, const char *key, cul_cmp_f *cmp_f) {
 		++find;
 	}
 	return find;
+}
+
+char **cul_strv_head(char **strv, size_t size) {
+	const size_t strv_size = cul_strv_size(strv);
+	char **head;
+
+	/* allocate head storage */
+	if( (head = malloc((size + 1)*sizeof(char *))) == NULL )
+		return NULL;
+
+	/* compute size to copy */
+	size = size > strv_size? strv_size: size;
+	/* shallow copy of strv head */
+	for(size_t i = 0; i < size; ++i)
+		head[i] = strv[i];
+	head[size] = NULL;
+
+	return head;
+}
+
+char **cul_strv_tail(char **strv, size_t size) {
+	const size_t strv_size = cul_strv_size(strv);
+	char **tail;
+
+	/* allocate tail storage */
+	if( (tail = malloc((size + 1)*sizeof(char *))) == NULL )
+		return NULL;
+
+	/* compute size to copy, size if offset */
+	size = size > strv_size? 0: strv_size - size;
+	/* shallow copy of strv tail */
+	for(size_t i = size; i < strv_size; ++i)
+		tail[i] = strv[i];
+	tail[strv_size] = NULL;
+
+	return tail;
+}
+
+char **cul_strv_grep(char **strv, const char *str) {
+	const size_t size = cul_strv_size(strv);
+	char **grep, **grepv;
+
+	/* allocate grep storage */
+	if( (grep = malloc((size + 1)*sizeof(char *))) == NULL )
+		return NULL;
+
+	/* make shallow grep copy */
+	for(grepv = grep; *strv != NULL; ++strv)
+		if( strstr(*strv, str) != NULL )
+			*(grepv++) = *strv;
+	*grepv = NULL;
+
+	return grep;
+}
+
+char **cul_strv_cat(char **strv, ...) {
+	va_list args;
+	char **stringv, **cat;
+	size_t size = 0;
+
+	/* compute total size of string */
+	va_start(args, strv);
+	while( (stringv = va_arg(args, char **)) != NULL )
+		size += cul_strv_size(stringv);
+	va_end(args);
+
+	/* allocate cat storage */
+	if( (cat = malloc((size + 1)*sizeof(char *))) == NULL )
+		return NULL;
+
+	/* shallow copy strv vectors */
+	va_start(args, strv);
+	while( (stringv = va_arg(args, char **)) != NULL )
+		for(; *stringv != NULL; ++stringv, ++cat)
+			*cat = *stringv;
+	*cat = NULL;
+	va_end(args);
+
+	return cat - size;
 }
 
 cul_errno cul_strv_tou(char **strv, size_t base, size_t *value) {

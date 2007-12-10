@@ -3,8 +3,8 @@
 
 #include <cul/cul_global.h>
 
-char     *cul_str_new       (size_t size);
-void      cul_str_free      (char *str);
+char     *cul_str_new      (size_t size);
+void      cul_str_free     (char *strv);
 
 cul_bool  cul_str_isspace   (const char *str);
 char     *cul_str_tolower   (char *str);
@@ -14,7 +14,10 @@ char     *cul_str_trim      (char *str);
 char     *cul_str_trim_right(char *str);
 char     *cul_str_trim_left (char *str);
 
-char    **cul_str_split     (const char *s, const char *delimiter);
+char    **cul_str_split     (const char *str, const char *delimiter);
+char    **cul_str_splits    (const char *str, const char *delimiters);
+char     *cul_str_cat       (const char *str, ...);
+char     *cul_str_join      (const char *separator, const char *str, ...);
 
 int       cul_strcmp        (const char *str, const char *other);
 int       cul_strcmp_size   (const char *str, const char *other, size_t size);
@@ -42,11 +45,16 @@ char    **cul_strv_dup      (char **strv);
 char    **cul_strv_dup_size (char **strv, size_t size);
 
 size_t    cul_strv_size     (char **strv);
-void      cul_strv_push     (char **strv, char *str);
-void      cul_strv_pop      (char **strv);
+void      cul_strv_push_back(char **strv, char *str);
+void      cul_strv_pop_back (char **strv);
 
 char     *cul_strv_join     (char *separator, char **strv);
 size_t    cul_strv_find     (char **strv, const char *key, cul_cmp_f *cmp_f);
+
+char    **cul_strv_head     (char **strv, size_t size);
+char    **cul_strv_tail     (char **strv, size_t size);
+char    **cul_strv_grep     (char **strv, const char *str);
+char    **cul_strv_cat      (char **strv, ...);
 
 cul_errno cul_strv_tou      (char **strv, size_t base, size_t *value);
 cul_errno cul_strv_toi      (char **strv, size_t base, int *value);
