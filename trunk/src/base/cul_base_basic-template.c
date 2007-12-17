@@ -63,10 +63,10 @@ void FUNCTION(swap_tda)(ATOM *data, ATOM *other, size_t size, size_t tda_size, s
 
 #ifndef TEMPLATE_CUL_PTR
 #else /* TEMPLATE_CUL_PTR */
-	ATOM FUNCTION(detach)(ATOM *data, size_t size, cul_cpy_f *cpy_f) {
+	ATOM FUNCTION(detach)(ATOM *data, size_t size, cul_clone_f *clone_f) {
 		ATOM *const first = data, *const last = data + size;
 		for(; data < last; ++data)
-			if( (*data = cpy_f(*data)) == NULL ) {
+			if( (*data = clone_f(*data)) == NULL ) {
 				/* erase rest of undetached pointers */
 				for(++data; data < last; ++data)
 					*data = NULL;
@@ -75,10 +75,10 @@ void FUNCTION(swap_tda)(ATOM *data, ATOM *other, size_t size, size_t tda_size, s
 		return first;
 	}
 
-	ATOM FUNCTION(detach_stride)(ATOM *data, size_t size, size_t stride, cul_cpy_f *cpy_f) {
+	ATOM FUNCTION(detach_stride)(ATOM *data, size_t size, size_t stride, cul_clone_f *clone_f) {
 		ATOM *const first = data, *const last = data + size * stride;
 		for(; data < last; data += stride)
-			if( (*data = cpy_f(*data)) == NULL ) {
+			if( (*data = clone_f(*data)) == NULL ) {
 				/* erase rest of undetached pointers */
 				for(++data; data < last; data += stride)
 					*data = NULL;
@@ -87,7 +87,7 @@ void FUNCTION(swap_tda)(ATOM *data, ATOM *other, size_t size, size_t tda_size, s
 		return first;
 	}
 
-	ATOM FUNCTION(detach_tda)(ATOM *data, size_t size, size_t tda_size, size_t tda, cul_cpy_f *cpy_f) {
+	ATOM FUNCTION(detach_tda)(ATOM *data, size_t size, size_t tda_size, size_t tda, cul_clone_f *clone_f) {
 		ATOM *const first = data, *const last = data + size, *tda_last = data + tda_size;
 
 		/* adjust tda jumps */
@@ -98,7 +98,7 @@ void FUNCTION(swap_tda)(ATOM *data, ATOM *other, size_t size, size_t tda_size, s
 		for(; data < last; tda_last += tda_size) {
 			/* move through single row */
 			for(; data < tda_last; ++data)
-				if( (*data = cpy_f(*data)) == NULL ) {
+				if( (*data = clone_f(*data)) == NULL ) {
 					/* erase rest of undetached pointers */
 
 					/* end of line */

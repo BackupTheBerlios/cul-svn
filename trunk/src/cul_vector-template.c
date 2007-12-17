@@ -392,22 +392,22 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *this, ATOM value) {
 		return CUL_SUCCESS;
 	}
 
-	cul_errno FUNCTION(vector_detach)(TYPE(Vector) *this, cul_cpy_f *cpy_f) {
-		if( FUNCTION(detach)(this->data, this->size, cpy_f) == NULL )
+	cul_errno FUNCTION(vector_detach)(TYPE(Vector) *this, cul_clone_f *clone_f) {
+		if( FUNCTION(detach)(this->data, this->size, clone_f) == NULL )
 			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 		return CUL_SUCCESS;
 	}
 
-	cul_errno FUNCTION(vector_detach_range)(TYPE(Vector) *this, size_t offset, size_t size, cul_cpy_f *cpy_f) {
+	cul_errno FUNCTION(vector_detach_range)(TYPE(Vector) *this, size_t offset, size_t size, cul_clone_f *clone_f) {
 		if( offset + size > this->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-		if( FUNCTION(detach)(this->data, this->size, cpy_f) == NULL )
+		if( FUNCTION(detach)(this->data, this->size, clone_f) == NULL )
 			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 		return CUL_SUCCESS;
 	}
 
-	cul_errno FUNCTION(vectorview_detach)(VIEW(Vector) *this, cul_cpy_f *cpy_f) {
-		if( FUNCTION(detach_stride)(this->data, this->size, this->stride, cpy_f) == NULL )
+	cul_errno FUNCTION(vectorview_detach)(VIEW(Vector) *this, cul_clone_f *clone_f) {
+		if( FUNCTION(detach_stride)(this->data, this->size, this->stride, clone_f) == NULL )
 			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 		return CUL_SUCCESS;
 	}

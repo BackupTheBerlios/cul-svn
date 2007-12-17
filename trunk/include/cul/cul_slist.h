@@ -32,7 +32,7 @@ CulSList *cul_slist_remove     (CulSList *this, cul_free_f *free_f);
 CulSList *cul_slist_remove_next(CulSList *this, cul_free_f *free_f);
 
 CulSList *cul_slist_copy       (CulSList *this);
-CulSList *cul_slist_detach     (CulSList *this, cul_cpy_f *cpy_f);
+CulSList *cul_slist_detach     (CulSList *this, cul_clone_f *clone_f);
 CulSList *cul_slist_reverse    (CulSList *this);
 
 CulSList *cul_slist_sort       (CulSList *this, cul_cmp_f *cmp_f);

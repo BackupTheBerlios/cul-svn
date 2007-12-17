@@ -582,11 +582,11 @@ char *cul_strv_join(char *separator, char **strv) {
 	return string;
 }
 
-size_t cul_strv_find(char **strv, const char *key, cul_cmp_f *cmp_f) {
+size_t cul_strv_find(char **strv, const char *key, cul_eq_f *eq_f) {
 	size_t find = 0;
 
 	for(; *strv != NULL; ++strv){
-		if( !cmp_f(*strv, key) ) break;
+		if( eq_f(*strv, key) ) break;
 		++find;
 	}
 	return find;
@@ -628,7 +628,7 @@ char **cul_strv_tail(char **strv, size_t size) {
 	return tail;
 }
 
-char **cul_strv_grep(char **strv, const char *str) {
+char **cul_strv_grep(char **strv, cul_const_ptr data, cul_eq_f *eq) {
 	const size_t size = cul_strv_size(strv);
 	char **grep, **grepv;
 
@@ -638,7 +638,7 @@ char **cul_strv_grep(char **strv, const char *str) {
 
 	/* make shallow grep copy */
 	for(grepv = grep; *strv != NULL; ++strv)
-		if( strstr(*strv, str) != NULL )
+		if( eq(*strv, data) )
 			*(grepv++) = *strv;
 	*grepv = NULL;
 

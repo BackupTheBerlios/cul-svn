@@ -35,7 +35,7 @@ CulList *cul_list_insert_prev(CulList *this, cul_ptr data);
 CulList *cul_list_remove     (CulList *this, cul_free_f *free_f);
 
 CulList *cul_list_copy       (CulList *this);
-CulList *cul_list_detach     (CulList *this, cul_cpy_f *cpy_f);
+CulList *cul_list_detach     (CulList *this, cul_clone_f *clone_f);
 CulList *cul_list_reverse    (CulList *this);
 
 CulList *cul_list_sort       (CulList *this, cul_cmp_f *cmp_f);

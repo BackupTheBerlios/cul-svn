@@ -75,9 +75,9 @@ cul_errno cul_pvector_remove          (CulPVector *this, size_t offset, cul_free
 cul_errno cul_pvector_remove_range    (CulPVector *this, size_t offset, size_t size, cul_free_f *free_f);
 cul_errno cul_pvector_pop_back        (CulPVector *this, cul_free_f *free_f);
 
-cul_errno cul_pvector_detach          (CulPVector *this, cul_cpy_f *cpy_f);
-cul_errno cul_pvector_detach_range    (CulPVector *this, size_t offset, size_t size, cul_cpy_f *cpy_f);
-cul_errno cul_pvectorview_detach      (CulPVectorView *this, cul_cpy_f *cpy_f);
+cul_errno cul_pvector_detach          (CulPVector *this, cul_clone_f *clone_f);
+cul_errno cul_pvector_detach_range    (CulPVector *this, size_t offset, size_t size, cul_clone_f *clone_f);
+cul_errno cul_pvectorview_detach      (CulPVectorView *this, cul_clone_f *clone_f);
 
 void      cul_pvector_set_all         (CulPVector *this, cul_ptr value);
 void      cul_pvector_set_basis       (CulPVector *this, size_t index, cul_ptr value, cul_ptr basis);

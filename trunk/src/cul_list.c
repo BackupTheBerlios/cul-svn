@@ -133,10 +133,10 @@ CulList *cul_list_copy(CulList *this) {
 	return first;
 }
 
-CulList *cul_list_detach(CulList *this, cul_cpy_f *cpy_f) {
+CulList *cul_list_detach(CulList *this, cul_clone_f *clone_f) {
 	CulList *first = this;
 	for( ; this != NULL; this = cul_list_next(this)) {
-		if( (this->data = cpy_f(this->data)) == NULL ) {
+		if( (this->data = clone_f(this->data)) == NULL ) {
 			/* erase rest of undetached pointers */
 			for( this = cul_list_next(this); this != NULL; this = cul_list_next(this))
 				this->data = NULL;

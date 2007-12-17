@@ -49,11 +49,11 @@ void      cul_strv_push_back(char **strv, char *str);
 void      cul_strv_pop_back (char **strv);
 
 char     *cul_strv_join     (char *separator, char **strv);
-size_t    cul_strv_find     (char **strv, const char *key, cul_cmp_f *cmp_f);
+size_t    cul_strv_find     (char **strv, const char *key, cul_eq_f *eq_f);
 
 char    **cul_strv_head     (char **strv, size_t size);
 char    **cul_strv_tail     (char **strv, size_t size);
-char    **cul_strv_grep     (char **strv, const char *str);
+char    **cul_strv_grep     (char **strv, cul_const_ptr data, cul_eq_f *eq);
 char    **cul_strv_cat      (char **strv, ...);
 
 cul_errno cul_strv_tou      (char **strv, size_t base, size_t *value);

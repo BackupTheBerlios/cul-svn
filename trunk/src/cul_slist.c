@@ -104,10 +104,10 @@ CulSList *cul_slist_copy(CulSList *this) {
 	return first;
 }
 
-CulSList *cul_slist_detach(CulSList *this, cul_cpy_f *cpy_f) {
+CulSList *cul_slist_detach(CulSList *this, cul_clone_f *clone_f) {
 	CulSList *first = this;
 	for( ; this != NULL; this = cul_slist_next(this)) {
-		if( (this->data = cpy_f(this->data)) == NULL ) {
+		if( (this->data = clone_f(this->data)) == NULL ) {
 			/* erase rest of undetached pointers */
 			for( this = cul_slist_next(this); this != NULL; this = cul_slist_next(this))
 				this->data = NULL;
