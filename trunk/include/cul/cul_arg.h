@@ -12,11 +12,11 @@ typedef enum   _CulArgFlag CulArgFlag;
 
 /** Command line argument flag.
  * Argument flag describe how to interpret specific argument, if it take
- * additional option or is only switch. Argument could be marked as required.
- * It is also possible to use specific argument entry only as additional
- * description.
+ * additional option or is only switch. Argument could be marked as required
+ * or exclusive in group. It is also possible to use specific argument entry
+ * only as additional description.
  *
- * NOTE: After argument parsing flag holds additional information, like if
+ * NOTE: After argument parsing flag holds additional information, i.e. if
  * argument was found on command line or its position.
  */
 enum _CulArgFlag {
@@ -43,8 +43,8 @@ enum _CulArgFlag {
 	CUL_ARG_NTYPE_MASK = 0xff0,                       /* mask for flags */
 	CUL_ARG_CONF_MASK  = 0xfff,                       /* mask for flags and type */
 	CUL_ARG_POS_MASK   = 0xffff << CUL_ARG_POS_SHIFT, /* mask for position */
-	CUL_ARG_EX_MASK    = 0x7    << CUL_ARG_EX_SHIFT,  /* mask for exclusive group */
-	CUL_ARG_MASK       = 0x7fffffff                   /* mask for whole flag value */
+	CUL_ARG_EX_MASK    = 0x3    << CUL_ARG_EX_SHIFT,  /* mask for exclusive group */
+	CUL_ARG_MASK       = 0x3fffffff                   /* mask for whole flag value */
 };
 
 /* argument utility macros */
