@@ -628,7 +628,7 @@ char **cul_strv_tail(char **strv, size_t size) {
 	return tail;
 }
 
-char **cul_strv_grep(char **strv, cul_const_ptr data, cul_eq_f *eq) {
+char **cul_strv_grep(char **strv, cul_const_ptr data, cul_eq_f *eq_f) {
 	const size_t size = cul_strv_size(strv);
 	char **grep, **grepv;
 
@@ -638,7 +638,7 @@ char **cul_strv_grep(char **strv, cul_const_ptr data, cul_eq_f *eq) {
 
 	/* make shallow grep copy */
 	for(grepv = grep; *strv != NULL; ++strv)
-		if( eq(*strv, data) )
+		if( eq_f(*strv, data) )
 			*(grepv++) = *strv;
 	*grepv = NULL;
 

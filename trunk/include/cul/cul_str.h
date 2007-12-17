@@ -53,7 +53,7 @@ size_t    cul_strv_find     (char **strv, const char *key, cul_eq_f *eq_f);
 
 char    **cul_strv_head     (char **strv, size_t size);
 char    **cul_strv_tail     (char **strv, size_t size);
-char    **cul_strv_grep     (char **strv, cul_const_ptr data, cul_eq_f *eq);
+char    **cul_strv_grep     (char **strv, cul_const_ptr data, cul_eq_f *eq_f);
 char    **cul_strv_cat      (char **strv, ...);
 
 cul_errno cul_strv_tou      (char **strv, size_t base, size_t *value);
