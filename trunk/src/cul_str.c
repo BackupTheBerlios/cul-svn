@@ -249,6 +249,64 @@ char *cul_str_cat(const char *str, ...) {
 	return cat - size;
 }
 
+cul_bool cul_str_eq(const char *str, const char *other) {
+	size_t i = 0;
+
+	for(; str[i] == other[i]; ++i)
+		if( str[i] == '\0' )
+			return CUL_TRUE;
+	return CUL_FALSE;
+}
+
+cul_bool cul_str_eq_sub(const char *str, const char *other) {
+	size_t i = 0, j = 0;
+
+	for(; str[i] != '\0'; ++i) {
+		if( str[i] == other[j] ) {
+			/* check for full match */
+			if( other[j] == '\0' )
+				return CUL_TRUE;
+
+			/* move to next character */
+			++j;
+			continue;
+		}
+
+		/* restart match */
+		j = 0;
+	}
+	return CUL_FALSE;
+}
+
+cul_bool cul_str_ieq(const char *str, const char *other) {
+	size_t i = 0;
+
+	for(; cul_tolower(str[i]) == cul_tolower(other[i]); ++i)
+		if( str[i] == '\0' )
+			return CUL_TRUE;
+	return CUL_FALSE;
+}
+
+cul_bool cul_str_ieq_sub(const char *str, const char *other) {
+	size_t i = 0, j = 0;
+
+	for(; str[i] != '\0'; ++i) {
+		if( cul_tolower(str[i]) == cul_tolower(other[j]) ) {
+			/* check for full match */
+			if( other[j] == '\0' )
+				return CUL_TRUE;
+
+			/* move to next character */
+			++j;
+			continue;
+		}
+
+		/* restart match */
+		j = 0;
+	}
+	return CUL_FALSE;
+}
+
 int cul_strcmp(const char *str, const char *other) {
 	size_t i = 0;
 

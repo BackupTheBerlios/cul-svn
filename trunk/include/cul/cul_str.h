@@ -19,6 +19,11 @@ char    **cul_str_splits    (const char *str, const char *delimiters);
 char     *cul_str_cat       (const char *str, ...);
 char     *cul_str_join      (const char *separator, const char *str, ...);
 
+cul_bool  cul_str_eq        (const char *str, const char *other);
+cul_bool  cul_str_eq_sub    (const char *str, const char *other);
+cul_bool  cul_str_ieq       (const char *str, const char *other);
+cul_bool  cul_str_ieq_sub   (const char *str, const char *other);
+
 int       cul_strcmp        (const char *str, const char *other);
 int       cul_strcmp_size   (const char *str, const char *other, size_t size);
 int       cul_strncmp       (const char *str, const char *other, size_t size);
