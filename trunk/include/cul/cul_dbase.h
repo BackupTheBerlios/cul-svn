@@ -74,12 +74,6 @@ void     cul_dsort_asc            (double *data, size_t size);
 void     cul_dsort_asc_stride     (double *data, size_t size, size_t stride);
 void     cul_dsort_desc           (double *data, size_t size);
 void     cul_dsort_desc_stride    (double *data, size_t size, size_t stride);
-double  *cul_dunique              (double *data, size_t size);
-double  *cul_dunique_stride       (double *data, size_t size, size_t stride);
-double  *cul_dfind                (const double *data, size_t size, double key);
-double  *cul_dfind_stride         (const double *data, size_t size, size_t stride, double key);
-double  *cul_dbfind               (const double *data, size_t size, double key);
-double  *cul_dbfind_stride        (const double *data, size_t size, size_t stride, double key);
 
 cul_bool cul_dfprintf             (FILE *stream, const double *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
 cul_bool cul_dfprintf_stride      (FILE *stream, const double *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);

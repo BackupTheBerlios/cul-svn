@@ -620,26 +620,51 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 		FUNCTION(sort_desc)(this->data, this->size);
 	}
 
-	size_t FUNCTION(vector_unique)(TYPE(Vector)  *this) {
-		return (size_t)(FUNCTION(unique)(this->data, this->size) - this->data);
+	size_t FUNCTION(vector_unique)(TYPE(Vector) *this) {
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+
+		/* check for non-empty vector */
+		if( size == 0 )
+			return 0;
+
+		/* number of unique items */
+		size_t u = 1;
+
+		for(size_t i = 1; i < size; ++i) {
+			if( data[i - 1] == data[i] )
+				continue;
+			data[u] = data[i];
+			++u;
+		}
+		return u; 
 	}
 
 	size_t FUNCTION(vector_find)(const TYPE(Vector) *this, size_t offset, ATOM key) {
-		ATOM *find;
+		const size_t size = this->size;
+		const ATOM *restrict data = this->data;
 
-		if( offset >= this->size )
-			CUL_ERROR_ERRNO_RET(this->size, CUL_EBADPOS);
-		if( (find = FUNCTION(find)(this->data + offset, this->size - offset, key)) == NULL )
-			return this->size;
-		return (size_t)(find - this->data);
+		for(size_t i = offset; i < size; ++i)
+			if( data[i] == key )
+				return i;
+		return this->size;
 	}
 
 	size_t FUNCTION(vector_bfind)(const TYPE(Vector) *this, ATOM key) {
-		ATOM *find;
+		size_t low = 0, high = this->size;
+		const ATOM *restrict data = this->data;
 
-		if( (find = FUNCTION(bfind)(this->data, this->size, key)) == NULL )
-			return this->size;
-		return (size_t)(find - this->data);
+		for(size_t mid; low < high;) {
+			mid = low + (high - low)/2;
+			if( data[mid] < key )
+				low = mid + 1;
+			else
+				high = mid;
+		}
+
+		if( low < this->size && data[low] == key )
+			return low;
+		return this->size;
 	}
 
 	void FUNCTION(vectorview_sort_asc)(VIEW(Vector) *this) {
@@ -651,43 +676,102 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 	}
 
 	size_t FUNCTION(vectorview_unique)(VIEW(Vector)  *this) {
-		return (size_t)(FUNCTION(unique_stride)(this->data, this->size, this->stride) - this->data)/this->stride;
+		const size_t stride = this->stride, size = this->size * stride;
+		ATOM *restrict data = this->data;
+
+		/* check for non-empty vector */
+		if( size == 0 )
+			return 0;
+
+		/* number of unique items */
+		size_t u = stride;
+
+		for(size_t i = stride; i < size; i += stride) {
+			if( data[i - stride] == data[i] )
+				continue;
+			data[u] = data[i];
+			u += stride;
+		}
+		return u / stride; 
 	}
 
 	size_t FUNCTION(vectorview_find)(const VIEW(Vector) *this, size_t offset, ATOM key) {
-		ATOM *find;
+		const size_t stride = this->stride, size = this->size * stride;
+		const ATOM *restrict data = this->data;
 
-		if( offset >= this->size )
-			CUL_ERROR_ERRNO_RET(this->size, CUL_EBADPOS);
-		if( (find = FUNCTION(find_stride)(this->data + offset * this->stride, this->size - offset, this->stride, key)) == NULL )
-			return this->size;
-		return (size_t)(find - this->data)/this->stride;
+		for(size_t i = offset * stride; i < size; i += stride)
+			if( data[i] == key )
+				return i / stride;
+		return this->size;
 	}
 
 	size_t FUNCTION(vectorview_bfind)(const VIEW(Vector) *this, ATOM key) {
-		ATOM *find;
+		const size_t stride = this->stride;
+		size_t low = 0, high = this->size;
+		const ATOM *restrict data = this->data;
 
-		if( (find = FUNCTION(bfind_stride)(this->data, this->size, this->stride, key)) == NULL )
-			return this->size;
-		return (size_t)(find - this->data)/this->stride;
+		for(size_t mid; low < high;) {
+			mid = low + (high - low)/2;
+			if( data[mid * stride] < key )
+				low = mid + 1;
+			else
+				high = mid;
+		}
+
+		if( low < this->size && data[low * stride] == key )
+			return low;
+		return this->size;
 	}
 #else /* TEMPLATE_CUL_PTR */
 	void FUNCTION(vector_sort)(TYPE(Vector) *this, cul_cmp_f *cmp_f) {
 		FUNCTION(sort)(this->data, this->size, cmp_f);
 	}
 
-	size_t FUNCTION(vector_unique)(TYPE(Vector)  *this, cul_cmp_f *cmp_f) {
-		return (size_t)(FUNCTION(unique)(this->data, this->size, cmp_f) - this->data);
+	size_t FUNCTION(vector_unique)(TYPE(Vector)  *this, cul_eq_f *eq_f) {
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+
+		/* check for non-empty vector */
+		if( size == 0 )
+			return 0;
+
+		/* number of unique items */
+		size_t u = 1;
+
+		for(size_t i = 1; i < size; ++i) {
+			if( eq_f(data[i - 1], data[i]) )
+				continue;
+			data[u] = data[i];
+			++u;
+		}
+		return u; 
 	}
 
-	size_t FUNCTION(vector_find)(const TYPE(Vector) *this, size_t offset, ATOM key, cul_cmp_f *cmp_f) {
-		if( offset >= this->size )
-			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-		return (size_t)(FUNCTION(find)(this->data + offset, this->size - offset, key, cmp_f) - this->data);
+	size_t FUNCTION(vector_find)(const TYPE(Vector) *this, size_t offset, ATOM key, cul_eq_f *eq_f) {
+		const size_t size = this->size;
+		const ATOM *restrict data = this->data;
+
+		for(size_t i = offset; i < size; ++i)
+			if( eq_f(data[i], &key) )
+				return i;
+		return this->size;
 	}
 
 	size_t FUNCTION(vector_bfind)(const TYPE(Vector) *this, ATOM key, cul_cmp_f *cmp_f) {
-		return (size_t)(FUNCTION(bfind)(this->data, this->size, key, cmp_f) - this->data);
+		size_t low = 0, high = this->size;
+		const ATOM *restrict data = this->data;
+
+		for(size_t mid; low < high;) {
+			mid = low + (high - low)/2;
+			if( cmp_f(data[mid], &key) < 0 )
+				low = mid + 1;
+			else
+				high = mid;
+		}
+
+		if( low < this->size && cmp_f(data[low], &key) == 0 )
+			return low;
+		return this->size;
 	}
 
 	void FUNCTION(vector_each)(TYPE(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
@@ -698,18 +782,52 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 		FUNCTION(sort_stride)(this->data, this->size, this->stride, cmp_f);
 	}
 
-	size_t FUNCTION(vectorview_unique)(VIEW(Vector)  *this, cul_cmp_f *cmp_f) {
-		return (size_t)(FUNCTION(unique_stride)(this->data, this->size, this->stride, cmp_f) - this->data)/this->stride;
+	size_t FUNCTION(vectorview_unique)(VIEW(Vector)  *this, cul_eq_f *eq_f) {
+		const size_t stride = this->stride, size = this->size * stride;
+		ATOM *restrict data = this->data;
+
+		/* check for non-empty vector */
+		if( size == 0 )
+			return 0;
+
+		/* number of unique items */
+		size_t u = stride;
+
+		for(size_t i = stride; i < size; i += stride) {
+			if( eq_f(data[i - stride], data[i]) )
+				continue;
+			data[u] = data[i];
+			u += stride;
+		}
+		return u / stride; 
 	}
 
-	size_t FUNCTION(vectorview_find)(const VIEW(Vector) *this, size_t offset, ATOM key, cul_cmp_f *cmp_f) {
-		if( offset >= this->size )
-			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-		return (size_t)(FUNCTION(find_stride)(this->data + offset * this->stride, this->size - offset, this->stride, key, cmp_f) - this->data)/this->stride;
+	size_t FUNCTION(vectorview_find)(const VIEW(Vector) *this, size_t offset, ATOM key, cul_eq_f *eq_f) {
+		const size_t size = this->size, stride = this->stride;
+		const ATOM *restrict data = this->data;
+
+		for(size_t i = offset * stride; i < size; i += stride)
+			if( eq_f(data[i], &key) )
+				return i / stride;
+		return this->size;
 	}
 
 	size_t FUNCTION(vectorview_bfind)(const VIEW(Vector) *this, ATOM key, cul_cmp_f *cmp_f) {
-		return (size_t)(FUNCTION(bfind_stride)(this->data, this->size, this->stride, key, cmp_f) - this->data)/this->stride;
+		const size_t stride = this->stride;
+		size_t low = 0, high = this->size;
+		const ATOM *restrict data = this->data;
+
+		for(size_t mid; low < high;) {
+			mid = low + (high - low)/2;
+			if( cmp_f(data[mid * stride], &key) < 0 )
+				low = mid + 1;
+			else
+				high = mid;
+		}
+
+		if( low < this->size && cmp_f(data[low * stride], &key) == 0 )
+			return low;
+		return this->size;
 	}
 
 	void FUNCTION(vectorview_each)(VIEW(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
