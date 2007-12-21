@@ -275,7 +275,7 @@ cul_errno FUNCTION(vector_reserve)(TYPE(Vector) *this, size_t size) {
 	if( size < this->size )
 		size = this->size;
 
-	if( (data = malloc(size*sizeof(ATOM)) ) == NULL )
+	if( (data = malloc(size*sizeof(ATOM))) == NULL )
 		CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 	memcpy(data, this->data, this->size*sizeof(ATOM));
 	free(this->data);
