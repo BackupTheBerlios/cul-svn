@@ -525,7 +525,7 @@ void cul_strv_free_size(char **strv, size_t size) {
 }
 
 int cul_strv_cmp(char **strv, char **otherv) {
-	int result;
+	int result = (*otherv == NULL)? 0: -1;
 
 	for(; *strv != NULL; ++strv, ++otherv)
 		if( (result = cul_strcmp(*strv, *otherv)) != 0 )
@@ -534,7 +534,7 @@ int cul_strv_cmp(char **strv, char **otherv) {
 }
 
 int cul_strv_cmp_size (char **strv, char **otherv, size_t size) {
-	int result;
+	int result = 0;
 
 	for(size_t i = 0; i < size; ++i)
 		if( (result = cul_strcmp(strv[i], otherv[i])) != 0 )
@@ -543,7 +543,7 @@ int cul_strv_cmp_size (char **strv, char **otherv, size_t size) {
 }
 
 int cul_strv_icmp(char **strv, char **otherv) {
-	int result;
+	int result = (*otherv == NULL)? 0: -1;
 
 	for(; *strv != NULL; ++strv, ++otherv)
 		if( (result = cul_stricmp(*strv, *otherv)) != 0 )
@@ -552,7 +552,7 @@ int cul_strv_icmp(char **strv, char **otherv) {
 }
 
 int cul_strv_icmp_size(char **strv, char **otherv, size_t size) {
-	int result;
+	int result = 0;
 
 	for(size_t i = 0; i < size; ++i)
 		if( (result = cul_stricmp(strv[i], otherv[i])) != 0 )
