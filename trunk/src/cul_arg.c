@@ -81,13 +81,13 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 	}
 
 	/* check and process EX arguments */
-	if( (entry = _cul_arg_process_ex(*table)) == NULL ) {
+	if( (entry = _cul_arg_process_ex(*table)) != NULL ) {
 		*table = entry;
 		return CUL_EARGEX;
 	}
 
 	/* check NEED arguments */
-	if( (entry = _cul_arg_process_need(*table)) == NULL ) {
+	if( (entry = _cul_arg_process_need(*table)) != NULL ) {
 		*table = entry;
 		return CUL_EARGNEED;
 	}
