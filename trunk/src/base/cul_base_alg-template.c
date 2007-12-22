@@ -291,3 +291,82 @@
 	}
 #endif /* TEMPLATE_CUL_PTR */
 
+#ifndef TEMPLATE_CUL_PTR
+	ATOM * FUNCTION(unique)(ATOM *data, size_t size) {
+		ATOM *cur = data + 1, *const last = data + size;
+		for(++data; data < last; ++data) {
+			if( *(data - 1) == *data )
+				continue;
+			*cur = *data;
+			++cur;
+		}
+		return cur;
+	}
+#else /* TEMPLATE_CUL_PTR */
+	ATOM * FUNCTION(unique)(ATOM *data, size_t size, cul_cmp_f *cmp_f) {
+		ATOM *cur = data + 1, *const last = data + size;
+		for(++data; data < last; ++data) {
+			if( !cmp_f(data - 1, data) )
+				continue;
+			*cur = *data;
+			++cur;
+		}
+		return cur;
+	}
+#endif /* TEMPLATE_CUL_PTR */
+
+#ifndef TEMPLATE_CUL_PTR
+	ATOM *FUNCTION(find)(const ATOM *data, size_t size, ATOM key) {
+		const ATOM *const last = data + size;
+		for( ; data < last; ++data)
+			if( *data == key )
+				return (ATOM *)data;
+		return NULL;
+	}
+#else /* TEMPLATE_CUL_PTR */
+	ATOM *FUNCTION(find)(const ATOM *data, size_t size, ATOM key, cul_cmp_f *cmp_f) {
+		const ATOM *const last = data + size;
+		for( ; data < last; ++data)
+			if( !cmp_f(data, &key) )
+				return (ATOM *)data;
+		return NULL;
+	}
+#endif /* TEMPLATE_CUL_PTR */
+
+#ifndef TEMPLATE_CUL_PTR
+	ATOM *FUNCTION(bfind)(const ATOM *data, size_t size, ATOM key) {
+		const ATOM *last = data + size;
+		for( size >>= 1; size > 0; size >>= 1) {
+			const ATOM val = *(data + size);
+			if( val < key ) {
+				data += size + 1;
+				size = last - data;
+			}	else if( val > key )
+				last = data + size;
+			else
+				return (ATOM *)(data + size);
+		}
+		if( *data == key )
+			return (ATOM *)data;
+		return NULL;
+	}
+#else /* TEMPLATE_CUL_PTR */
+	ATOM *FUNCTION(bfind)(const ATOM *data, size_t size, ATOM key, cul_cmp_f *cmp_f) {
+		const ATOM *last = data + size;
+		for( size >>= 1; size > 0; size >>= 1) {
+			int cmp_res = cmp_f(*(data + size), &key);
+			if( cmp_res < 0 ) {
+				data += size + 1;
+				size = last - data;
+			}
+			else if( cmp_res > 0 )
+				last = data + size;
+			else
+				return (ATOM *)(data + size);
+		}
+		if( cmp_f(*data, key) == 0 )
+			return (ATOM *)data;
+		return NULL;
+	}
+#endif /* TEMPLATE_CUL_PTR */
+
