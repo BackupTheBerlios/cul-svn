@@ -122,7 +122,7 @@ VIEW(Vector) *FUNCTION(matrixview_superdiag)(VIEW(Vector) *this, const TYPE(Matr
 cul_errno FUNCTION(matrix_copy)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy)(this->data, other->data, other->size_x * other->size_y);
+	memcpy(this->data, other->data, this->size_x*this->size_y*sizeof(ATOM));
 	return CUL_SUCCESS;
 }
 
@@ -136,7 +136,7 @@ cul_errno FUNCTION(matrix_copy_offset)(TYPE(Matrix) *this, const TYPE(Matrix) *o
 cul_errno FUNCTION(matrix_copy_submatrix)(TYPE(Matrix) *this, const TYPE(Matrix) *other, size_t other_offset_x, size_t other_offset_y) {
 	if( other->size_x - other_offset_x < this->size_x || other->size_y - other_offset_y < this->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(this->data, other->data + other_offset_x + other->size_x * other_offset_y, other->size_x * (this->size_y - 1) + this->size_x, this->size_x, this->size_x, other->size_x);
+	FUNCTION(copy_tda)(this->data, other->data + other_offset_x + other->size_x * other_offset_y, this->size_x * this->size_y, this->size_x, this->size_x, other->size_x);
 	return CUL_SUCCESS;
 }
 
@@ -145,7 +145,7 @@ cul_errno FUNCTION(matrix_copy_row)(TYPE(Matrix) *this, const TYPE(Matrix) *othe
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	if( this->size_x != other->size_x )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy)(this->data + this->size_x * row, other->data + other->size_x * other_row, other->size_x);
+	memcpy(this->data + this->size_x * row, other->data + other->size_x * other_row, this->size_x*sizeof(ATOM));
 	return CUL_SUCCESS;
 }
 
@@ -162,28 +162,28 @@ cul_errno FUNCTION(matrix_copy_view)(TYPE(Matrix) *this, const VIEW(Matrix) *oth
 	if( this->size_x != other->size_x || this->size_y == other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	if( other->tda == other->size_x )
-		FUNCTION(copy)(this->data, other->data, other->size_x * other->size_y);
+		memcpy(this->data, other->data, this->size_x*this->size_y*sizeof(ATOM));
 	else
-		FUNCTION(copy_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->size_x, other->tda);
+		FUNCTION(copy_tda)(this->data, other->data, this->size_x * this->size_y, this->size_x, this->size_x, other->tda);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_copy_view_offset)(TYPE(Matrix) *this, const VIEW(Matrix) *other, size_t offset_x, size_t offset_y) {
 	if( this->size_x - offset_x < other->size_x || this->size_y - offset_y < other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(this->data + offset_x + this->size_x * offset_y, other->data, other->tda * other->size_y, other->size_x, this->size_x, other->tda);
+	FUNCTION(copy_tda)(this->data + offset_x + this->size_x * offset_y, other->data, other->size_x * other->size_y, other->size_x, this->size_x, other->tda);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrixview_copy)(VIEW(Matrix) *this, const VIEW(Matrix) *other) {
-	if( this->size_x != other->size_x || this->size_y == other->size_y )
+	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->tda, other->tda);
+	FUNCTION(copy_tda)(this->data, other->data, this->size_x * this->size_y, this->size_x, this->tda, other->tda);
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrixview_copy_matrix)(VIEW(Matrix) *this, const TYPE(Matrix) *other) {
-	if( this->size_x != other->size_x || this->size_y == other->size_y )
+	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	FUNCTION(copy_tda)(this->data, other->data, other->size_x * other->size_y, other->size_x, this->tda, other->size_x);
 	return CUL_SUCCESS;
@@ -247,7 +247,7 @@ cul_errno FUNCTION(matrix_resize)(TYPE(Matrix) *this, size_t x, size_t y) {
 	const size_t copy_y = y > this->size_y? this->size_y: y;
 
 	if( x == copy_x )
-		FUNCTION(copy)(data, this->data, copy_x * copy_y);
+		memcpy(data, this->data, copy_x*copy_y*sizeof(ATOM));
 	else
 		FUNCTION(copy_tda)(data, this->data, this->size_x * copy_y, copy_x, x, this->size_x);
 

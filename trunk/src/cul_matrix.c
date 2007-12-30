@@ -4,6 +4,7 @@
 #include <cul/cul_vector.h>
 #include <cul/cul_matrix.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define TEMPLATE_CUL_CHAR
 #include "templates_on.h"

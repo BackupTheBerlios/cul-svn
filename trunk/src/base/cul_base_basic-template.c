@@ -1,61 +1,70 @@
 #ifndef TEMPLATE_CUL_PTR
 #else /* TEMPLATE_CUL_PTR */
-	void FUNCTION(free)(ATOM *data, size_t size, cul_free_f *free_f) {
-		ATOM *const last = data + size;
-		for(; data < last; ++data)
-			free_f(*data);
+	void FUNCTION(free)(ATOM *restrict data, size_t size, cul_free_f *free_f) {
+		for(size_t i = 0; i < size; ++i)
+			free_f(data[i]);
+		free(data);
 	}
 #endif /* TEMPLATE_CUL_PTR */
 
-void FUNCTION(copy)(ATOM *data, const ATOM *other, size_t size) {
-	memcpy(data, other, size*sizeof(ATOM));
+void FUNCTION(copy)(ATOM *restrict data, const ATOM *restrict other, size_t size) {
+	for(size_t i = 0; i < size; ++i)
+		data[i] = other[i];
 }
 
 void FUNCTION(copy_overlap)(ATOM *data, const ATOM *other, size_t size) {
-	memmove(data, other, size*sizeof(ATOM));
+	if( data < other ) for(size_t i = 0; i < size; ++i)
+		data[i] = other[i];
+	 else for(size_t i = size; i-- > 0;)
+	 	data[i] = other[i];
 }
 
 void FUNCTION(copy_stride)(ATOM *data, const ATOM *other, size_t size, size_t stride, size_t other_stride) {
-	const ATOM *const last = other + size * other_stride;
-	for(; other < last; data += stride, other += other_stride)
-		*data = *other;
+	/* adjust size */
+	size *= stride;
+
+	for(size_t i = 0, j = 0; i < size; i += stride, j += other_stride)
+		data[i] = other[j];
 }
 
-void FUNCTION(copy_tda)(ATOM *data, const ATOM *other, size_t size, size_t tda_size, size_t tda, size_t other_tda) {
-	const ATOM *const last = other + size;
+void FUNCTION(copy_tda)(ATOM *restrict data, const ATOM *restrict other, size_t size, size_t tda_size, size_t tda, size_t other_tda) {
+	for(size_t i = 0; i < size; i += tda_size) {
+		/* copy row */
+		for(size_t j = 0; j < tda_size; ++j)
+			data[j] = other[j];
 
-	/* move through all rows */
-	for(; other < last; data += tda, other += other_tda)
-		memcpy(data, other, tda_size*sizeof(ATOM));
+		/* adjust current row */
+		data += tda;
+		other += other_tda;
+	}
 }
 
-void FUNCTION(swap)(ATOM *data, ATOM *other, size_t size) {
-	ATOM tmp, *const last = other + size;
-	for(; other < last; ++data, ++other)
-		CUL_SWAP(*data, *other, tmp);
-}
-
-void FUNCTION(swap_stride)(ATOM *data, ATOM *other, size_t size, size_t stride, size_t other_stride) {
-	ATOM tmp, *const last = other + size * other_stride;
-	for(; other < last; data += stride, other += other_stride)
-		CUL_SWAP(*data, *other, tmp);
-}
-
-void FUNCTION(swap_tda)(ATOM *data, ATOM *other, size_t size, size_t tda_size, size_t tda, size_t other_tda) {
-	const ATOM *const last = other + size, *tda_last = other + tda_size;
+void FUNCTION(swap)(ATOM *restrict data, ATOM *restrict other, size_t size) {
 	ATOM tmp;
 
-	/* adjust tda jumps */
-	tda -= tda_size;
-	other_tda -= tda_size;
-	tda_size += other_tda;
+	for(size_t i = 0; i < size; ++i)
+		CUL_SWAP(data[i], other[i], tmp);
+}
 
-	/* move through all rows */
-	for(; other < last; tda_last += tda_size) {
-		/* move through single row */
-		for(; other < tda_last; ++data, ++other)
-			CUL_SWAP(*data, *other, tmp);
-		/* move through empty space */
+void FUNCTION(swap_stride)(ATOM *restrict data, ATOM *restrict other, size_t size, size_t stride, size_t other_stride) {
+	ATOM tmp;
+
+	/* adjust size */
+	size *= stride;
+
+	for(size_t i = 0, j = 0; i < size; i += stride, j += other_stride)
+		CUL_SWAP(data[i], other[j], tmp);
+}
+
+void FUNCTION(swap_tda)(ATOM *restrict data, ATOM *restrict other, size_t size, size_t tda_size, size_t tda, size_t other_tda) {
+	ATOM tmp;
+
+	for(size_t i = 0; i < size; i += tda_size) {
+		/* copy row */
+		for(size_t j = 0; j < tda_size; ++j)
+			CUL_SWAP(data[i], other[j], tmp);
+
+		/* adjust current row */
 		data += tda;
 		other += other_tda;
 	}
@@ -63,62 +72,29 @@ void FUNCTION(swap_tda)(ATOM *data, ATOM *other, size_t size, size_t tda_size, s
 
 #ifndef TEMPLATE_CUL_PTR
 #else /* TEMPLATE_CUL_PTR */
-	ATOM FUNCTION(detach)(ATOM *data, size_t size, cul_clone_f *clone_f) {
-		ATOM *const first = data, *const last = data + size;
-		for(; data < last; ++data)
-			if( (*data = clone_f(*data)) == NULL ) {
+	ATOM *FUNCTION(detach)(ATOM *data, size_t size, cul_clone_f *clone_f) {
+		for(size_t i = 0; i < size; ++i)
+			if( (data[i] = clone_f(data[i])) == NULL ) {
 				/* erase rest of undetached pointers */
-				for(++data; data < last; ++data)
-					*data = NULL;
+				for(++i; i < size; ++i)
+					data[i] = NULL;
 				return NULL;
 			}
-		return first;
+		return data;
 	}
 
-	ATOM FUNCTION(detach_stride)(ATOM *data, size_t size, size_t stride, cul_clone_f *clone_f) {
-		ATOM *const first = data, *const last = data + size * stride;
-		for(; data < last; data += stride)
-			if( (*data = clone_f(*data)) == NULL ) {
+	ATOM *FUNCTION(detach_stride)(ATOM *data, size_t size, size_t stride, cul_clone_f *clone_f) {
+		/* adjust size */
+		size *= stride;
+
+		for(size_t i = 0; i < size; i += stride)
+			if( (data[i] = clone_f(data[i])) == NULL ) {
 				/* erase rest of undetached pointers */
-				for(++data; data < last; data += stride)
-					*data = NULL;
+				for(i += stride; i < size; i += stride)
+					data[i] = NULL;
 				return NULL;
 			}
-		return first;
-	}
-
-	ATOM FUNCTION(detach_tda)(ATOM *data, size_t size, size_t tda_size, size_t tda, cul_clone_f *clone_f) {
-		ATOM *const first = data, *const last = data + size, *tda_last = data + tda_size;
-
-		/* adjust tda jumps */
-		tda -= tda_size;
-		tda_size += tda;
-
-		/* move through all rows */
-		for(; data < last; tda_last += tda_size) {
-			/* move through single row */
-			for(; data < tda_last; ++data)
-				if( (*data = clone_f(*data)) == NULL ) {
-					/* erase rest of undetached pointers */
-
-					/* end of line */
-					for(; data < tda_last; ++data)
-						*data = NULL;
-					data += tda;
-
-					/* rest lines */
-					for(tda_last += tda_size; data < last; tda_last += tda_size) {
-						for(; data < tda_last; ++data)
-							*data = NULL;
-						data += tda;
-					}
-
-					return NULL;
-				}
-			/* move through empty space */
-			data += tda;
-		}
-		return first;
+		return data;
 	}
 #endif /* TEMPLATE_CUL_PTR */
 
@@ -795,17 +771,3 @@ void FUNCTION(zero)(ATOM *data, size_t size) {
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 
-#ifndef TEMPLATE_CUL_PTR
-#else /* TEMPLATE_CUL_PTR */
-	void FUNCTION(each)(const ATOM *data, size_t size, cul_each_f *each_f, cul_ptr user_data){
-		const ATOM *const last = data + size;
-		for(; data < last; ++data)
-			each_f(*data, user_data);
-	}
-
-	void FUNCTION(each_stride)(const ATOM *data, size_t size, size_t stride, cul_each_f *each_f, cul_ptr user_data) {
-		const ATOM *const last = data + size * stride;
-		for(; data < last; data += stride)
-			each_f(*data, user_data);
-	}
-#endif /* TEMPLATE_CUL_PTR */

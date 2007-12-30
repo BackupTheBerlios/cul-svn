@@ -121,21 +121,21 @@ VIEW(Vector) *FUNCTION(vectorview_subvector)(VIEW(Vector) *this, const TYPE(Vect
 cul_errno FUNCTION(vector_copy)(TYPE(Vector) *this, const TYPE(Vector) *other) {
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy)(this->data, other->data, other->size);
+	memcpy(this->data, other->data, this->size*sizeof(ATOM));
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_offset)(TYPE(Vector) *this, const TYPE(Vector) *other, size_t offset) {
 	if( this->size - offset < other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy)(this->data + offset, other->data, other->size);
+	memcpy(this->data + offset, other->data, other->size*sizeof(ATOM));
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_subvector)(TYPE(Vector) *this, const TYPE(Vector) *other, size_t other_offset) {
 	if( other->size - other_offset < this->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy)(this->data, other->data + other_offset, this->size);
+	memcpy(this->data, other->data + other_offset, this->size*sizeof(ATOM));
 	return CUL_SUCCESS;
 }
 
@@ -143,9 +143,9 @@ cul_errno FUNCTION(vector_copy_view)(TYPE(Vector) *this, const VIEW(Vector) *oth
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	if( other->stride == 1 )
-		FUNCTION(copy)(this->data, other->data, other->size);
+		memcpy(this->data, other->data, this->size*sizeof(ATOM));
 	else
-		FUNCTION(copy_stride)(this->data, other->data, other->size, 1, other->stride);
+		FUNCTION(copy_stride)(this->data, other->data, this->size, 1, other->stride);
 	return CUL_SUCCESS;
 }
 
@@ -153,7 +153,7 @@ cul_errno FUNCTION(vector_copy_view_offset)(TYPE(Vector) *this, const VIEW(Vecto
 	if( this->size - offset < other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	if( other->stride == 1 )
-		FUNCTION(copy)(this->data + offset, other->data, other->size);
+		memcpy(this->data + offset, other->data, other->size*sizeof(ATOM));
 	else
 		FUNCTION(copy_stride)(this->data + offset, other->data, other->size, 1, other->stride);
 	return CUL_SUCCESS;
@@ -170,9 +170,9 @@ cul_errno FUNCTION(vectorview_copy_vector)(VIEW(Vector) *this, const TYPE(Vector
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	if( this->stride == 1 )
-		FUNCTION(copy)(this->data, other->data, other->size);
+		memcpy(this->data, other->data, this->size*sizeof(ATOM));
 	else
-		FUNCTION(copy_stride)(this->data, other->data, other->size, this->stride, 1);
+		FUNCTION(copy_stride)(this->data, other->data, this->size, this->stride, 1);
 	return CUL_SUCCESS;
 }
 
@@ -313,9 +313,9 @@ cul_errno FUNCTION(vector_insert_vector)(TYPE(Vector) *this, size_t offset, cons
 			CUL_ERROR_ERRNO_RET(CUL_EFAILED, CUL_EFAILED);
 
 	/* make space for item */
-	FUNCTION(copy_overlap)(this->data + offset + other->size, this->data + offset, this->size - offset);
+	memmove(this->data + offset + other->size, this->data + offset, (this->size - offset)*sizeof(ATOM));
 	/* copy insert item */
-	FUNCTION(copy)(this->data + offset, other->data, other->size);
+	memcpy(this->data + offset, other->data, other->size*sizeof(ATOM));
 	this->size += other->size;
 	return CUL_SUCCESS;
 }
@@ -329,9 +329,12 @@ cul_errno FUNCTION(vector_insert_view)(TYPE(Vector) *this, size_t offset, const 
 			CUL_ERROR_ERRNO_RET(CUL_EFAILED, CUL_EFAILED);
 
 	/* make space for item */
-	FUNCTION(copy_overlap)(this->data + offset + other->size, this->data + offset, this->size - offset);
+	memmove(this->data + offset + other->size, this->data + offset, (this->size - offset)*sizeof(ATOM));
 	/* copy insert item */
-	FUNCTION(copy_stride)(this->data + offset, other->data, other->size, 1, other->stride);
+	if( other->stride == 1 )
+		memcpy(this->data + offset, other->data, other->size*sizeof(ATOM));
+	else
+		FUNCTION(copy_stride)(this->data + offset, other->data, other->size, 1, other->stride);
 	this->size += other->size;
 	return CUL_SUCCESS;
 }
@@ -356,7 +359,7 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *this, ATOM value) {
 			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 
 		this->size -= size;
-		FUNCTION(copy_overlap)(this->data + offset, this->data + offset + size, this->size - offset);
+		memmove(this->data + offset, this->data + offset + size, (this->size - offset)*sizeof(ATOM));
 		return CUL_SUCCESS;
 	}
 
@@ -376,10 +379,10 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *this, ATOM value) {
 		if( offset + size > this->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 
-		this->size -= size;
 		if( free_f != NULL ) FUNCTION(free)(this->data + offset, size, free_f);
 
-		FUNCTION(copy_overlap)(this->data + offset, this->data + offset + size, this->size - offset);
+		this->size -= size;
+		memmove(this->data + offset, this->data + offset + size, (this->size - offset)*sizeof(ATOM));
 		return CUL_SUCCESS;
 	}
 
@@ -393,22 +396,39 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *this, ATOM value) {
 	}
 
 	cul_errno FUNCTION(vector_detach)(TYPE(Vector) *this, cul_clone_f *clone_f) {
-		if( FUNCTION(detach)(this->data, this->size, clone_f) == NULL )
-			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
-		return CUL_SUCCESS;
+		return FUNCTION(vector_detach_range)(this, 0, this->size, clone_f);
 	}
 
 	cul_errno FUNCTION(vector_detach_range)(TYPE(Vector) *this, size_t offset, size_t size, cul_clone_f *clone_f) {
 		if( offset + size > this->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-		if( FUNCTION(detach)(this->data, this->size, clone_f) == NULL )
-			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
+
+		ATOM *restrict data = this->data;
+
+		/* adjust size */
+		size += offset;
+
+		for(size_t i = offset; i < size; ++i)
+			if( (data[i] = clone_f(data[i])) == NULL ) {
+				/* erase rest of undetached pointers */
+				for(++i; i < size; ++i)
+					data[i] = NULL;
+				CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
+			}
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vectorview_detach)(VIEW(Vector) *this, cul_clone_f *clone_f) {
-		if( FUNCTION(detach_stride)(this->data, this->size, this->stride, clone_f) == NULL )
-			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
+		const size_t stride = this->stride, size = this->size * stride;
+		ATOM *restrict data = this->data;
+
+		for(size_t i = 0; i < size; i += stride)
+			if( (data[i] = clone_f(data[i])) == NULL ) {
+				/* erase rest of undetached pointers */
+				for(i += stride; i < size; i += stride)
+					data[i] = NULL;
+				CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
+			}
 		return CUL_SUCCESS;
 	}
 #endif /* TEMPLATE_CUL_PTR */
@@ -668,11 +688,17 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 	}
 
 	void FUNCTION(vectorview_sort_asc)(VIEW(Vector) *this) {
-		FUNCTION(sort_asc_stride)(this->data, this->size, this->stride);
+		if( this->stride == 1 )
+			FUNCTION(sort_asc)(this->data, this->size);
+		else
+			FUNCTION(sort_asc_stride)(this->data, this->size, this->stride);
 	}
 
 	void FUNCTION(vectorview_sort_desc)(VIEW(Vector) *this) {
-		FUNCTION(sort_desc_stride)(this->data, this->size, this->stride);
+		if( this->stride == 1 )
+			FUNCTION(sort_desc)(this->data, this->size);
+		else
+			FUNCTION(sort_desc_stride)(this->data, this->size, this->stride);
 	}
 
 	size_t FUNCTION(vectorview_unique)(VIEW(Vector)  *this) {
@@ -775,11 +801,18 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 	}
 
 	void FUNCTION(vector_each)(TYPE(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
-		FUNCTION(each)(this->data, this->size, each_f, user_data);
+		const size_t size = this->size;
+		const ATOM *restrict data = this->data;
+
+		for(size_t i = 0; i < size; ++i)
+			each_f(data[i], user_data);
 	}
 
 	void FUNCTION(vectorview_sort)(VIEW(Vector) *this, cul_cmp_f *cmp_f) {
-		FUNCTION(sort_stride)(this->data, this->size, this->stride, cmp_f);
+		if( this->stride == 1 )
+			FUNCTION(sort)(this->data, this->size, cmp_f);
+		else
+			FUNCTION(sort_stride)(this->data, this->size, this->stride, cmp_f);
 	}
 
 	size_t FUNCTION(vectorview_unique)(VIEW(Vector)  *this, cul_eq_f *eq_f) {
@@ -803,7 +836,7 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 	}
 
 	size_t FUNCTION(vectorview_find)(const VIEW(Vector) *this, size_t offset, ATOM key, cul_eq_f *eq_f) {
-		const size_t size = this->size, stride = this->stride;
+		const size_t stride = this->stride, size = this->size * stride;
 		const ATOM *restrict data = this->data;
 
 		for(size_t i = offset * stride; i < size; i += stride)
@@ -831,7 +864,11 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, AT
 	}
 
 	void FUNCTION(vectorview_each)(VIEW(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
-		FUNCTION(each_stride)(this->data, this->size, this->stride, each_f, user_data);
+		const size_t stride = this->stride, size = this->size * stride;
+		const ATOM *restrict data = this->data;
+
+		for(size_t i = 0; i < size; i += stride)
+			each_f(data[i], user_data);
 	}
 #endif /* TEMPLATE_CUL_PTR */
 
