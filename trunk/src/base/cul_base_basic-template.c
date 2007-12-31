@@ -1,12 +1,3 @@
-#ifndef TEMPLATE_CUL_PTR
-#else /* TEMPLATE_CUL_PTR */
-	void FUNCTION(free)(ATOM *restrict data, size_t size, cul_free_f *free_f) {
-		for(size_t i = 0; i < size; ++i)
-			free_f(data[i]);
-		free(data);
-	}
-#endif /* TEMPLATE_CUL_PTR */
-
 void FUNCTION(copy)(ATOM *restrict data, const ATOM *restrict other, size_t size) {
 	for(size_t i = 0; i < size; ++i)
 		data[i] = other[i];

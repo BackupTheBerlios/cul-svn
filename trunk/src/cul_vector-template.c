@@ -86,7 +86,10 @@ TYPE(Vector) *FUNCTION(vector_new_empty)() {
 #else /* TEMPLATE_CUL_PTR */
 	void FUNCTION(vector_free)(TYPE(Vector) *this, cul_free_f *free_f) {
 		if( this != NULL ) {
-			if( free_f != NULL) FUNCTION(free)(this->data, this->size, free_f);
+			/* free data if needed */
+			if( free_f != NULL) for(size_t i = 0; i < this->size; ++i)
+				free_f(this->data[i]);
+
 			free(this->data);
 			FUNCTION(vector_free_struct)(this);
 		}
@@ -226,8 +229,11 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *this) {
 		ATOM *data;
 
 		if( size == 0 ) {
-			if( free_f != NULL) FUNCTION(free)(this->data, this->size, free_f);
+			/* free data if needed */
+			if( free_f != NULL) for(size_t i = 0; i < this->size; ++i)
+				free_f(this->data[i]);
 			free(this->data);
+
 			FUNCTION(vector_init_struct)(this, NULL, 0, 0);
 			return CUL_SUCCESS;
 		} else if( size >= this->size && size <= this->reserved ) {
@@ -240,8 +246,9 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *this) {
 			CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
 		memcpy(data, this->data, copy*sizeof(ATOM));
 
-		/* free items if needed */
-		if( free_f != NULL ) FUNCTION(free)(this->data + size, this->size - copy, free_f);
+		/* free data if needed */
+		if( free_f != NULL) for(size_t i = copy; i < this->size; ++i)
+			free_f(this->data[i]);
 		free(this->data);
 
 		FUNCTION(vector_init_struct)(this, data, size, size);
@@ -379,7 +386,9 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *this, ATOM value) {
 		if( offset + size > this->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 
-		if( free_f != NULL ) FUNCTION(free)(this->data + offset, size, free_f);
+		/* free data if needed */
+		if( free_f != NULL) for(size_t i = offset; i < offset + size; ++i)
+			free_f(this->data[i]);
 
 		this->size -= size;
 		memmove(this->data + offset, this->data + offset + size, (this->size - offset)*sizeof(ATOM));
