@@ -86,9 +86,15 @@ TYPE(Vector) *FUNCTION(vector_new_empty)() {
 #else /* TEMPLATE_CUL_PTR */
 	void FUNCTION(vector_free)(TYPE(Vector) *this, cul_free_f *free_f) {
 		if( this != NULL ) {
+
 			/* free data if needed */
-			if( free_f != NULL) for(size_t i = 0; i < this->size; ++i)
-				free_f(this->data[i]);
+			if( free_f != NULL) {
+				ATOM *restrict data = this->data;
+				const size_t size = this->size;
+
+				for(size_t i = 0; i < size; ++i)
+					free_f(data[i]);
+			}
 
 			free(this->data);
 			FUNCTION(vector_free_struct)(this);
@@ -124,48 +130,81 @@ VIEW(Vector) *FUNCTION(vectorview_subvector)(VIEW(Vector) *this, const TYPE(Vect
 cul_errno FUNCTION(vector_copy)(TYPE(Vector) *this, const TYPE(Vector) *other) {
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+
 	memcpy(this->data, other->data, this->size*sizeof(ATOM));
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_offset)(TYPE(Vector) *this, const TYPE(Vector) *other, size_t offset) {
 	if( this->size - offset < other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+
 	memcpy(this->data + offset, other->data, other->size*sizeof(ATOM));
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_subvector)(TYPE(Vector) *this, const TYPE(Vector) *other, size_t other_offset) {
 	if( other->size - other_offset < this->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+
 	memcpy(this->data, other->data + other_offset, this->size*sizeof(ATOM));
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_view)(TYPE(Vector) *this, const VIEW(Vector) *other) {
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+
 	if( other->stride == 1 )
 		memcpy(this->data, other->data, this->size*sizeof(ATOM));
-	else
-		FUNCTION(copy_stride)(this->data, other->data, this->size, 1, other->stride);
+	else {
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_stride = other->stride;
+
+		const size_t size = this->size;
+		for(size_t i = 0, other_i = 0; i < size; ++i, other_i += other_stride)
+			data[i] = other_data[other_i];
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_copy_view_offset)(TYPE(Vector) *this, const VIEW(Vector) *other, size_t offset) {
 	if( this->size - offset < other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+
 	if( other->stride == 1 )
 		memcpy(this->data + offset, other->data, other->size*sizeof(ATOM));
-	else
-		FUNCTION(copy_stride)(this->data + offset, other->data, other->size, 1, other->stride);
+	else {
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_stride = other->stride;
+
+		const size_t size = other->size;
+		for(size_t i = 0, other_i = 0; i < size; ++i, other_i += other_stride)
+			data[i] = other_data[other_i];
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vectorview_copy)(VIEW(Vector) *this, const VIEW(Vector) *other) {
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy_stride)(this->data, other->data, other->size, this->stride, other->stride);
+
+	ATOM *restrict data = this->data;
+	const size_t stride = this->stride;
+	const ATOM *restrict other_data = other->data;
+	const size_t other_stride = other->stride;
+
+	const size_t size = stride * this->size;
+	for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+		data[i] = other_data[other_i];
+
 	return CUL_SUCCESS;
 }
 
@@ -174,22 +213,48 @@ cul_errno FUNCTION(vectorview_copy_vector)(VIEW(Vector) *this, const TYPE(Vector
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 	if( this->stride == 1 )
 		memcpy(this->data, other->data, this->size*sizeof(ATOM));
-	else
-		FUNCTION(copy_stride)(this->data, other->data, this->size, this->stride, 1);
+	else {
+		ATOM *restrict data = this->data;
+		const size_t stride = this->stride;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = stride * this->size;
+		for(size_t i = 0, other_i = 0; i < size; i += stride, ++other_i)
+			data[i] = other_data[other_i];
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vector_swap)(TYPE(Vector) *this, TYPE(Vector) *other) {
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(swap)(this->data, other->data, this->size);
+
+	ATOM *restrict data = this->data;
+	ATOM *restrict other_data = other->data;
+	ATOM tmp;
+
+	const size_t size = this->size;
+	for(size_t i = 0; i < size; ++i)
+		CUL_SWAP(data[i], other_data[i], tmp);
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(vectorview_swap)(VIEW(Vector) *this, VIEW(Vector) *other) {
 	if( this->size != other->size )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(swap_stride)(this->data, other->data, this->size, this->stride, other->stride);
+	
+	ATOM *restrict data = this->data;
+	const size_t stride = this->stride;
+	ATOM *restrict other_data = other->data;
+	const size_t other_stride = other->stride;
+	ATOM tmp;
+
+	const size_t size = stride * this->size;
+	for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+		CUL_SWAP(data[i], other_data[other_i], tmp);
+
 	return CUL_SUCCESS;
 }
 
@@ -229,9 +294,15 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *this) {
 		ATOM *data;
 
 		if( size == 0 ) {
+
 			/* free data if needed */
-			if( free_f != NULL) for(size_t i = 0; i < this->size; ++i)
-				free_f(this->data[i]);
+			if( free_f != NULL)  {
+				ATOM *restrict data = this->data;
+
+				const size_t size = this->size;
+				for(size_t i = 0; i < size; ++i)
+					free_f(data[i]);
+			}
 			free(this->data);
 
 			FUNCTION(vector_init_struct)(this, NULL, 0, 0);
@@ -247,8 +318,13 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *this) {
 		memcpy(data, this->data, copy*sizeof(ATOM));
 
 		/* free data if needed */
-		if( free_f != NULL) for(size_t i = copy; i < this->size; ++i)
-			free_f(this->data[i]);
+		if( free_f != NULL)  {
+			ATOM *restrict data = this->data;
+
+			const size_t size = this->size;
+			for(size_t i = 0; i < size; ++i)
+				free_f(data[i]);
+		}
 		free(this->data);
 
 		FUNCTION(vector_init_struct)(this, data, size, size);
@@ -304,9 +380,9 @@ cul_errno FUNCTION(vector_insert)(TYPE(Vector) *this, size_t offset, ATOM value)
 			CUL_ERROR_ERRNO_RET(CUL_EFAILED, CUL_EFAILED);
 
 	/* make space for item */
-	FUNCTION(copy_overlap)(this->data + offset + 1, this->data + offset, this->size - offset);
+	memmove(this->data + offset + 1, this->data + offset, this->size - offset);
 	/* copy insert item */
-	this->data[this->size] = value;
+	this->data[offset] = value;
 	this->size += 1;
 	return CUL_SUCCESS;
 }
@@ -340,8 +416,15 @@ cul_errno FUNCTION(vector_insert_view)(TYPE(Vector) *this, size_t offset, const 
 	/* copy insert item */
 	if( other->stride == 1 )
 		memcpy(this->data + offset, other->data, other->size*sizeof(ATOM));
-	else
-		FUNCTION(copy_stride)(this->data + offset, other->data, other->size, 1, other->stride);
+	else {
+		ATOM *restrict this_data = this->data + offset;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_stride = other->stride;
+
+		const size_t size = other->size;
+		for(size_t i = 0; i < size; ++i)
+			this_data[i] = other_data[i * other_stride];
+	}
 	this->size += other->size;
 	return CUL_SUCCESS;
 }

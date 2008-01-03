@@ -4,14 +4,6 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
-void     cul_ucopy                (size_t *data, const size_t *other, size_t size);
-void     cul_ucopy_overlap        (size_t *data, const size_t *other, size_t size);
-void     cul_ucopy_stride         (size_t *data, const size_t *other, size_t size, size_t stride, size_t other_stride);
-void     cul_ucopy_tda            (size_t *data, const size_t *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_uswap                (size_t *data, size_t *other, size_t size);
-void     cul_uswap_stride         (size_t *data, size_t *other, size_t size, size_t stride, size_t other_stride);
-void     cul_uswap_tda            (size_t *data, size_t *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-
 void     cul_upermute             (size_t *data, const size_t *permutation, size_t size);
 void     cul_upermute_stride      (size_t *data, const size_t *permutation, size_t size, size_t stride);
 void     cul_ureverse             (size_t *data, size_t size);

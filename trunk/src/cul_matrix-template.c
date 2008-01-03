@@ -122,21 +122,55 @@ VIEW(Vector) *FUNCTION(matrixview_superdiag)(VIEW(Vector) *this, const TYPE(Matr
 cul_errno FUNCTION(matrix_copy)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+
 	memcpy(this->data, other->data, this->size_x*this->size_y*sizeof(ATOM));
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_copy_offset)(TYPE(Matrix) *this, const TYPE(Matrix) *other, size_t offset_x, size_t offset_y) {
 	if( this->size_x - offset_x < other->size_x || this->size_y - offset_y < other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(this->data + offset_x + this->size_x * offset_y, other->data, other->size_x * other->size_y, other->size_x, this->size_x, other->size_x);
+
+	ATOM *restrict data = this->data + this->size_x * offset_y + offset_x;
+	const size_t tda = this->size_x;
+	const ATOM *restrict other_data = other->data;
+	const size_t other_tda = other->size_x;
+
+	const size_t size = other->size_x;
+	const size_t rows = other->size_y;
+	for(size_t row = 0; row < rows; ++row) {
+		for(size_t i = 0; i < size; ++i)
+			data[i] = other_data[i];
+
+		/* adjust current row */
+		data += tda;
+		other_data += other_tda;
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_copy_submatrix)(TYPE(Matrix) *this, const TYPE(Matrix) *other, size_t other_offset_x, size_t other_offset_y) {
 	if( other->size_x - other_offset_x < this->size_x || other->size_y - other_offset_y < this->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(this->data, other->data + other_offset_x + other->size_x * other_offset_y, this->size_x * this->size_y, this->size_x, this->size_x, other->size_x);
+
+	ATOM *restrict data = this->data;
+	const size_t tda = this->size_x;
+	const ATOM *restrict other_data = other->data + other->size_x * other_offset_y + other_offset_x;
+	const size_t other_tda = other->size_x;
+
+	const size_t size = this->size_x;
+	const size_t rows = this->size_y;
+	for(size_t row = 0; row < rows; ++row) {
+		for(size_t i = 0; i < size; ++i)
+			data[i] = other_data[i];
+
+		/* adjust current row */
+		data += tda;
+		other_data += other_tda;
+	}
+
 	return CUL_SUCCESS;
 }
 
@@ -145,7 +179,9 @@ cul_errno FUNCTION(matrix_copy_row)(TYPE(Matrix) *this, const TYPE(Matrix) *othe
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	if( this->size_x != other->size_x )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+
 	memcpy(this->data + this->size_x * row, other->data + other->size_x * other_row, this->size_x*sizeof(ATOM));
+
 	return CUL_SUCCESS;
 }
 
@@ -154,45 +190,127 @@ cul_errno FUNCTION(matrix_copy_col)(TYPE(Matrix) *this, const TYPE(Matrix) *othe
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	if( this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy_stride)(this->data + col, other->data + other_col, other->size_y, this->size_x, other->size_x);
+
+	ATOM *restrict data = this->data + col;
+	const size_t stride = this->size_x;
+	const ATOM *restrict other_data = other->data + other_col;
+	const size_t other_stride = other->size_x;
+
+	const size_t size = stride * this->size_y;
+	for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+		data[i] = other_data[other_i];
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_copy_view)(TYPE(Matrix) *this, const VIEW(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y == other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+
 	if( other->tda == other->size_x )
 		memcpy(this->data, other->data, this->size_x*this->size_y*sizeof(ATOM));
-	else
-		FUNCTION(copy_tda)(this->data, other->data, this->size_x * this->size_y, this->size_x, this->size_x, other->tda);
+	else {
+		ATOM *restrict data = this->data;
+		const size_t tda = this->size_x;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_tda = other->tda;
+
+		const size_t size = this->size_x;
+		const size_t rows = this->size_y;
+		for(size_t row = 0; row < rows; ++row) {
+			for(size_t i = 0; i < size; ++i)
+				data[i] = other_data[i];
+
+			/* adjust current row */
+			data += tda;
+			other_data += other_tda;
+		}
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_copy_view_offset)(TYPE(Matrix) *this, const VIEW(Matrix) *other, size_t offset_x, size_t offset_y) {
 	if( this->size_x - offset_x < other->size_x || this->size_y - offset_y < other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
-	FUNCTION(copy_tda)(this->data + offset_x + this->size_x * offset_y, other->data, other->size_x * other->size_y, other->size_x, this->size_x, other->tda);
+
+	ATOM *restrict data = this->data + this->size_x * offset_y + offset_x;
+	const size_t tda = this->size_x;
+	const ATOM *restrict other_data = other->data;
+	const size_t other_tda = other->tda;
+
+	const size_t size = other->size_x;
+	const size_t rows = other->size_y;
+	for(size_t row = 0; row < rows; ++row) {
+		for(size_t i = 0; i < size; ++i)
+			data[i] = other_data[i];
+
+		/* adjust current row */
+		data += tda;
+		other_data += other_tda;
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrixview_copy)(VIEW(Matrix) *this, const VIEW(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy_tda)(this->data, other->data, this->size_x * this->size_y, this->size_x, this->tda, other->tda);
+
+	ATOM *restrict data = this->data;
+	const size_t tda = this->tda;
+	const ATOM *restrict other_data = other->data;
+	const size_t other_tda = other->tda;
+
+	const size_t size = this->size_x;
+	const size_t rows = this->size_y;
+	for(size_t row = 0; row < rows; ++row) {
+		for(size_t i = 0; i < size; ++i)
+			data[i] = other_data[i];
+
+		/* adjust current row */
+		data += tda;
+		other_data += other_tda;
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrixview_copy_matrix)(VIEW(Matrix) *this, const TYPE(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(copy_tda)(this->data, other->data, other->size_x * other->size_y, other->size_x, this->tda, other->size_x);
+
+	ATOM *restrict data = this->data;
+	const size_t tda = this->tda;
+	const ATOM *restrict other_data = other->data;
+	const size_t other_tda = other->size_x;
+
+	const size_t size = this->size_x;
+	const size_t rows = this->size_y;
+	for(size_t row = 0; row < rows; ++row) {
+		for(size_t i = 0; i < size; ++i)
+			data[i] = other_data[i];
+
+		/* adjust current row */
+		data += tda;
+		other_data += other_tda;
+	}
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_swap)(TYPE(Matrix) *this, TYPE(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(swap)(this->data, other->data, this->size_x * this->size_y);
+
+	ATOM *restrict data = this->data;
+	ATOM *restrict other_data = other->data;
+	ATOM tmp;
+
+	const size_t size = this->size_x * this->size_y;
+	for(size_t i = 0; i < size; ++i)
+		CUL_SWAP(data[i], other_data[i], tmp);
+
 	return CUL_SUCCESS;
 }
 
@@ -201,7 +319,15 @@ cul_errno FUNCTION(matrix_swap_row)(TYPE(Matrix) *this, TYPE(Matrix) *other, siz
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	if( this->size_x != other->size_x )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(swap)(this->data + this->size_x * row, other->data + other->size_x * other_row, this->size_x);
+
+	ATOM *restrict data = this->data + this->size_x * row;
+	ATOM *restrict other_data = other->data + other->size_x * other_row;
+	ATOM tmp;
+
+	const size_t size = this->size_x;
+	for(size_t i = 0; i < size; ++i)
+		CUL_SWAP(data[i], other_data[i], tmp);
+
 	return CUL_SUCCESS;
 }
 
@@ -210,14 +336,41 @@ cul_errno FUNCTION(matrix_swap_col)(TYPE(Matrix) *this, TYPE(Matrix) *other, siz
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 	if( this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(swap_stride)(this->data + col, other->data + other_col, this->size_y, this->size_x, other->size_x);
+
+	ATOM *restrict data = this->data + col;
+	const size_t stride = this->size_x;
+	ATOM *restrict other_data = other->data + other_col;
+	const size_t other_stride = other->size_x;
+	ATOM tmp;
+
+	const size_t size = stride * this->size_y;
+	for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+		CUL_SWAP(data[i], other_data[other_i], tmp);
+
 	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrixview_swap)(VIEW(Matrix) *this, VIEW(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	FUNCTION(swap_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->tda, other->tda);
+
+	ATOM *restrict data = this->data;
+	const size_t tda = this->tda;
+	ATOM *restrict other_data = other->data;
+	const size_t other_tda = other->tda;
+	ATOM tmp;
+
+	const size_t size = this->size_x;
+	const size_t rows = this->size_y;
+	for(size_t row = 0; row < rows; ++row) {
+		for(size_t i = 0; i < size; ++i)
+			CUL_SWAP(data[i], other_data[i], tmp);
+
+		/* adjust current row */
+		data += tda;
+		other_data += other_tda;
+	}
+
 	return CUL_SUCCESS;
 }
 
@@ -248,8 +401,23 @@ cul_errno FUNCTION(matrix_resize)(TYPE(Matrix) *this, size_t x, size_t y) {
 
 	if( x == copy_x )
 		memcpy(data, this->data, copy_x*copy_y*sizeof(ATOM));
-	else
-		FUNCTION(copy_tda)(data, this->data, this->size_x * copy_y, copy_x, x, this->size_x);
+	else {
+		ATOM *restrict this_data = data;
+		const size_t this_tda = x;
+		const ATOM *restrict other_data = this->data;
+		const size_t other_tda = this->size_x;
+
+		const size_t size = copy_x;
+		const size_t rows = copy_y;
+		for(size_t row = 0; row < rows; ++row) {
+			for(size_t i = 0; i < size; ++i)
+				this_data[i] = other_data[i];
+
+			/* adjust current row */
+			this_data += this_tda;
+			other_data += other_tda;
+		}
+	}
 
 	free(this->data);
 	FUNCTION(matrix_init_struct)(this, data, x, y);
