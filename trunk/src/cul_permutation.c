@@ -18,10 +18,9 @@ cul_bool cul_permutation_valid(const CulUVector *this) {
 }
 
 cul_bool cul_permutationview_valid(const CulUVectorView *this) {
+	const size_t stride = this->stride, size = stride * this->size;
 	const size_t *restrict data = this->data;
 
-	const size_t stride = this->stride;
-	const size_t size = stride * this->size;
 	for(size_t i = 0; i < size; i += stride) {
 		/* check for item value */
 		if( data[i] >= size )
@@ -66,10 +65,9 @@ void cul_permutation_reverse(CulUVector *this) {
 }
 
 void cul_permutationview_identity(CulUVectorView *this) {
+	const size_t stride = this->stride, size = stride * this->size;
 	size_t *restrict data = this->data;
 
-	const size_t stride = this->stride;
-	const size_t size = stride * this->size;
 	for(size_t i = 0, j = 0; i < size; i += stride, ++j)
 		data[i] = j;
 }
@@ -86,10 +84,10 @@ void cul_permutationview_shuffle(CulUVectorView *this, const CulRng *rng) {
 }
 
 void cul_permutationview_reverse(CulUVectorView *this) {
+	const size_t stride = this->stride;
 	size_t *restrict data = this->data;
 	size_t tmp, pos;
 
-	const size_t stride = this->stride;
 	const size_t half = stride * (this->size / 2);
 	const size_t size = stride * (this->size - 1);
 	for(size_t i = 0; i < half; i += stride) {
