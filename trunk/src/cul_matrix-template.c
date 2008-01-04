@@ -440,27 +440,49 @@ cul_errno FUNCTION(matrix_resize_empty)(TYPE(Matrix) *this, size_t x, size_t y) 
 }
 
 void FUNCTION(matrix_set_all)(TYPE(Matrix) *this, ATOM value) {
-	FUNCTION(set)(this->data, this->size_x * this->size_y, value);
+	ATOM *restrict data = this->data;
+
+	/* set all */
+	const size_t size = this->size_x * this->size_y;
+	for(size_t i = 0; i < size; ++i)
+		data[i] = value;
 }
 
 void FUNCTION(matrix_set_diag)(TYPE(Matrix) *this, ATOM value, ATOM diag) {
-	FUNCTION(set)(this->data, this->size_x * this->size_y, value);
-	FUNCTION(set_stride)(this->data, this->size_x * this->size_y, this->size_x + 1, diag);
+	ATOM *restrict data = this->data;
+
+	/* set all */
+	const size_t size = this->size_x * this->size_y;
+	for(size_t i = 0; i < size; ++i)
+		data[i] = value;
+
+	/* set diag */
+	const size_t stride = this->size_x + 1;
+	for(size_t i = 0; i < size; i += stride)
+		data[i] = diag;
 }
 
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(matrix_add_constant)(TYPE(Matrix) *this, double value) {
-		FUNCTION(add_constant)(this->data, this->size_x * this->size_y, value);
+		ATOM *restrict data = this->data;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			data[i] += value;
 	}
 
 	void FUNCTION(matrix_scale)(TYPE(Matrix) *this, double value) {
-		FUNCTION(scale)(this->data, this->size_x * this->size_y, value);
+		ATOM *restrict data = this->data;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			data[i] *= value;
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(matrix_zero)(TYPE(Matrix) *this) {
-	FUNCTION(zero)(this->data, this->size_x * this->size_y);
+	memset(this->data, 0, this->size_x * this->size_y * sizeof(ATOM));
 }
 
 #ifndef TEMPLATE_CUL_PTR
@@ -495,21 +517,50 @@ void FUNCTION(matrix_zero)(TYPE(Matrix) *this) {
 #endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(matrixview_set_all)(VIEW(Matrix) *this, ATOM value) {
-	FUNCTION(set_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda, value);
+	ATOM *restrict data = this->data;
+	const size_t row = this->size_x, tda = this->tda - row;
+
+	/* set all */
+	const size_t size = this->tda * this->size_y;
+	for(size_t i = 0; i < size; i += tda)
+		for(const size_t end = i + row; i < end; ++i)
+			data[i] = value;
 }
 
 void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
-	FUNCTION(set_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda, value);
-	FUNCTION(set_stride)(this->data, this->tda * this->size_y, this->tda + 1, diag);
+	ATOM *restrict data = this->data;
+	const size_t row = this->size_x, tda = this->tda - row;
+
+	/* set all */
+	const size_t size = this->tda * this->size_y;
+	for(size_t i = 0; i < size; i += tda)
+		for(const size_t end = i + row; i < end; ++i)
+			data[i] = value;
+
+	/* set diag */
+	for(size_t i = 0; i < size; i += (tda + 1))
+		data[i] = diag;
 }
 
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(matrixview_add_constant)(VIEW(Matrix) *this, double value) {
-		FUNCTION(add_constant_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda, value);
+		ATOM *restrict data = this->data;
+		const size_t row = this->size_x, tda = this->tda - row;
+
+		const size_t size = this->tda * this->size_y;
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i)
+				data[i] += value;
 	}
 
 	void FUNCTION(matrixview_scale)(VIEW(Matrix) *this, double value) {
-		FUNCTION(scale_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda, value);
+		ATOM *restrict data = this->data;
+		const size_t row = this->size_x, tda = this->tda - row;
+
+		const size_t size = this->tda * this->size_y;
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i)
+				data[i] *= value;
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */

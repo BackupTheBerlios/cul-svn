@@ -9,16 +9,6 @@ void     cul_ipermute_stride      (int *data, const size_t *permutation, size_t 
 void     cul_ireverse             (int *data, size_t size);
 void     cul_ireverse_stride      (int *data, size_t size, size_t stride);
 
-void     cul_iset                 (int *data, size_t size, int value);
-void     cul_iset_stride          (int *data, size_t size, size_t stride, int value);
-void     cul_iset_tda             (int *data, size_t size, size_t tda_size, size_t tda, int value);
-void     cul_iadd_constant        (int *data, size_t size, double value);
-void     cul_iadd_constant_stride (int *data, size_t size, size_t stride, double value);
-void     cul_iadd_constant_tda    (int *data, size_t size, size_t tda_size, size_t tda, double value);
-void     cul_iscale               (int *data, size_t size, double value);
-void     cul_iscale_stride        (int *data, size_t size, size_t stride, double value);
-void     cul_iscale_tda           (int *data, size_t size, size_t tda_size, size_t tda, double value);
-void     cul_izero                (int *data, size_t size);
 void     cul_iadd                 (int *data, const int *other, size_t size);
 void     cul_iadd_stride          (int *data, const int *other, size_t size, size_t stride, size_t other_stride);
 void     cul_iadd_tda             (int *data, const int *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);

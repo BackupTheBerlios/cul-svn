@@ -9,16 +9,6 @@ void     cul_dpermute_stride      (double *data, const size_t *permutation, size
 void     cul_dreverse             (double *data, size_t size);
 void     cul_dreverse_stride      (double *data, size_t size, size_t stride);
 
-void     cul_dset                 (double *data, size_t size, double value);
-void     cul_dset_stride          (double *data, size_t size, size_t stride, double value);
-void     cul_dset_tda             (double *data, size_t size, size_t tda_size, size_t tda, double value);
-void     cul_dadd_constant        (double *data, size_t size, double value);
-void     cul_dadd_constant_stride (double *data, size_t size, size_t stride, double value);
-void     cul_dadd_constant_tda    (double *data, size_t size, size_t tda_size, size_t tda, double value);
-void     cul_dscale               (double *data, size_t size, double value);
-void     cul_dscale_stride        (double *data, size_t size, size_t stride, double value);
-void     cul_dscale_tda           (double *data, size_t size, size_t tda_size, size_t tda, double value);
-void     cul_dzero                (double *data, size_t size);
 void     cul_dadd                 (double *data, const double *other, size_t size);
 void     cul_dadd_stride          (double *data, const double *other, size_t size, size_t stride, size_t other_stride);
 void     cul_dadd_tda             (double *data, const double *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);

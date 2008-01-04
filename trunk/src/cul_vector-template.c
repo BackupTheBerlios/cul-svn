@@ -526,27 +526,47 @@ cul_errno FUNCTION(vector_push_back)(TYPE(Vector) *this, ATOM value) {
 #endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(vector_set_all)(TYPE(Vector) *this, ATOM value) {
-	FUNCTION(set)(this->data, this->size, value);
+	ATOM *restrict data = this->data;
+
+	/* set all */
+	const size_t size = this->size;
+	for(size_t i = 0; i < size; ++i)
+		data[i] = value;
 }
 
-void FUNCTION(vector_set_basis)(TYPE(Vector) *this, size_t i, ATOM value, ATOM basis) {
-	FUNCTION(set)(this->data, this->size, value);
-	FUNCTION(vector_set)(this, i, basis);
+void FUNCTION(vector_set_basis)(TYPE(Vector) *this, size_t index, ATOM value, ATOM basis) {
+	ATOM *restrict data = this->data;
+
+	/* set all */
+	const size_t size = this->size;
+	for(size_t i = 0; i < size; ++i)
+		data[i] = value;
+
+	/* set basis */
+	data[index] = basis;
 }
 
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(vector_add_constant)(TYPE(Vector) *this, double value) {
-		FUNCTION(add_constant)(this->data, this->size, value);
+		ATOM *restrict data = this->data;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			data[i] += value;
 	}
 
 	void FUNCTION(vector_scale)(TYPE(Vector) *this, double value) {
-		FUNCTION(scale)(this->data, this->size, value);
+		ATOM *restrict data = this->data;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			data[i] *= value;
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(vector_zero)(TYPE(Vector) *this) {
-	FUNCTION(zero)(this->data, this->size);
+	memset(this->data, 0, this->size * sizeof(ATOM));
 }
 
 #ifndef TEMPLATE_CUL_PTR
@@ -581,27 +601,51 @@ void FUNCTION(vector_zero)(TYPE(Vector) *this) {
 #endif /* TEMPLATE_CUL_PTR */
 
 void FUNCTION(vectorview_set_all)(VIEW(Vector) *this, ATOM value) {
-	if( this->stride == 1 )
-		FUNCTION(set)(this->data, this->size, value);
-	else
-		FUNCTION(set_stride)(this->data, this->size, this->stride, value);
+	const size_t stride = this->stride, size = stride * this->size;
+	ATOM *restrict data = this->data;
+
+	/* set all */
+	if( stride == 1 ) for(size_t i = 0; i < size; ++i)
+		data[i] = value;
+	else for(size_t i = 0; i < size; i += stride)
+		data[i] = value;
 }
 
-void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t i, ATOM value, ATOM basis) {
-	if( this->stride == 1 )
-		FUNCTION(set)(this->data, this->size, value);
-	else
-		FUNCTION(set_stride)(this->data, this->size, this->stride, value);
-	FUNCTION(vectorview_set)(this, i, basis);
+void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value, ATOM basis) {
+	const size_t stride = this->stride, size = stride * this->size;
+	ATOM *restrict data = this->data;
+
+	/* set all */
+	if( stride == 1 ) for(size_t i = 0; i < size; ++i)
+		data[i] = value;
+	else for(size_t i = 0; i < size; i += stride)
+		data[i] = value;
+
+	/* set basis */
+	data[index * stride] = basis;
 }
 
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(vectorview_add_constant)(VIEW(Vector) *this, double value) {
-		FUNCTION(add_constant_stride)(this->data, this->size, this->stride, value);
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+
+		/* set all */
+		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
+			data[i] += value;
+		else for(size_t i = 0; i < size; i += stride)
+			data[i] += value;
 	}
 
 	void FUNCTION(vectorview_scale)(VIEW(Vector) *this, double value) {
-		FUNCTION(scale_stride)(this->data, this->size, this->stride, value);
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+
+		/* set all */
+		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
+			data[i] *= value;
+		else for(size_t i = 0; i < size; i += stride)
+			data[i] *= value;
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
