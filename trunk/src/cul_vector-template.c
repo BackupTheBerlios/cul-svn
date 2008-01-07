@@ -1022,7 +1022,8 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 		const ATOM *restrict data = this->data;
 
 		for(size_t i = 0; i < size; ++i)
-			each_f(data[i], user_data);
+			if( each_f(data[i], user_data) )
+				break;
 	}
 
 	void FUNCTION(vectorview_sort)(VIEW(Vector) *this, cul_cmp_f *cmp_f) {

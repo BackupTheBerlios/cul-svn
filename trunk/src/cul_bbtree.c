@@ -8,6 +8,7 @@ struct _CulBBTree {
 };
 
 struct _CulBBTreeNode {
+	cul_ptr key;
 	cul_ptr data;
 	CulBBTreeNode *left;
 	CulBBTreeNode *right;
@@ -82,7 +83,7 @@ void cul_bbtree_free(CulBBTree *this, cul_free_f *free_f) {
 	}
 }
 
-CulBBTreeNode *cul_bbtree_insert(CulBBTree *this, cul_ptr data) {
+CulBBTreeNode *cul_bbtree_insert(CulBBTree *this, cul_ptr key, cul_ptr data) {
 	CUL_UNUSED(this);
 	CUL_UNUSED(data);
 	/* TODO cul_bbtree_insert stub */
@@ -126,10 +127,11 @@ CulBBTreeNode *cul_bbtree_find(const CulBBTree *this, cul_ptr data) {
 	return NULL;
 }
 
-void cul_bbtree_each(CulBBTree *this, cul_each_f *each_f, cul_ptr user_data) {
+void cul_bbtree_each(CulBBTree *this, cul_each2_f *each_f, cul_ptr user_data) {
 	CulBBTreeNode *node = cul_bbtree_first(this);
 	for(; node != NULL; node = cul_bbtree_node_next(node))
-		each_f(node->data, user_data);
+		if( each_f(node->key, node->data, user_data) )
+			break;
 }
 
 CulBBTreeNode *cul_bbtree_first(CulBBTree *this) {

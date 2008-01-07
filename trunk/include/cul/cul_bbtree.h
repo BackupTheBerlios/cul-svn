@@ -14,12 +14,12 @@ void           cul_bbtree_free       (CulBBTree *t, cul_free_f *free_f);
 
 size_t         cul_bbtree_nodes      (const CulBBTree *this);
 
-CulBBTreeNode *cul_bbtree_insert     (CulBBTree *this, cul_ptr data);
-cul_bool       cul_bbtree_remove     (CulBBTree *this, cul_ptr data, cul_free_f *free_f);
+CulBBTreeNode *cul_bbtree_insert     (CulBBTree *this, cul_ptr key, cul_ptr data);
+cul_bool       cul_bbtree_remove     (CulBBTree *this, cul_ptr key, cul_free_f *free_f);
 cul_bool       cul_bbtree_remove_node(CulBBTree *this, CulBBTreeNode *node, cul_free_f *free_f);
 
-CulBBTreeNode *cul_bbtree_find       (const CulBBTree *this, cul_ptr data);
-void           cul_bbtree_each       (CulBBTree *this, cul_each_f *each_f, cul_ptr user_data);
+CulBBTreeNode *cul_bbtree_find       (const CulBBTree *this, cul_ptr key);
+void           cul_bbtree_each       (CulBBTree *this, cul_each2_f *each_f, cul_ptr user_data);
 
 CulBBTreeNode *cul_bbtree_first      (CulBBTree *this);
 CulBBTreeNode *cul_bbtree_last       (CulBBTree *this);

@@ -31,7 +31,8 @@ typedef int      cul_cmp_f  (cul_const_ptr a, cul_const_ptr b);
 typedef void     cul_free_f (cul_ptr data);
 typedef cul_ptr  cul_clone_f(cul_const_ptr data);
 typedef void     cul_cpy_f  (cul_ptr copy, cul_const_ptr data);
-typedef void     cul_each_f (cul_ptr data, cul_ptr user_data);
+typedef cul_bool cul_each_f (cul_ptr data, cul_ptr user_data);
+typedef cul_bool cul_each2_f(cul_ptr key, cul_ptr data, cul_ptr user_data);
 
 #define CUL_EQ_F(ptr)    ((cul_eq_f *)(ptr))
 #define CUL_CMP_F(ptr)   ((cul_cmp_f *)(ptr))
@@ -39,5 +40,6 @@ typedef void     cul_each_f (cul_ptr data, cul_ptr user_data);
 #define CUL_CLONE_F(ptr) ((cul_clone_f *)(ptr))
 #define CUL_CPY_F(ptr)   ((cul_cpy_f *)(ptr))
 #define CUL_EACH_F(ptr)  ((cul_each_f *)(ptr))
+#define CUL_EACH2_F(ptr) ((cul_each2_f *)(ptr))
 
 #endif /* __CUL_BASE_GLOBAL_H__ */
