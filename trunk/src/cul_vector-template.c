@@ -259,11 +259,28 @@ cul_errno FUNCTION(vectorview_swap)(VIEW(Vector) *this, VIEW(Vector) *other) {
 }
 
 void FUNCTION(vector_reverse)(TYPE(Vector) *this) {
-	FUNCTION(reverse)(this->data, this->size);
+	/* validate minimum size */
+	if( this->size < 2 )
+		return;
+
+	ATOM *restrict data = this->data;
+	ATOM tmp;
+
+	for(size_t i = 0, last = this->size - 1; i < last; ++i, --last)
+		CUL_SWAP(data[i], data[last], tmp);
 }
 
 void FUNCTION(vectorview_reverse)(VIEW(Vector) *this) {
-	FUNCTION(reverse_stride)(this->data, this->size, this->stride);
+	/* validate minimum size */
+	if( this->size < 2 )
+		return;
+
+	ATOM *restrict data = this->data;
+	const size_t stride = this->stride;
+	ATOM tmp;
+
+	for(size_t i = 0, last = (this->size - 1) * stride; i < last; i += stride, last -= stride)
+		CUL_SWAP(data[i], data[last], tmp);
 }
 
 #ifndef TEMPLATE_CUL_PTR

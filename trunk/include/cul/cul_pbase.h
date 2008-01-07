@@ -3,9 +3,6 @@
 
 #include <cul/cul_base_global.h>
 
-void     cul_preverse         (cul_ptr *data, size_t size);
-void     cul_preverse_stride  (cul_ptr *data, size_t size, size_t stride);
-
 void     cul_psort            (cul_ptr *data, size_t size, cul_cmp_f *cmp_f);
 void     cul_psort_stride     (cul_ptr *data, size_t size, size_t stride, cul_cmp_f *cmp_f);
 cul_ptr *cul_punique          (cul_ptr *data, size_t size, cul_cmp_f *cmp_f);

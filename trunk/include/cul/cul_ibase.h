@@ -4,9 +4,6 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
-void     cul_ireverse             (int *data, size_t size);
-void     cul_ireverse_stride      (int *data, size_t size, size_t stride);
-
 void     cul_iadd                 (int *data, const int *other, size_t size);
 void     cul_iadd_stride          (int *data, const int *other, size_t size, size_t stride, size_t other_stride);
 void     cul_iadd_tda             (int *data, const int *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);

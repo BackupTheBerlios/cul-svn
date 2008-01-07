@@ -1,15 +1,3 @@
-void FUNCTION(reverse)(ATOM *data, size_t size) {
-	ATOM tmp, *last = data + size - 1;
-	for(; data < last; ++data, --last)
-		CUL_SWAP(*data, *last, tmp);
-}
-
-void FUNCTION(reverse_stride)(ATOM *data, size_t size, size_t stride) {
-	ATOM tmp, *last = data + (size - 1) * stride;
-	for(; data < last; data += stride, last -= stride)
-		CUL_SWAP(*data, *last, tmp);
-}
-
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(add)(ATOM *data, const ATOM *other, size_t size) {
 		const ATOM *last = other + size;
