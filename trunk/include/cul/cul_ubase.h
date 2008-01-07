@@ -4,8 +4,6 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
-void     cul_upermute             (size_t *data, const size_t *permutation, size_t size);
-void     cul_upermute_stride      (size_t *data, const size_t *permutation, size_t size, size_t stride);
 void     cul_ureverse             (size_t *data, size_t size);
 void     cul_ureverse_stride      (size_t *data, size_t size, size_t stride);
 

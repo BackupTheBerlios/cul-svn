@@ -3,8 +3,6 @@
 
 #include <cul/cul_base_global.h>
 
-void     cul_ppermute         (cul_ptr *data, const size_t *permutation, size_t size);
-void     cul_ppermute_stride  (cul_ptr *data, const size_t *permutation, size_t size, size_t stride);
 void     cul_preverse         (cul_ptr *data, size_t size);
 void     cul_preverse_stride  (cul_ptr *data, size_t size, size_t stride);
 

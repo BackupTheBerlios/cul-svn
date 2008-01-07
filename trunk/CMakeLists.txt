@@ -55,6 +55,7 @@ SET(CUL_SOURCES
 	src/cul_rng.c
 	src/cul_random.c
 	src/cul_permutation.c
+	src/cul_permute.c
 
 	src/cul_vector.c
 	src/cul_matrix.c

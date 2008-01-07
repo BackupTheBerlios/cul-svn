@@ -1,38 +1,3 @@
-void FUNCTION(permute)(ATOM *data, const size_t *permutation, size_t size) {
-	ATOM tmp;
-
-	for(size_t k=0; k<size; ++k) {
-		size_t k0, kn = permutation[k];
-
-		for(k0 = kn; kn<k; k0 = kn)
-			kn = permutation[ k0 ];
-
-		if( kn == k )
-			continue;
-
-		CUL_SWAP(data[kn], data[k], tmp);
-	}
-}
-
-void FUNCTION(permute_stride)(ATOM *data, const size_t *permutation, size_t size, size_t stride) {
-	ATOM tmp;
-
-	/* adjust size to actual number of items */
-	size /= stride;
-
-	for(size_t k=0; k<size; ++k) {
-		size_t k0, kn = permutation[k];
-
-		for(k0 = kn; kn<k; k0 = kn)
-			kn = permutation[ k0 ];
-
-		if( kn == k )
-			continue;
-
-		CUL_SWAP(data[kn*stride], data[k*stride], tmp);
-	}
-}
-
 void FUNCTION(reverse)(ATOM *data, size_t size) {
 	ATOM tmp, *last = data + size - 1;
 	for(; data < last; ++data, --last)
