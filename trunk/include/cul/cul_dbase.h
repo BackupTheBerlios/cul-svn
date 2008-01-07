@@ -4,21 +4,6 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
-void     cul_dadd                 (double *data, const double *other, size_t size);
-void     cul_dadd_stride          (double *data, const double *other, size_t size, size_t stride, size_t other_stride);
-void     cul_dadd_tda             (double *data, const double *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_dsub                 (double *data, const double *other, size_t size);
-void     cul_dsub_stride          (double *data, const double *other, size_t size, size_t stride, size_t other_stride);
-void     cul_dsub_tda             (double *data, const double *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_dmul                 (double *data, const double *other, size_t size);
-void     cul_dmul_stride          (double *data, const double *other, size_t size, size_t stride, size_t other_stride);
-void     cul_dmul_tda             (double *data, const double *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_ddiv                 (double *data, const double *other, size_t size);
-void     cul_ddiv_stride          (double *data, const double *other, size_t size, size_t stride, size_t other_stride);
-void     cul_ddiv_tda             (double *data, const double *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-double   cul_ddot                 (double *data, const double *other, size_t size);
-double   cul_ddot_stride          (double *data, const double *other, size_t size, size_t stride, size_t other_stride);
-
 double   cul_dmin                 (const double *data, size_t size);
 double   cul_dmin_stride          (const double *data, size_t size, size_t stride);
 static inline double cul_dmin_2   (double value_a, double value_b);

@@ -590,28 +590,56 @@ void FUNCTION(vector_zero)(TYPE(Vector) *this) {
 	cul_errno FUNCTION(vector_add)(TYPE(Vector) *this, const TYPE(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(add)(this->data, other->data, this->size);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			data[i] += other_data[i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vector_sub)(TYPE(Vector) *this, const TYPE(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(sub)(this->data, other->data, this->size);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			data[i] -= other_data[i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vector_mul)(TYPE(Vector) *this, const TYPE(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(mul)(this->data, other->data, this->size);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			data[i] *= other_data[i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vector_div)(TYPE(Vector) *this, const TYPE(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(div)(this->data, other->data, this->size);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			data[i] /= other_data[i];
+
 		return CUL_SUCCESS;
 	}
 #else /* TEMPLATE_CUL_PTR */
@@ -671,28 +699,64 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 	cul_errno FUNCTION(vectorview_add)(VIEW(Vector) *this, const VIEW(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(add_stride)(this->data, other->data, this->size, this->stride, other->stride);
+
+		ATOM *restrict data = this->data;
+		const size_t stride = this->stride;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_stride = other->stride;
+
+		const size_t size = stride * this->size;
+		for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+			data[i] += other_data[other_i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vectorview_sub)(VIEW(Vector) *this, const VIEW(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(sub_stride)(this->data, other->data, this->size, this->stride, other->stride);
+
+		ATOM *restrict data = this->data;
+		const size_t stride = this->stride;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_stride = other->stride;
+
+		const size_t size = stride * this->size;
+		for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+			data[i] -= other_data[other_i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vectorview_mul)(VIEW(Vector) *this, const VIEW(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(mul_stride)(this->data, other->data, this->size, this->stride, other->stride);
+
+		ATOM *restrict data = this->data;
+		const size_t stride = this->stride;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_stride = other->stride;
+
+		const size_t size = stride * this->size;
+		for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+			data[i] *= other_data[other_i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vectorview_div)(VIEW(Vector) *this, const VIEW(Vector)  *other) {
 		if( this->size != other->size )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(div_stride)(this->data, other->data, this->size, this->stride, other->stride);
+
+		ATOM *restrict data = this->data;
+		const size_t stride = this->stride;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_stride = other->stride;
+
+		const size_t size = stride * this->size;
+		for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
+			data[i] /= other_data[other_i];
+
 		return CUL_SUCCESS;
 	}
 #else /* TEMPLATE_CUL_PTR */

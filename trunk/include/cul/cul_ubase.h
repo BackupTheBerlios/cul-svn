@@ -4,21 +4,6 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
-void     cul_uadd                 (size_t *data, const size_t *other, size_t size);
-void     cul_uadd_stride          (size_t *data, const size_t *other, size_t size, size_t stride, size_t other_stride);
-void     cul_uadd_tda             (size_t *data, const size_t *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_usub                 (size_t *data, const size_t *other, size_t size);
-void     cul_usub_stride          (size_t *data, const size_t *other, size_t size, size_t stride, size_t other_stride);
-void     cul_usub_tda             (size_t *data, const size_t *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_umul                 (size_t *data, const size_t *other, size_t size);
-void     cul_umul_stride          (size_t *data, const size_t *other, size_t size, size_t stride, size_t other_stride);
-void     cul_umul_tda             (size_t *data, const size_t *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_udiv                 (size_t *data, const size_t *other, size_t size);
-void     cul_udiv_stride          (size_t *data, const size_t *other, size_t size, size_t stride, size_t other_stride);
-void     cul_udiv_tda             (size_t *data, const size_t *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-size_t   cul_udot                 (size_t *data, const size_t *other, size_t size);
-size_t   cul_udot_stride          (size_t *data, const size_t *other, size_t size, size_t stride, size_t other_stride);
-
 size_t   cul_umin                 (const size_t *data, size_t size);
 size_t   cul_umin_stride          (const size_t *data, size_t size, size_t stride);
 static inline size_t cul_umin_2   (size_t value_a, size_t value_b);

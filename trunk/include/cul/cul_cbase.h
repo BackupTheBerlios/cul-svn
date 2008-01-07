@@ -4,21 +4,6 @@
 #include <cul/cul_base_global.h>
 #include <stdio.h>
 
-void     cul_cadd                 (char *data, const char *other, size_t size);
-void     cul_cadd_stride          (char *data, const char *other, size_t size, size_t stride, size_t other_stride);
-void     cul_cadd_tda             (char *data, const char *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_csub                 (char *data, const char *other, size_t size);
-void     cul_csub_stride          (char *data, const char *other, size_t size, size_t stride, size_t other_stride);
-void     cul_csub_tda             (char *data, const char *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_cmul                 (char *data, const char *other, size_t size);
-void     cul_cmul_stride          (char *data, const char *other, size_t size, size_t stride, size_t other_stride);
-void     cul_cmul_tda             (char *data, const char *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-void     cul_cdiv                 (char *data, const char *other, size_t size);
-void     cul_cdiv_stride          (char *data, const char *other, size_t size, size_t stride, size_t other_stride);
-void     cul_cdiv_tda             (char *data, const char *other, size_t size, size_t tda_size, size_t tda, size_t other_tda);
-char     cul_cdot                 (char *data, const char *other, size_t size);
-char     cul_cdot_stride          (char *data, const char *other, size_t size, size_t stride, size_t other_stride);
-
 char     cul_cmin                 (const char *data, size_t size);
 char     cul_cmin_stride          (const char *data, size_t size, size_t stride);
 static inline char cul_cmin_2     (char value_a, char value_b);

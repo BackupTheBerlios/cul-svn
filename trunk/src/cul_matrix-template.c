@@ -489,28 +489,56 @@ void FUNCTION(matrix_zero)(TYPE(Matrix) *this) {
 	cul_errno FUNCTION(matrix_add)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(add)(this->data, other->data, other->size_x * other->size_y);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			data[i] += other_data[i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(matrix_sub)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(sub)(this->data, other->data, other->size_x * other->size_y);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			data[i] -= other_data[i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(matrix_mul)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(mul)(this->data, other->data, other->size_x * other->size_y);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			data[i] *= other_data[i];
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(matrix_div)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(div)(this->data, other->data, other->size_x * other->size_y);
+
+		ATOM *restrict data = this->data;
+		const ATOM *restrict other_data = other->data;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			data[i] /= other_data[i];
+
 		return CUL_SUCCESS;
 	}
 #else /* TEMPLATE_CUL_PTR */
@@ -569,28 +597,92 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 	cul_errno FUNCTION(matrixview_add)(VIEW(Matrix) *this, const VIEW(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(add_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->tda, other->tda);
+
+		ATOM *restrict data = this->data;
+		const size_t tda = this->size_x;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_tda = other->tda;
+
+		const size_t size = this->size_x;
+		const size_t rows = this->size_y;
+		for(size_t row = 0; row < rows; ++row) {
+			for(size_t i = 0; i < size; ++i)
+				data[i] += other_data[i];
+
+			/* adjust current row */
+			data += tda;
+			other_data += other_tda;
+		}
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(matrixview_sub)(VIEW(Matrix) *this, const VIEW(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(sub_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->tda, other->tda);
+
+		ATOM *restrict data = this->data;
+		const size_t tda = this->size_x;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_tda = other->tda;
+
+		const size_t size = this->size_x;
+		const size_t rows = this->size_y;
+		for(size_t row = 0; row < rows; ++row) {
+			for(size_t i = 0; i < size; ++i)
+				data[i] -= other_data[i];
+
+			/* adjust current row */
+			data += tda;
+			other_data += other_tda;
+		}
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(matrixview_mul)(VIEW(Matrix) *this, const VIEW(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(mul_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->tda, other->tda);
+
+		ATOM *restrict data = this->data;
+		const size_t tda = this->size_x;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_tda = other->tda;
+
+		const size_t size = this->size_x;
+		const size_t rows = this->size_y;
+		for(size_t row = 0; row < rows; ++row) {
+			for(size_t i = 0; i < size; ++i)
+				data[i] *= other_data[i];
+
+			/* adjust current row */
+			data += tda;
+			other_data += other_tda;
+		}
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(matrixview_div)(VIEW(Matrix) *this, const VIEW(Matrix) *other) {
 		if( this->size_x != other->size_x || this->size_y != other->size_y )
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-		FUNCTION(div_tda)(this->data, other->data, other->tda * other->size_y, other->size_x, this->tda, other->tda);
+
+		ATOM *restrict data = this->data;
+		const size_t tda = this->size_x;
+		const ATOM *restrict other_data = other->data;
+		const size_t other_tda = other->tda;
+
+		const size_t size = this->size_x;
+		const size_t rows = this->size_y;
+		for(size_t row = 0; row < rows; ++row) {
+			for(size_t i = 0; i < size; ++i)
+				data[i] /= other_data[i];
+
+			/* adjust current row */
+			data += tda;
+			other_data += other_tda;
+		}
+
 		return CUL_SUCCESS;
 	}
 #else /* TEMPLATE_CUL_PTR */
