@@ -572,23 +572,33 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(matrixview_add_constant)(VIEW(Matrix) *this, double value) {
-		ATOM *restrict data = this->data;
-		const size_t row = this->size_x, tda = this->tda - row;
-
 		const size_t size = this->tda * this->size_y;
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i)
+		ATOM *restrict data = this->data;
+
+		if( this->tda == this->size_x ) {
+			for(size_t i = 0; i < size; ++i)
 				data[i] += value;
+		} else {
+			const size_t row = this->size_x, tda = this->tda - row;
+			for(size_t i = 0; i < size; i += tda)
+				for(const size_t end = i + row; i < end; ++i)
+					data[i] += value;
+		}
 	}
 
 	void FUNCTION(matrixview_scale)(VIEW(Matrix) *this, double value) {
-		ATOM *restrict data = this->data;
-		const size_t row = this->size_x, tda = this->tda - row;
-
 		const size_t size = this->tda * this->size_y;
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i)
+		ATOM *restrict data = this->data;
+
+		if( this->tda == this->size_x ) {
+			for(size_t i = 0; i < size; ++i)
 				data[i] *= value;
+		} else {
+			const size_t row = this->size_x, tda = this->tda - row;
+			for(size_t i = 0; i < size; i += tda)
+				for(const size_t end = i + row; i < end; ++i)
+					data[i] *= value;
+		}
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
@@ -717,35 +727,99 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 #ifndef TEMPLATE_CUL_PTR
 	double FUNCTION(matrix_sum)(const TYPE(Matrix) *this) {
-		return FUNCTION(sum)(this->data, this->size_x * this->size_y);
+		ATOM *restrict data = this->data;
+		double sum = 0.0;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			sum += data[i];
+
+		return sum;
 	}
 
 	double FUNCTION(matrix_mean)(const TYPE(Matrix) *this) {
-		return FUNCTION(mean)(this->data, this->size_x * this->size_y);
+		ATOM *restrict data = this->data;
+		double mean = 0.0;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			mean += data[i];
+
+		return mean / size;
 	}
 
 	double FUNCTION(matrix_variance)(const TYPE(Matrix) *this) {
-		return FUNCTION(variance)(this->data, this->size_x * this->size_y);
+		double mean = FUNCTION(matrix_mean)(this);
+		return FUNCTION(matrix_variance_mean)(this, mean);
 	}
 
 	double FUNCTION(matrix_variance_mean)(const TYPE(Matrix) *this, double mean) {
-		return FUNCTION(variance_mean)(this->data, this->size_x * this->size_y, mean);
+		ATOM *restrict data = this->data;
+		double variance = 0.0;
+
+		const size_t size = this->size_x * this->size_y;
+		for(size_t i = 0; i < size; ++i)
+			variance += (data[i] - mean)*(data[i] - mean);
+		return variance / size;
 	}
 
 	double FUNCTION(matrixview_sum)(const VIEW(Matrix) *this) {
-		return FUNCTION(sum_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda);
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		double sum = 0.0;
+
+		if( this->tda == this->size_x ) {
+			for(size_t i = 0; i < size; ++i)
+				sum += data[i];
+		} else {
+			const size_t row = this->size_x, tda = this->tda - row;
+			for(size_t i = 0; i < size; i += tda)
+				for(const size_t end = i + row; i < end; ++i)
+					sum += data[i];
+		}
+
+		return sum;
 	}
 	
 	double FUNCTION(matrixview_mean)(const VIEW(Matrix) *this) {
-		return FUNCTION(mean_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda);
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		double mean = 0.0;
+
+		if( this->tda == this->size_x ) {
+			for(size_t i = 0; i < size; ++i)
+				mean += data[i];
+		} else {
+			const size_t row = this->size_x, tda = this->tda - row;
+			for(size_t i = 0; i < size; i += tda)
+				for(const size_t end = i + row; i < end; ++i)
+					mean += data[i];
+		}
+
+		return mean / (this->size_x * this->size_y);
 	}
 	
 	double FUNCTION(matrixview_variance)(const VIEW(Matrix) *this) {
-		return FUNCTION(variance_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda);
+		double mean = FUNCTION(matrixview_mean)(this);
+		return FUNCTION(matrixview_variance_mean)(this, mean);
 	}
 
 	double FUNCTION(matrixview_variance_mean)(const VIEW(Matrix) *this, double mean) {
-		return FUNCTION(variance_mean_tda)(this->data, this->tda * this->size_y, this->size_x, this->tda, mean);
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		double variance = 0.0;
+
+		if( this->tda == this->size_x ) {
+			for(size_t i = 0; i < size; ++i)
+				variance += (data[i] - mean)*(data[i] - mean);
+		} else {
+			const size_t row = this->size_x, tda = this->tda - row;
+			for(size_t i = 0; i < size; i += tda)
+				for(const size_t end = i + row; i < end; ++i)
+					variance += (data[i] - mean)*(data[i] - mean);
+		}
+
+		return variance / (this->size_x * this->size_y);
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */

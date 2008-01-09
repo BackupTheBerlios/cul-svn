@@ -19,19 +19,6 @@ void     cul_dminmax_stride       (const double *data, size_t size, size_t strid
 void     cul_dminmax_index        (const double *data, size_t size, size_t *min_index, size_t *max_index);
 void     cul_dminmax_index_stride (const double *data, size_t size, size_t stride, size_t *min_index, size_t *max_index);
 
-double   cul_dsum                 (const double *data, size_t size);
-double   cul_dsum_stride          (const double *data, size_t size, size_t stride);
-double   cul_dsum_tda             (const double *data, size_t size, size_t tda_size, size_t tda);
-double   cul_dmean                (const double *data, size_t size);
-double   cul_dmean_stride         (const double *data, size_t size, size_t stride);
-double   cul_dmean_tda            (const double *data, size_t size, size_t tda_size, size_t tda);
-double   cul_dvariance            (const double *data, size_t size);
-double   cul_dvariance_stride     (const double *data, size_t size, size_t stride);
-double   cul_dvariance_tda        (const double *data, size_t size, size_t tda_size, size_t tda);
-double   cul_dvariance_mean       (const double *data, size_t size, double mean);
-double   cul_dvariance_mean_stride(const double *data, size_t size, size_t stride, double mean);
-double   cul_dvariance_mean_tda   (const double *data, size_t size, size_t tda_size, size_t tda, double mean);
-
 void     cul_dsort_asc            (double *data, size_t size);
 void     cul_dsort_asc_stride     (double *data, size_t size, size_t stride);
 void     cul_dsort_desc           (double *data, size_t size);

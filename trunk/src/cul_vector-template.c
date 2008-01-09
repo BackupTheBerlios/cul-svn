@@ -815,35 +815,84 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 #ifndef TEMPLATE_CUL_PTR
 	double FUNCTION(vector_sum)(const TYPE(Vector) *this) {
-		return FUNCTION(sum)(this->data, this->size);
+		ATOM *restrict data = this->data;
+		double sum = 0.0;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			sum += data[i];
+
+		return sum;
 	}
 
 	double FUNCTION(vector_mean)(const TYPE(Vector) *this) {
-		return FUNCTION(mean)(this->data, this->size);
+		ATOM *restrict data = this->data;
+		double mean = 0.0;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			mean += data[i];
+
+		return mean / size;
 	}
 
 	double FUNCTION(vector_variance)(const TYPE(Vector) *this) {
-		return FUNCTION(variance)(this->data, this->size);
+		double mean = FUNCTION(vector_mean)(this);
+		return FUNCTION(vector_variance_mean)(this, mean);
 	}
 
 	double FUNCTION(vector_variance_mean)(const TYPE(Vector) *this, double mean) {
-		return FUNCTION(variance_mean)(this->data, this->size, mean);
+		ATOM *restrict data = this->data;
+		double variance = 0.0;
+
+		const size_t size = this->size;
+		for(size_t i = 0; i < size; ++i)
+			variance += (data[i] - mean)*(data[i] - mean);
+		return variance / size;
 	}
 
 	double FUNCTION(vectorview_sum)(const VIEW(Vector) *this) {
-		return FUNCTION(sum_stride)(this->data, this->size, this->stride);
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		double sum = 0.0;
+
+		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
+			sum += data[i];
+		else for(size_t i = 0; i < size; i += stride)
+			sum += data[i];
+
+		return sum;
 	}
 	
 	double FUNCTION(vectorview_mean)(const VIEW(Vector) *this) {
-		return FUNCTION(mean_stride)(this->data, this->size, this->stride);
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		double mean = 0.0;
+
+		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
+			mean += data[i];
+		else for(size_t i = 0; i < size; i += stride)
+			mean += data[i];
+
+		return mean / this->size;
 	}
 	
 	double FUNCTION(vectorview_variance)(const VIEW(Vector) *this) {
-		return FUNCTION(variance_stride)(this->data, this->size, this->stride);
+		double mean = FUNCTION(vectorview_mean)(this);
+		return FUNCTION(vectorview_variance_mean)(this, mean);
 	}
 
 	double FUNCTION(vectorview_variance_mean)(const VIEW(Vector) *this, double mean) {
-		return FUNCTION(variance_mean_stride)(this->data, this->size, this->stride, mean);
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		double variance = 0.0;
+
+		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
+			variance += (data[i] - mean)*(data[i] - mean);
+		else for(size_t i = 0; i < size; i += stride)
+			variance += (data[i] - mean)*(data[i] - mean);
+			
+		return variance / this->size;
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
