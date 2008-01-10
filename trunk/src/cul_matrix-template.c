@@ -100,7 +100,8 @@ VIEW(Vector) *FUNCTION(matrixview_col)(VIEW(Vector) *this, const TYPE(Matrix) *b
 VIEW(Vector) *FUNCTION(matrixview_diag)(VIEW(Vector) *this, const TYPE(Matrix) *base) {
 	if( this == NULL && (this = FUNCTION(vectorview_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	return FUNCTION(vectorview_init_struct)(this, base->data, cul_umin_2(base->size_x, base->size_y), base->size_x + 1);
+	const size_t size = base->size_x < base->size_y? base->size_x: base->size_y;
+	return FUNCTION(vectorview_init_struct)(this, base->data, size, base->size_x + 1);
 }
 
 VIEW(Vector) *FUNCTION(matrixview_subdiag)(VIEW(Vector) *this, const TYPE(Matrix) *base, size_t base_k) {
@@ -108,7 +109,8 @@ VIEW(Vector) *FUNCTION(matrixview_subdiag)(VIEW(Vector) *this, const TYPE(Matrix
 		CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 	if( this == NULL && (this = FUNCTION(vectorview_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	return FUNCTION(vectorview_init_struct)(this, base->data + base->size_x * base_k, cul_umin_2(base->size_x - base_k, base->size_y), base->size_x + 1);
+	const size_t size = base->size_x - base_k < base->size_y? base->size_x - base_k: base->size_y;
+	return FUNCTION(vectorview_init_struct)(this, base->data + base->size_x * base_k, size, base->size_x + 1);
 }
 
 VIEW(Vector) *FUNCTION(matrixview_superdiag)(VIEW(Vector) *this, const TYPE(Matrix) *base, size_t base_k) {
@@ -116,7 +118,8 @@ VIEW(Vector) *FUNCTION(matrixview_superdiag)(VIEW(Vector) *this, const TYPE(Matr
 		CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
 	if( this == NULL && (this = FUNCTION(vectorview_new_struct)()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	return FUNCTION(vectorview_init_struct)(this, base->data + base_k, cul_umin_2(base->size_x, base->size_y - base_k), base->size_x + 1);
+	const size_t size = base->size_x < base->size_y - base_k? base->size_x: base->size_y - base_k;
+	return FUNCTION(vectorview_init_struct)(this, base->data + base_k, size, base->size_x + 1);
 }
 
 cul_errno FUNCTION(matrix_copy)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
@@ -700,52 +703,132 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 #ifndef TEMPLATE_CUL_PTR
 	ATOM FUNCTION(matrix_min)(const TYPE(Matrix) *this) {
-		return FUNCTION(min)(this->data, this->size_x * this->size_y);
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t size = this->size_x * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] < min )
+				min = data[i];
+
+		return min;
 	}
 	
 	size_t FUNCTION(matrix_min_index)(const TYPE(Matrix) *this) {
-		return FUNCTION(min_index)(this->data, this->size_x * this->size_y);
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t size = this->size_x * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+		size_t index = 0;
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] < min ) {
+				min = data[i];
+				index = i;
+			}
+
+		return index;
 	}
 	
 	ATOM FUNCTION(matrix_max)(const TYPE(Matrix) *this) {
-		return FUNCTION(max)(this->data, this->size_x * this->size_y);
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t size = this->size_x * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] > max )
+				max = data[i];
+
+		return max;
 	}
 	
 	size_t FUNCTION(matrix_max_index)(const TYPE(Matrix) *this) {
-		return FUNCTION(max_index)(this->data, this->size_x * this->size_y);
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t size = this->size_x * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+		size_t index = 0;
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] > max ) {
+				max = data[i];
+				index = i;
+			}
+
+		return index;
 	}
 	
-	void FUNCTION(matrix_minmax)(const TYPE(Matrix) *this, ATOM *min, ATOM *max) {
-		return FUNCTION(minmax)(this->data, this->size_x * this->size_y, min, max);
+	void FUNCTION(matrix_minmax)(const TYPE(Matrix) *this, ATOM *min_v, ATOM *max_v) {
+		if( this->size_x == 0 || this->size_y == 0 ) {
+			if( min_v != NULL ) *min_v = EMPTY;
+			if( max_v != NULL ) *max_v = EMPTY;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t size = this->size_x * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = min;
+
+		for(size_t i = 1; i < size; ++i) {
+			if( data[i] < min )
+				min = data[i];
+			if( data[i] > max )
+				max = data[i];
+		}
+
+		if( min_v != NULL ) *min_v = min;
+		if( max_v != NULL ) *max_v = max;
 	}
 	
 	void FUNCTION(matrix_minmax_index)(const TYPE(Matrix) *this, size_t *min_i, size_t *max_i) {
-		return FUNCTION(minmax_index)(this->data, this->size_x * this->size_y, min_i, max_i);
+		if( this->size_x == 0 || this->size_y == 0 ) {
+			if( min_i != NULL ) *min_i = 0;
+			if( max_i != NULL ) *max_i = 0;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t size = this->size_x * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = min;
+		size_t min_index = 0, max_index = 0;
+
+		for(size_t i = 1; i < size; ++i) {
+			if( data[i] < min ) {
+				min = data[i];
+				min_index = i;
+			}
+			if( data[i] > max ) {
+				max = data[i];
+				max_index = i;
+			}
+		}
+
+		if( min_i != NULL ) *min_i = min_index;
+		if( max_i != NULL ) *max_i = max_index;
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 
 #ifndef TEMPLATE_CUL_PTR
-	double FUNCTION(matrix_sum)(const TYPE(Matrix) *this) {
-		ATOM *restrict data = this->data;
-		double sum = 0.0;
-
-		const size_t size = this->size_x * this->size_y;
-		for(size_t i = 0; i < size; ++i)
-			sum += data[i];
-
-		return sum;
-	}
-
 	double FUNCTION(matrix_mean)(const TYPE(Matrix) *this) {
-		ATOM *restrict data = this->data;
-		double mean = 0.0;
-
 		const size_t size = this->size_x * this->size_y;
-		for(size_t i = 0; i < size; ++i)
-			mean += data[i];
+		ATOM *restrict data = this->data;
+		long double mean = 0.0;
 
-		return mean / size;
+		for(size_t i = 0, value_i = 1; i < size; ++i, ++value_i)
+			mean += (data[i] - mean)/value_i;
+
+		return mean;
 	}
 
 	double FUNCTION(matrix_variance)(const TYPE(Matrix) *this) {
@@ -754,49 +837,31 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 	}
 
 	double FUNCTION(matrix_variance_mean)(const TYPE(Matrix) *this, double mean) {
+		const size_t size = this->size_x * this->size_y;
 		ATOM *restrict data = this->data;
 		double variance = 0.0;
 
-		const size_t size = this->size_x * this->size_y;
 		for(size_t i = 0; i < size; ++i)
 			variance += (data[i] - mean)*(data[i] - mean);
 		return variance / size;
 	}
 
-	double FUNCTION(matrixview_sum)(const VIEW(Matrix) *this) {
-		const size_t size = this->tda * this->size_y;
-		ATOM *restrict data = this->data;
-		double sum = 0.0;
-
-		if( this->tda == this->size_x ) {
-			for(size_t i = 0; i < size; ++i)
-				sum += data[i];
-		} else {
-			const size_t row = this->size_x, tda = this->tda - row;
-			for(size_t i = 0; i < size; i += tda)
-				for(const size_t end = i + row; i < end; ++i)
-					sum += data[i];
-		}
-
-		return sum;
-	}
-	
 	double FUNCTION(matrixview_mean)(const VIEW(Matrix) *this) {
 		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
-		double mean = 0.0;
+		long double mean = 0.0;
 
 		if( this->tda == this->size_x ) {
-			for(size_t i = 0; i < size; ++i)
-				mean += data[i];
+			for(size_t i = 0, value_i = 1; i < size; ++i, ++value_i)
+				mean += (data[i] - mean)/value_i;
 		} else {
 			const size_t row = this->size_x, tda = this->tda - row;
-			for(size_t i = 0; i < size; i += tda)
-				for(const size_t end = i + row; i < end; ++i)
-					mean += data[i];
+			for(size_t i = 0, value_i = 1; i < size; i += tda)
+				for(const size_t end = i + row; i < end; ++i, ++value_i)
+					mean += (data[i] - mean)/value_i;
 		}
 
-		return mean / (this->size_x * this->size_y);
+		return mean;
 	}
 	
 	double FUNCTION(matrixview_variance)(const VIEW(Matrix) *this) {

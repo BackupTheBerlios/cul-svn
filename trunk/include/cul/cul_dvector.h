@@ -107,11 +107,9 @@ size_t    cul_dvectorview_max_index    (const CulDVectorView *this);
 void      cul_dvectorview_minmax       (const CulDVectorView *this, double *min, double *max);
 void      cul_dvectorview_minmax_index (const CulDVectorView *this, size_t *min_i, size_t *max_i);
 
-double    cul_dvector_sum              (const CulDVector *this);
 double    cul_dvector_mean             (const CulDVector *this);
 double    cul_dvector_variance         (const CulDVector *this);
 double    cul_dvector_variance_mean    (const CulDVector *this, double mean);
-double    cul_dvectorview_sum          (const CulDVectorView *this);
 double    cul_dvectorview_mean         (const CulDVectorView *this);
 double    cul_dvectorview_variance     (const CulDVectorView *this);
 double    cul_dvectorview_variance_mean(const CulDVectorView *this, double mean);

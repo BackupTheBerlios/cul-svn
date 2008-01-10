@@ -1,10 +1,11 @@
 #include <cul/cul_global.h>
 #include <cul/cul_stream.h>
-#include <cul/cul_base.h>
 #include <cul/cul_vector.h>
 #include <cul/cul_matrix.h>
+#include <cul/cul_base.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define TEMPLATE_CUL_CHAR
 #include "templates_on.h"
@@ -29,3 +30,4 @@
 #include "cul_matrix-template.c"
 #include "templates_off.h"
 #undef  TEMPLATE_CUL_SIZE
+

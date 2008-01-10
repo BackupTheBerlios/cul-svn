@@ -48,7 +48,6 @@ SET(CUL_SOURCES
 	src/cul_tree.c
 	src/cul_bbtree.c
 
-	src/base/cul_base_basic.c
 	src/base/cul_base_alg.c
 	src/base/cul_base_io.c
 

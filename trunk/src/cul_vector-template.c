@@ -764,76 +764,247 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 #ifndef TEMPLATE_CUL_PTR
 	ATOM FUNCTION(vector_min)(const TYPE(Vector) *this) {
-		return FUNCTION(min)(this->data, this->size);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] < min )
+				min = data[i];
+
+		return min;
 	}
 
 	size_t FUNCTION(vector_min_index)(const TYPE(Vector) *this) {
-		return FUNCTION(min_index)(this->data, this->size);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+		size_t index = 0;
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] < min ) {
+				min = data[i];
+				index = i;
+			}
+
+		return index;
 	}
 
 	ATOM FUNCTION(vector_max)(const TYPE(Vector) *this) {
-		return FUNCTION(max)(this->data, this->size);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] > max )
+				max = data[i];
+
+		return max;
 	}
 
 	size_t FUNCTION(vector_max_index)(const TYPE(Vector) *this) {
-		return FUNCTION(max_index)(this->data, this->size);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+		size_t index = 0;
+
+		for(size_t i = 1; i < size; ++i)
+			if( data[i] > max ) {
+				max = data[i];
+				index = i;
+			}
+
+		return index;
 	}
 
-	void FUNCTION(vector_minmax)(const TYPE(Vector) *this, ATOM *min, ATOM *max) {
-		FUNCTION(minmax)(this->data, this->size, min, max);
+	void FUNCTION(vector_minmax)(const TYPE(Vector) *this, ATOM *min_v, ATOM *max_v) {
+		if( this->size == 0 ) {
+			if( min_v != NULL ) *min_v = EMPTY;
+			if( max_v != NULL ) *max_v = EMPTY;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = min;
+
+		for(size_t i = 1; i < size; ++i) {
+			if( data[i] < min )
+				min = data[i];
+			if( data[i] > max )
+				max = data[i];
+		}
+
+		if( min_v != NULL ) *min_v = min;
+		if( max_v != NULL ) *max_v = max;
 	}
 
 	void FUNCTION(vector_minmax_index)(const TYPE(Vector) *this, size_t *min_i, size_t *max_i) {
-		FUNCTION(minmax_index)(this->data, this->size, min_i, max_i);
+		if( this->size == 0 ) {
+			if( min_i != NULL ) *min_i = 0;
+			if( max_i != NULL ) *max_i = 0;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t size = this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = min;
+		size_t min_index = 0, max_index = 0;
+
+		for(size_t i = 1; i < size; ++i) {
+			if( data[i] < min ) {
+				min = data[i];
+				min_index = i;
+			}
+			if( data[i] > max ) {
+				max = data[i];
+				max_index = i;
+			}
+		}
+
+		if( min_i != NULL ) *min_i = min_index;
+		if( max_i != NULL ) *max_i = max_index;
 	}
 
 	ATOM FUNCTION(vectorview_min)(const VIEW(Vector) *this) {
-		return FUNCTION(min_stride)(this->data, this->size, this->stride);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+
+		for(size_t i = stride; i < size; i += stride)
+			if( data[i] < min )
+				min = data[i];
+
+		return min;
 	}
 
 	size_t FUNCTION(vectorview_min_index)(const VIEW(Vector) *this) {
-		return FUNCTION(min_index_stride)(this->data, this->size, this->stride);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+		size_t index = 0;
+
+		for(size_t i = stride; i < size; i += stride)
+			if( data[i] < min ) {
+				min = data[i];
+				index = i;
+			}
+
+		return index / stride;
 	}
 
 	ATOM FUNCTION(vectorview_max)(const VIEW(Vector) *this) {
-		return FUNCTION(max_stride)(this->data, this->size, this->stride);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+
+		for(size_t i = stride; i < size; i += stride)
+			if( data[i] > max )
+				max = data[i];
+
+		return max;
 	}
 
 	size_t FUNCTION(vectorview_max_index)(const VIEW(Vector) *this) {
-		return FUNCTION(max_index_stride)(this->data, this->size, this->stride);
+		if( this->size == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+		size_t index = 0;
+
+		for(size_t i = stride; i < size; i += stride)
+			if( data[i] > max ) {
+				max = data[i];
+				index = i;
+			}
+
+		return index / stride;
 	}
 
-	void FUNCTION(vectorview_minmax)(const VIEW(Vector) *this, ATOM *min, ATOM *max) {
-		FUNCTION(minmax_stride)(this->data, this->size, this->stride, min, max);
+	void FUNCTION(vectorview_minmax)(const VIEW(Vector) *this, ATOM *min_v, ATOM *max_v) {
+		if( this->size == 0 ) {
+			if( min_v != NULL ) *min_v = EMPTY;
+			if( max_v != NULL ) *max_v = EMPTY;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = min;
+
+		for(size_t i = stride; i < size; i += stride) {
+			if( data[i] < min )
+				min = data[i];
+			if( data[i] > max )
+				max = data[i];
+		}
+
+		if( min_v != NULL ) *min_v = min;
+		if( max_v != NULL ) *max_v = max;
 	}
 
 	void FUNCTION(vectorview_minmax_index)(const VIEW(Vector) *this, size_t *min_i, size_t *max_i) {
-		FUNCTION(minmax_index_stride)(this->data, this->size, this->stride, min_i, max_i);
+		if( this->size == 0 ) {
+			if( min_i != NULL ) *min_i = 0;
+			if( max_i != NULL ) *max_i = 0;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t stride = this->stride, size = stride * this->size;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = min;
+		size_t min_index = 0, max_index = 0;
+
+		for(size_t i = stride; i < size; i += stride) {
+			if( data[i] < min ) {
+				min = data[i];
+				min_index = i;
+			}
+			if( data[i] > max ) {
+				max = data[i];
+				max_index = i;
+			}
+		}
+
+		if( min_i != NULL ) *min_i = min_index / stride;
+		if( max_i != NULL ) *max_i = max_index / stride;
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 
 #ifndef TEMPLATE_CUL_PTR
-	double FUNCTION(vector_sum)(const TYPE(Vector) *this) {
-		ATOM *restrict data = this->data;
-		double sum = 0.0;
-
-		const size_t size = this->size;
-		for(size_t i = 0; i < size; ++i)
-			sum += data[i];
-
-		return sum;
-	}
-
 	double FUNCTION(vector_mean)(const TYPE(Vector) *this) {
 		ATOM *restrict data = this->data;
-		double mean = 0.0;
+		long double mean = 0.0;
 
 		const size_t size = this->size;
-		for(size_t i = 0; i < size; ++i)
-			mean += data[i];
+		for(size_t i = 0, value_i = 1; i < size; ++i, ++value_i)
+			mean += (data[i] - mean)/value_i;
 
-		return mean / size;
+		return mean;
 	}
 
 	double FUNCTION(vector_variance)(const TYPE(Vector) *this) {
@@ -851,32 +1022,19 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 		return variance / size;
 	}
 
-	double FUNCTION(vectorview_sum)(const VIEW(Vector) *this) {
-		const size_t stride = this->stride, size = stride * this->size;
-		ATOM *restrict data = this->data;
-		double sum = 0.0;
-
-		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
-			sum += data[i];
-		else for(size_t i = 0; i < size; i += stride)
-			sum += data[i];
-
-		return sum;
-	}
-	
 	double FUNCTION(vectorview_mean)(const VIEW(Vector) *this) {
 		const size_t stride = this->stride, size = stride * this->size;
 		ATOM *restrict data = this->data;
-		double mean = 0.0;
+		long double mean = 0.0;
 
-		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
-			mean += data[i];
-		else for(size_t i = 0; i < size; i += stride)
-			mean += data[i];
+		if( stride == 1 ) for(size_t i = 0, value_i = 1; i < size; ++i, ++value_i)
+			mean += (data[i] - mean)/value_i;
+		else for(size_t i = 0, value_i = 1; i < size; i += stride, ++value_i)
+			mean += (data[i] - mean)/value_i;
 
-		return mean / this->size;
+		return mean;
 	}
-	
+
 	double FUNCTION(vectorview_variance)(const VIEW(Vector) *this) {
 		double mean = FUNCTION(vectorview_mean)(this);
 		return FUNCTION(vectorview_variance_mean)(this, mean);
@@ -1165,3 +1323,4 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 	}
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
+
