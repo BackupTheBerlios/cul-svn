@@ -38,7 +38,8 @@ CulSList *cul_slist_reverse    (CulSList *this);
 CulSList *cul_slist_sort       (CulSList *this, cul_cmp_f *cmp_f);
 size_t    cul_slist_unique     (CulSList *this, cul_cmp_f *cmp_f, cul_free_f *free_f);
 CulSList *cul_slist_find       (CulSList *this, cul_ptr data, cul_cmp_f *cmp_f);
-void      cul_slist_each       (CulSList *this, cul_each_f *each_f, cul_ptr user_data);
+void      cul_slist_each       (CulSList *this, cul_each_f *each_f);
+void      cul_slist_each_prv   (CulSList *this, cul_each_prv_f *each_prv_f, cul_ptr prv);
 
 /* implementations */
 

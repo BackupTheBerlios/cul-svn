@@ -127,11 +127,22 @@ CulBBTreeNode *cul_bbtree_find(const CulBBTree *this, cul_ptr data) {
 	return NULL;
 }
 
-void cul_bbtree_each(CulBBTree *this, cul_each2_f *each_f, cul_ptr user_data) {
+void cul_bbtree_each_key(CulBBTree *this, cul_each_key_f *each_f) {
 	CulBBTreeNode *node = cul_bbtree_first(this);
-	for(; node != NULL; node = cul_bbtree_node_next(node))
-		if( each_f(node->key, node->data, user_data) )
+	for(CulBBTreeNode *next; node != NULL; node = next) {
+		next = cul_bbtree_node_next(node);
+		if( each_f(node->key, node->data) )
 			break;
+	}
+}
+
+void cul_bbtree_each_key_prv(CulBBTree *this, cul_each_key_prv_f *each_prv_f, cul_ptr prv) {
+	CulBBTreeNode *node = cul_bbtree_first(this);
+	for(CulBBTreeNode *next; node != NULL; node = next) {
+		next = cul_bbtree_node_next(node);
+		if( each_prv_f(node->key, node->data, prv) )
+			break;
+	}
 }
 
 CulBBTreeNode *cul_bbtree_first(CulBBTree *this) {

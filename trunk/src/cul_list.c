@@ -257,7 +257,19 @@ CulList *cul_list_find(CulList *this, cul_ptr data, cul_cmp_f *cmp_f) {
 	return NULL;
 }
 
-void cul_list_each(CulList *this, cul_each_f *each_f, cul_ptr user_data) {
-	for(; this != NULL; this = cul_list_next(this))
-		each_f(this->data, user_data);
+void cul_list_each(CulList *this, cul_each_f *each_f) {
+	for(CulList *next; this != NULL; this = next) {
+		next = cul_list_next(this);
+		if( each_f(this->data) )
+			break;
+	}
 }
+
+void cul_list_each_prv(CulList *this, cul_each_prv_f *each_prv_f, cul_ptr prv) {
+	for(CulList *next; this != NULL; this = next) {
+		next = cul_list_next(this);
+		if( each_prv_f(this->data, prv) )
+			break;
+	}
+}
+

@@ -222,7 +222,19 @@ CulSList *cul_slist_find(CulSList *this, cul_ptr data, cul_cmp_f *cmp_f) {
 	return NULL;
 }
 
-void cul_slist_each(CulSList *this, cul_each_f *each_f, cul_ptr user_data) {
-	for(; this != NULL; this = cul_slist_next(this))
-		each_f(this->data, user_data);
+void cul_slist_each(CulSList *this, cul_each_f *each_f) {
+	for(CulSList *next; this != NULL; this = next) {
+		next = cul_slist_next(this);
+		if( each_f(this->data) )
+			break;
+	}
 }
+
+void cul_slist_each_prv(CulSList *this, cul_each_prv_f *each_prv_f, cul_ptr prv) {
+	for(CulSList *next; this != NULL; this = next) {
+		next = cul_slist_next(this);
+		if( each_prv_f(this->data, prv) )
+			break;
+	}
+}
+

@@ -1224,12 +1224,21 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 		return this->size;
 	}
 
-	void FUNCTION(vector_each)(TYPE(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
+	void FUNCTION(vector_each)(TYPE(Vector) *this, cul_each_f *each_f) {
 		const size_t size = this->size;
 		const ATOM *restrict data = this->data;
 
 		for(size_t i = 0; i < size; ++i)
-			if( each_f(data[i], user_data) )
+			if( each_f(data[i]) )
+				break;
+	}
+
+	void FUNCTION(vector_each_prv)(TYPE(Vector) *this, cul_each_prv_f *each_prv_f, cul_ptr prv) {
+		const size_t size = this->size;
+		const ATOM *restrict data = this->data;
+
+		for(size_t i = 0; i < size; ++i)
+			if( each_prv_f(data[i], prv) )
 				break;
 	}
 
@@ -1288,12 +1297,20 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 		return this->size;
 	}
 
-	void FUNCTION(vectorview_each)(VIEW(Vector) *this, cul_each_f *each_f, cul_ptr user_data) {
+	void FUNCTION(vectorview_each)(VIEW(Vector) *this, cul_each_f *each_f) {
 		const size_t stride = this->stride, size = this->size * stride;
 		const ATOM *restrict data = this->data;
 
 		for(size_t i = 0; i < size; i += stride)
-			each_f(data[i], user_data);
+			each_f(data[i]);
+	}
+
+	void FUNCTION(vectorview_each_prv)(VIEW(Vector) *this, cul_each_prv_f *each_prv_f, cul_ptr prv) {
+		const size_t stride = this->stride, size = this->size * stride;
+		const ATOM *restrict data = this->data;
+
+		for(size_t i = 0; i < size; i += stride)
+			each_prv_f(data[i], prv);
 	}
 #endif /* TEMPLATE_CUL_PTR */
 
