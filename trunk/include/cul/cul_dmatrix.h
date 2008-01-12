@@ -99,6 +99,12 @@ double    cul_dmatrix_max              (const CulDMatrix *this);
 size_t    cul_dmatrix_max_index        (const CulDMatrix *this);
 void      cul_dmatrix_minmax           (const CulDMatrix *this, double *min, double *max);
 void      cul_dmatrix_minmax_index     (const CulDMatrix *this, size_t *min_i, size_t *max_i);
+double    cul_dmatrixview_min          (const CulDMatrixView *this);
+size_t    cul_dmatrixview_min_index    (const CulDMatrixView *this);
+double    cul_dmatrixview_max          (const CulDMatrixView *this);
+size_t    cul_dmatrixview_max_index    (const CulDMatrixView *this);
+void      cul_dmatrixview_minmax       (const CulDMatrixView *this, double *min, double *max);
+void      cul_dmatrixview_minmax_index (const CulDMatrixView *this, size_t *min_i, size_t *max_i);
 
 double    cul_dmatrix_mean             (const CulDMatrix *this);
 double    cul_dmatrix_variance         (const CulDMatrix *this);

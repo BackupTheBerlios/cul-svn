@@ -716,7 +716,7 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 		return min;
 	}
-	
+
 	size_t FUNCTION(matrix_min_index)(const TYPE(Matrix) *this) {
 		if( this->size_x == 0 || this->size_y == 0 )
 			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
@@ -734,7 +734,7 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 		return index;
 	}
-	
+
 	ATOM FUNCTION(matrix_max)(const TYPE(Matrix) *this) {
 		if( this->size_x == 0 || this->size_y == 0 )
 			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
@@ -749,7 +749,7 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 		return max;
 	}
-	
+
 	size_t FUNCTION(matrix_max_index)(const TYPE(Matrix) *this) {
 		if( this->size_x == 0 || this->size_y == 0 )
 			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
@@ -767,7 +767,7 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 		return index;
 	}
-	
+
 	void FUNCTION(matrix_minmax)(const TYPE(Matrix) *this, ATOM *min_v, ATOM *max_v) {
 		if( this->size_x == 0 || this->size_y == 0 ) {
 			if( min_v != NULL ) *min_v = EMPTY;
@@ -789,7 +789,7 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 		if( min_v != NULL ) *min_v = min;
 		if( max_v != NULL ) *max_v = max;
 	}
-	
+
 	void FUNCTION(matrix_minmax_index)(const TYPE(Matrix) *this, size_t *min_i, size_t *max_i) {
 		if( this->size_x == 0 || this->size_y == 0 ) {
 			if( min_i != NULL ) *min_i = 0;
@@ -812,6 +812,145 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 				max_index = i;
 			}
 		}
+
+		if( min_i != NULL ) *min_i = min_index;
+		if( max_i != NULL ) *max_i = max_index;
+	}
+
+	ATOM FUNCTION(matrixview_min)(const VIEW(Matrix) *this) {
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+
+		const size_t row = this->size_x;
+		const size_t tda = this->tda - row;
+
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i)
+				if( data[i] < min )
+					min = data[i];
+
+		return min;
+	}
+
+	size_t FUNCTION(matrixview_min_index)(const VIEW(Matrix) *this) {
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0];
+		size_t index = 0;
+
+		const size_t row = this->size_x;
+		const size_t tda = this->tda - row;
+
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i)
+				if( data[i] < min ) {
+					min = data[i];
+					index = i;
+				}
+
+		return index;
+	}
+
+	ATOM FUNCTION(matrixview_max)(const VIEW(Matrix) *this) {
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
+
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+
+		const size_t row = this->size_x;
+		const size_t tda = this->tda - row;
+
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i)
+				if( data[i] > max )
+					max = data[i];
+
+		return max;
+	}
+
+	size_t FUNCTION(matrixview_max_index)(const VIEW(Matrix) *this) {
+		if( this->size_x == 0 || this->size_y == 0 )
+			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
+
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM max = data[0];
+		size_t index = 0;
+
+		const size_t row = this->size_x;
+		const size_t tda = this->tda - row;
+
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i)
+				if( data[i] > max ) {
+					max = data[i];
+					index = i;
+				}
+
+		return index;
+	}
+
+	void FUNCTION(matrixview_minmax)(const VIEW(Matrix) *this, ATOM *min_v, ATOM *max_v) {
+		if( this->size_x == 0 || this->size_y == 0 ) {
+			if( min_v != NULL ) *min_v = EMPTY;
+			if( max_v != NULL ) *max_v = EMPTY;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = data[0];
+
+		const size_t row = this->size_x;
+		const size_t tda = this->tda - row;
+
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i) {
+				if( data[i] < min )
+					min = data[i];
+				if( data[i] > max )
+					max = data[i];
+			}
+
+		if( min_v != NULL ) *min_v = min;
+		if( max_v != NULL ) *max_v = max;
+	}
+
+	void FUNCTION(matrixview_minmax_index)(const VIEW(Matrix) *this, size_t *min_i, size_t *max_i) {
+		if( this->size_x == 0 || this->size_y == 0 ) {
+			if( min_i != NULL ) *min_i = 0;
+			if( max_i != NULL ) *max_i = 0;
+			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
+		}
+
+		const size_t size = this->tda * this->size_y;
+		ATOM *restrict data = this->data;
+		ATOM min = data[0], max = data[0];
+		size_t min_index = 0, max_index = 0;
+
+		const size_t row = this->size_x;
+		const size_t tda = this->tda - row;
+
+		for(size_t i = 0; i < size; i += tda)
+			for(const size_t end = i + row; i < end; ++i) {
+				if( data[i] < min ) {
+					min = data[i];
+					min_index = i;
+				}
+				if( data[i] > max ) {
+					max = data[i];
+					max_index = i;
+				}
+			}
 
 		if( min_i != NULL ) *min_i = min_index;
 		if( max_i != NULL ) *max_i = max_index;
