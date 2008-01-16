@@ -74,6 +74,10 @@ cul_errno cul_cmatrixview_transpose    (CulCMatrixView *this);
 
 cul_errno cul_cmatrix_resize           (CulCMatrix *this, size_t x, size_t y);
 cul_errno cul_cmatrix_resize_empty     (CulCMatrix *this, size_t x, size_t y);
+cul_errno cul_cmatrix_insert_row       (CulCMatrix *this, size_t row, const CulCVectorView *other);
+cul_errno cul_cmatrix_insert_col       (CulCMatrix *this, size_t col, const CulCVectorView *other);
+cul_errno cul_cmatrix_remove_row       (CulCMatrix *this, size_t row);
+cul_errno cul_cmatrix_remove_col       (CulCMatrix *this, size_t col);
 
 void      cul_cmatrix_set_all          (CulCMatrix *this, char value);
 void      cul_cmatrix_set_diag         (CulCMatrix *this, char value, char diag);

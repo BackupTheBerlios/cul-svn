@@ -74,6 +74,10 @@ cul_errno cul_imatrixview_transpose    (CulIMatrixView *this);
 
 cul_errno cul_imatrix_resize           (CulIMatrix *this, size_t x, size_t y);
 cul_errno cul_imatrix_resize_empty     (CulIMatrix *this, size_t x, size_t y);
+cul_errno cul_imatrix_insert_row       (CulIMatrix *this, size_t row, const CulIVectorView *other);
+cul_errno cul_imatrix_insert_col       (CulIMatrix *this, size_t col, const CulIVectorView *other);
+cul_errno cul_imatrix_remove_row       (CulIMatrix *this, size_t row);
+cul_errno cul_imatrix_remove_col       (CulIMatrix *this, size_t col);
 
 void      cul_imatrix_set_all          (CulIMatrix *this, int value);
 void      cul_imatrix_set_diag         (CulIMatrix *this, int value, int diag);

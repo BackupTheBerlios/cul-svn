@@ -1316,26 +1316,102 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 #ifndef TEMPLATE_CUL_PTR
 	cul_errno FUNCTION(vector_fprintf)(FILE *stream, const TYPE(Vector) *this, const char *format, const char *separator, const char *begin, const char *end) {
-		if( !FUNCTION(fprintf)(stream, this->data, this->size, format, separator, begin, end) )
+		const ATOM *restrict data = this->data;
+		const size_t size = this->size;
+
+		/* prepare formatting */
+		separator = separator == NULL? " ": separator;
+
+		/* print begin */
+		if( begin != NULL && fprintf(stream, "%s", begin) < 0 )
 			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
+		/* print data */
+		if( fprintf(stream, format, data[0]) < 0 )
+			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+		for(size_t i = 1; i < size; ++i)
+			if( fprintf(stream, separator) < 0 || fprintf(stream, format, data[i]) < 0 )
+				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
+		/* print end */
+		if( end != NULL && fprintf(stream, "%s", end) < 0 )
+			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vector_fscanf)(FILE *stream, TYPE(Vector) *this, const char *format, const char *separator, const char *begin, const char *end) {
-		if( !FUNCTION(fscanf)(stream, this->data, this->size, format, separator, begin, end) )
+		const ATOM *restrict data = this->data;
+		const size_t size = this->size;
+
+		/* prepare formatting */
+		separator = separator == NULL? " ": separator;
+
+		/* read begin */
+		if( begin != NULL && fscanf(stream, begin) != 0 )
 			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
+		/* read data */
+		if( fscanf(stream, format, data[0]) != 1 )
+			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+		for(size_t i = 1; i < size; ++i)
+			if( fscanf(stream, separator) != 0 || fscanf(stream, format, data[i]) != 1 )
+				CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
+		/* read end */
+		if( end != NULL && fscanf(stream, end) != 0 )
+			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vectorview_fprintf)(FILE *stream, const VIEW(Vector) *this, const char *format, const char *separator, const char *begin, const char *end) {
-		if( !FUNCTION(fprintf_stride)(stream, this->data, this->size, this->stride, format, separator, begin, end) )
+		const ATOM *restrict data = this->data;
+		const size_t stride = this->stride, size = stride * this->size;
+
+		/* prepare formatting */
+		separator = separator == NULL? " ": separator;
+
+		/* print begin */
+		if( begin != NULL && fprintf(stream, "%s", begin) < 0 )
 			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
+		/* print data */
+		if( fprintf(stream, format, data[0]) < 0 )
+			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+		for(size_t i = stride; i < size; i += stride)
+			if( fprintf(stream, separator) < 0 || fprintf(stream, format, data[i]) < 0 )
+				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
+		/* print end */
+		if( end != NULL && fprintf(stream, "%s", end) < 0 )
+			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
 		return CUL_SUCCESS;
 	}
 
 	cul_errno FUNCTION(vectorview_fscanf)(FILE *stream, VIEW(Vector) *this, const char *format, const char *separator, const char *begin, const char *end) {
-		if( !FUNCTION(fscanf_stride)(stream, this->data, this->size, this->stride, format, separator, begin, end) )
+		const ATOM *restrict data = this->data;
+		const size_t stride = this->stride, size = stride * this->size;
+
+		/* prepare formatting */
+		separator = separator == NULL? " ": separator;
+
+		/* read begin */
+		if( begin != NULL && fscanf(stream, begin) != 0 )
 			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
+		/* read data */
+		if( fscanf(stream, format, data[0]) != 1 )
+			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+		for(size_t i = stride; i < size; i += stride)
+			if( fscanf(stream, separator) != 0 || fscanf(stream, format, data[i]) != 1 )
+				CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
+		/* read end */
+		if( end != NULL && fscanf(stream, end) != 0 )
+			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
 		return CUL_SUCCESS;
 	}
 #else /* TEMPLATE_CUL_PTR */

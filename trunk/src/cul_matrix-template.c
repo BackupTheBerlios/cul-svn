@@ -390,11 +390,11 @@ cul_errno FUNCTION(matrixview_transpose)(VIEW(Matrix) *this) {
 }
 
 cul_errno FUNCTION(matrix_resize)(TYPE(Matrix) *this, size_t x, size_t y) {
-	ATOM *data;
+	ATOM *restrict data;
 
-	if( x*y == 0 ) {
+	if( x == 0 || y == 0 ) {
 		free(this->data);
-		FUNCTION(matrix_init_struct)(this, NULL, 0, 0);
+		FUNCTION(matrix_init_struct)(this, NULL, x, y);
 		return CUL_SUCCESS;
 	}	else if( (data = malloc((x*y)*sizeof(ATOM))) == NULL )
 		CUL_ERROR_ERRNO_RET(CUL_ENOMEM, CUL_ENOMEM);
@@ -428,7 +428,7 @@ cul_errno FUNCTION(matrix_resize)(TYPE(Matrix) *this, size_t x, size_t y) {
 }
 
 cul_errno FUNCTION(matrix_resize_empty)(TYPE(Matrix) *this, size_t x, size_t y) {
-	ATOM *data;
+	ATOM *restrict data;
 
 	if( x*y == 0 ) {
 		free(this->data);
@@ -440,6 +440,34 @@ cul_errno FUNCTION(matrix_resize_empty)(TYPE(Matrix) *this, size_t x, size_t y) 
 	free(this->data);
 	FUNCTION(matrix_init_struct)(this, data, x, y);
 	return CUL_SUCCESS;
+}
+
+cul_errno FUNCTION(matrix_insert_row)(TYPE(Matrix) *this, size_t row, const VIEW(Vector) *other) {
+	if( row > this->size_y )
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+	if( this->size_x != other->size )
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+	CUL_ERROR_ERRNO_RET(CUL_ESTUB, CUL_ESTUB);
+}
+
+cul_errno FUNCTION(matrix_insert_col)(TYPE(Matrix) *this, size_t col, const VIEW(Vector) *other) {
+	if( col > this->size_x )
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+	if( this->size_y != other->size )
+		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
+	CUL_ERROR_ERRNO_RET(CUL_ESTUB, CUL_ESTUB);
+}
+
+cul_errno FUNCTION(matrix_remove_row)(TYPE(Matrix) *this, size_t row) {
+	if( row >= this->size_y )
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+	CUL_ERROR_ERRNO_RET(CUL_ESTUB, CUL_ESTUB);
+}
+
+cul_errno FUNCTION(matrix_remove_col)(TYPE(Matrix) *this, size_t col) {
+	if( col >= this->size_x )
+		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
+	CUL_ERROR_ERRNO_RET(CUL_ESTUB, CUL_ESTUB);
 }
 
 void FUNCTION(matrix_set_all)(TYPE(Matrix) *this, ATOM value) {
@@ -1028,32 +1056,65 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 
-cul_errno FUNCTION(matrix_fprintf)(FILE *id, const TYPE(Matrix) *this, const char *format, const char *separator, const char *begin, const char *end, const char *row) {
-	size_t i;
+cul_errno FUNCTION(matrix_fprintf)(FILE *stream, const TYPE(Matrix) *this, const char *format, const char *separator, const char *begin, const char *end, const char *row) {
+	const ATOM *restrict data = this->data;
+	const size_t row_size = this->size_x;
+	const size_t size = row_size * this->size_y;
 
 	/* prepare formatting */
+	separator = separator == NULL? " ": separator;
 	row = row == NULL? "\n": row;
 
-	for( i=0; i<this->size_y; ++i) {
-		if( !FUNCTION(fprintf)(id, FUNCTION(matrix_const_ptr)(this, 0, i), this->size_x, format, separator, begin, end) )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
-		if( row != NULL && fprintf(id, row) < 0 )
+	/* print begin */
+	if( begin != NULL && fprintf(stream, "%s", begin) < 0 )
+		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
+	/* print data */
+	for(size_t i = 0; i < size; ) {
+		/* print single row */
+		for(const size_t end = i + row_size; i < end; ++i)
+			if( fprintf(stream, separator) < 0 || fprintf(stream, format, data[i]) < 0 )
+				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+		/* print row separator */
+		if( row != NULL && fprintf(stream, row) < 0 )
 			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
 	}
+
+	/* print end */
+	if( end != NULL && fprintf(stream, "%s", end) < 0 )
+		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+
 	return CUL_SUCCESS;
 }
 
-cul_errno FUNCTION(matrix_fscanf)(FILE *id, TYPE(Matrix) *this, const char *format, const char *separator, const char *begin, const char *end, const char *row) {
-	size_t i;
+cul_errno FUNCTION(matrix_fscanf)(FILE *stream, TYPE(Matrix) *this, const char *format, const char *separator, const char *begin, const char *end, const char *row) {
+	const ATOM *restrict data = this->data;
+	const size_t row_size = this->size_x;
+	const size_t size = row_size * this->size_y;
 
 	/* prepare formatting */
+	separator = separator == NULL? " ": separator;
 	row = row == NULL? "\n": row;
 
-	for( i=0; i<this->size_y; ++i) {
-		if( !FUNCTION(fscanf)(id, FUNCTION(matrix_ptr)(this, 0, i), this->size_x, format, separator, begin, end) )
-			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
-		if( row != NULL && fscanf(id, row) != 0 )
+	/* print begin */
+	if( begin != NULL && fscanf(stream, begin) != 0 )
+		CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
+	/* print data */
+	for(size_t i = 0; i < size; ) {
+		/* print single row */
+		for(const size_t end = i + row_size; i < end; ++i)
+			if( fscanf(stream, separator) != 0 || fscanf(stream, format, data[i]) != 1 )
+				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+		/* print row separator */
+		if( row != NULL && fprintf(stream, row) < 0 )
 			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
 	}
+
+	/* print end */
+	if( end != NULL && fscanf(stream, end) != 0 )
+		CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+
 	return CUL_SUCCESS;
 }
+

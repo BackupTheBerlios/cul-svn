@@ -12,11 +12,6 @@ size_t  *cul_uunique              (size_t *data, size_t size);
 size_t  *cul_ufind                (const size_t *data, size_t size, size_t key);
 size_t  *cul_ubfind               (const size_t *data, size_t size, size_t key);
 
-cul_bool cul_ufprintf             (FILE *stream, const size_t *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
-cul_bool cul_ufprintf_stride      (FILE *stream, const size_t *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
-cul_bool cul_ufscanf              (FILE *stream, const size_t *data, size_t size, const char *format, const char *separator, const char *begin, const char *end);
-cul_bool cul_ufscanf_stride       (FILE *stream, const size_t *data, size_t size, size_t stride, const char *format, const char *separator, const char *begin, const char *end);
-
 /* implementations */
 
 #endif /* __CUL_UBASE_H__ */
