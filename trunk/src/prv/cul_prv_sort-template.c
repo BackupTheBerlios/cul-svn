@@ -88,12 +88,12 @@
 		}
 	}
 
-	void PFUNCTION(isort_desc)(ATOM *l, ATOM *r);
-	void PFUNCTION(isort_desc_stride)(ATOM *l, ATOM *r, size_t stride);
-	void PFUNCTION(qsort_desc)(ATOM *l, ATOM *r);
-	void PFUNCTION(qsort_desc_stride)(ATOM *l, ATOM *r, size_t stride);
+	void PFUNCTION(isort_dsc)(ATOM *l, ATOM *r);
+	void PFUNCTION(isort_dsc_stride)(ATOM *l, ATOM *r, size_t stride);
+	void PFUNCTION(qsort_dsc)(ATOM *l, ATOM *r);
+	void PFUNCTION(qsort_dsc_stride)(ATOM *l, ATOM *r, size_t stride);
 
-	void PFUNCTION(isort_desc)(ATOM *l, ATOM *r) {
+	void PFUNCTION(isort_dsc)(ATOM *l, ATOM *r) {
 		ATOM *const begin = l, *i, l_val;
 		for( ++l; l <= r; ++l) {
 			l_val = *l;
@@ -103,7 +103,7 @@
 		}
 	}
 
-	void PFUNCTION(isort_desc_stride)(ATOM *l, ATOM *r, size_t stride) {
+	void PFUNCTION(isort_dsc_stride)(ATOM *l, ATOM *r, size_t stride) {
 		ATOM *const begin = l, *i, l_val;
 		for( l += stride; l <= r; l += stride) {
 			l_val = *l;
@@ -113,11 +113,11 @@
 		}
 	}
 
-	void PFUNCTION(qsort_desc)(ATOM *l, ATOM *r) {
+	void PFUNCTION(qsort_dsc)(ATOM *l, ATOM *r) {
 		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + 8 )
-			PFUNCTION(isort_desc)(l, r);
+			PFUNCTION(isort_dsc)(l, r);
 		else {
 			pivot += (r - l) >> 1;
 			if( *pivot > *l ) CUL_SWAP(*pivot, *l, val);
@@ -140,12 +140,12 @@
 					break;
 				}
 			} while( l <= r );
-			PFUNCTION(qsort_desc)(begin, r);
-			PFUNCTION(qsort_desc)(l, last);
+			PFUNCTION(qsort_dsc)(begin, r);
+			PFUNCTION(qsort_dsc)(l, last);
 		}
 	}
 
-	void PFUNCTION(qsort_desc_stride)(ATOM *l, ATOM *r, size_t stride) {
+	void PFUNCTION(qsort_dsc_stride)(ATOM *l, ATOM *r, size_t stride) {
 		ATOM *const begin = l, *const last = r;
 		ATOM *pivot = l, val;
 		if( r < l + (stride << 3) )
@@ -185,12 +185,12 @@
 		PFUNCTION(qsort_asc_stride)(data, data + (size - 1) * stride, stride);
 	}
 
-	void FUNCTION(sort_desc)(ATOM *data, size_t size) {
-		PFUNCTION(qsort_desc)(data, data + size - 1);
+	void FUNCTION(sort_dsc)(ATOM *data, size_t size) {
+		PFUNCTION(qsort_dsc)(data, data + size - 1);
 	}
 
-	void FUNCTION(sort_desc_stride)(ATOM *data, size_t size, size_t stride) {
-		PFUNCTION(qsort_desc_stride)(data, data + (size - 1) * stride, stride);
+	void FUNCTION(sort_dsc_stride)(ATOM *data, size_t size, size_t stride) {
+		PFUNCTION(qsort_dsc_stride)(data, data + (size - 1) * stride, stride);
 	}
 #else /* TEMPLATE_CUL_PTR */
 	void PFUNCTION(isort)(ATOM *l, ATOM *r, cul_cmp_f *cmp_f);

@@ -74,8 +74,8 @@ cul_errno cul_dmatrixview_transpose    (CulDMatrixView *this);
 
 cul_errno cul_dmatrix_resize           (CulDMatrix *this, size_t x, size_t y);
 cul_errno cul_dmatrix_resize_empty     (CulDMatrix *this, size_t x, size_t y);
-cul_errno cul_dmatrix_insert_row       (CulDMatrix *this, size_t row, const CulDVectorView *value);
-cul_errno cul_dmatrix_insert_col       (CulDMatrix *this, size_t col, const CulDVectorView *value);
+cul_errno cul_dmatrix_insert_row       (CulDMatrix *this, size_t row, const CulDVectorView *other);
+cul_errno cul_dmatrix_insert_col       (CulDMatrix *this, size_t col, const CulDVectorView *other);
 cul_errno cul_dmatrix_remove_row       (CulDMatrix *this, size_t row);
 cul_errno cul_dmatrix_remove_col       (CulDMatrix *this, size_t col);
 

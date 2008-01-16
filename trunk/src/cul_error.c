@@ -4,8 +4,9 @@ cul_bool cul_error_fatal = CUL_TRUE;
 
 const char *cul_error_string(CulErrno eid) {
 	switch( eid ) {
+	case CUL_UNKNOWN:    return "unknown, success or error";
 	case CUL_SUCCESS:    return "success";
-	case CUL_FAILURE:    return "failure";
+	case CUL_EFAIL:      return "generic failure";
 	case CUL_ESTUB:      return "missing implementation";
 	case CUL_EINVAL:     return "invalid argument";
 	case CUL_EFAILED:    return "operation failed";

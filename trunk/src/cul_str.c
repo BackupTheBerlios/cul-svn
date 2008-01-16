@@ -733,7 +733,7 @@ cul_errno cul_strv_tou(char **strv, size_t base, size_t *value) {
 	const size_t size = cul_strv_size(strv);
 	for(size_t i = 0; i < size; ++i) if( cul_strtou(strv[i], base, &value[i]) ) {
 		while( i < size ) value[i++] = 0;
-		return CUL_FAILURE;
+		return CUL_EFAIL;
 	}
 	return CUL_SUCCESS;
 }
@@ -742,7 +742,7 @@ cul_errno cul_strv_toi(char **strv, size_t base, int *value) {
 	const size_t size = cul_strv_size(strv);
 	for(size_t i = 0; i < size; ++i) if( cul_strtoi(strv[i], base, &value[i]) ) {
 		while( i < size ) value[i++] = 0;
-		return CUL_FAILURE;
+		return CUL_EFAIL;
 	}
 	return CUL_SUCCESS;
 }
@@ -751,7 +751,7 @@ cul_errno cul_strv_tod(char **strv, double *value) {
 	const size_t size = cul_strv_size(strv);
 	for(size_t i = 0; i < size; ++i) if( cul_strtod(strv[i], &value[i]) ) {
 		while( i < size ) value[i++] = 0.0;
-		return CUL_FAILURE;
+		return CUL_EFAIL;
 	}
 	return CUL_SUCCESS;
 }

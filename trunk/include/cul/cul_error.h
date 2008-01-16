@@ -1,9 +1,13 @@
 #ifndef __CUL_ERROR_H__
 #define __CUL_ERROR_H__
 
-#include <cul/cul_base_global.h>
+#include <cul/cul_core.h>
 
+/* basic error type */
 typedef enum _CulErrno CulErrno;
+
+/* type mapping */
+typedef CulErrno cul_errno;
 
 /** Error flag describing type of error.
  * Error flag describes error situation in cul library. Possible errors are
@@ -17,9 +21,10 @@ typedef enum _CulErrno CulErrno;
  * used, but its previous value is restored.
  */
 enum _CulErrno {
-	CUL_FAILURE  = -1,
+	CUL_UNKNOWN  = -1,
 	CUL_SUCCESS  =  0,
 
+	CUL_EFAIL,
 	CUL_ESTUB,
 	CUL_EINVAL,
 	CUL_EFAILED,

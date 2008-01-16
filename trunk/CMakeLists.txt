@@ -37,6 +37,8 @@ SET(CUL_SOURCES
 	src/cul_mem.c
 	src/cul_stream.c
 
+	src/prv/cul_prv_sort.c
+
 	src/cul_str.c
 	src/cul_str_type.c
 	src/cul_string.c
@@ -47,8 +49,6 @@ SET(CUL_SOURCES
 	src/cul_list.c
 	src/cul_tree.c
 	src/cul_bbtree.c
-
-	src/base/cul_base_alg.c
 
 	src/cul_rng.c
 	src/cul_random.c

@@ -1061,7 +1061,7 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 	}
 
 	void FUNCTION(vector_sort_desc)(TYPE(Vector) *this) {
-		FUNCTION(sort_desc)(this->data, this->size);
+		FUNCTION(sort_dsc)(this->data, this->size);
 	}
 
 	size_t FUNCTION(vector_unique)(TYPE(Vector) *this) {
@@ -1120,9 +1120,9 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 	void FUNCTION(vectorview_sort_desc)(VIEW(Vector) *this) {
 		if( this->stride == 1 )
-			FUNCTION(sort_desc)(this->data, this->size);
+			FUNCTION(sort_dsc)(this->data, this->size);
 		else
-			FUNCTION(sort_desc_stride)(this->data, this->size, this->stride);
+			FUNCTION(sort_dsc_stride)(this->data, this->size, this->stride);
 	}
 
 	size_t FUNCTION(vectorview_unique)(VIEW(Vector)  *this) {

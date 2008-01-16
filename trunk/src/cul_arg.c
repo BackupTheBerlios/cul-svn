@@ -1,6 +1,5 @@
 #include <cul/cul_arg.h>
 #include <cul/cul_stream.h>
-#include <cul/cul_base.h>
 #include <cul/cul_str.h>
 
 #include <stdlib.h>
@@ -50,7 +49,7 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 				case CUL_SUCCESS:  break;
 				case CUL_EARGCONV: return CUL_EARGCONV;
 				case CUL_EARGUNK:  return CUL_EARGUNK;
-				default:           return CUL_FAILURE;
+				default:           return CUL_EFAIL;
 				}
 
 				/* increment argument position */
@@ -68,7 +67,7 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 			case CUL_SUCCESS:  break;
 			case CUL_EARGCONV: return CUL_EARGCONV;
 			case CUL_EARGUNK:  return CUL_EARGUNK;
-			default:           return CUL_FAILURE;
+			default:           return CUL_EFAIL;
 			}
 
 			/* increment argument position */
@@ -309,7 +308,7 @@ static cul_errno _cul_arg_cmd_parse_short(int *argc, char ***argv, CulArg *table
 			}
 		}
 	}
-	return CUL_FAILURE;
+	return CUL_EFAIL;
 }
 
 static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table, size_t n) {
@@ -362,7 +361,7 @@ static cul_errno _cul_arg_cmd_parse_long(int *argc, char ***argv, CulArg *table,
 
 		return CUL_SUCCESS;
 	}
-	return CUL_FAILURE;
+	return CUL_EFAIL;
 }
 
 static cul_bool _cul_arg_cmd_convert(const char *arg, CulArg *entry, size_t n) {

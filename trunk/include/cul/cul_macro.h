@@ -2,7 +2,7 @@
 #define __CUL_MACRO_H__
 
 /* include all needed function definitions */
-#include <cul/cul_base_global.h>
+#include <cul/cul_core.h>
 #include <cul/cul_error.h>
 #include <cul/cul_log.h>
 

@@ -1,5 +1,4 @@
 #include <cul/cul_permutation.h>
-#include <cul/cul_ubase.h>
 
 cul_bool cul_permutation_valid(const CulUVector *this) {
 	const size_t *restrict data = this->data;
