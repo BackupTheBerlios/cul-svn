@@ -126,7 +126,7 @@ cul_errno FUNCTION(matrix_copy)(TYPE(Matrix) *this, const TYPE(Matrix) *other) {
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
-	memcpy(this->data, other->data, this->size_x*this->size_y*sizeof(ATOM));
+	FUNCTION(copy)(this->data, other->data, this->size_x*this->size_y);
 
 	return CUL_SUCCESS;
 }
@@ -135,21 +135,8 @@ cul_errno FUNCTION(matrix_copy_offset)(TYPE(Matrix) *this, const TYPE(Matrix) *o
 	if( this->size_x - offset_x < other->size_x || this->size_y - offset_y < other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 
-	ATOM *restrict data = this->data + this->size_x * offset_y + offset_x;
-	const size_t tda = this->size_x;
-	const ATOM *restrict other_data = other->data;
-	const size_t other_tda = other->size_x;
-
-	const size_t size = other->size_x;
-	const size_t rows = other->size_y;
-	for(size_t row = 0; row < rows; ++row) {
-		for(size_t i = 0; i < size; ++i)
-			data[i] = other_data[i];
-
-		/* adjust current row */
-		data += tda;
-		other_data += other_tda;
-	}
+	const size_t offset = this->size_x * offset_y + offset_x;
+	FUNCTION(copy_tda)(this->data + offset, other->data, other->size_x, other->size_y, this->size_x, other->size_x);
 
 	return CUL_SUCCESS;
 }
@@ -158,21 +145,8 @@ cul_errno FUNCTION(matrix_copy_submatrix)(TYPE(Matrix) *this, const TYPE(Matrix)
 	if( other->size_x - other_offset_x < this->size_x || other->size_y - other_offset_y < this->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 
-	ATOM *restrict data = this->data;
-	const size_t tda = this->size_x;
-	const ATOM *restrict other_data = other->data + other->size_x * other_offset_y + other_offset_x;
-	const size_t other_tda = other->size_x;
-
-	const size_t size = this->size_x;
-	const size_t rows = this->size_y;
-	for(size_t row = 0; row < rows; ++row) {
-		for(size_t i = 0; i < size; ++i)
-			data[i] = other_data[i];
-
-		/* adjust current row */
-		data += tda;
-		other_data += other_tda;
-	}
+	const size_t other_offset = other->size_x * other_offset_y + other_offset_x;
+	FUNCTION(copy_tda)(this->data, other->data + other_offset, this->size_x, this->size_y, this->size_x, other->size_x);
 
 	return CUL_SUCCESS;
 }
@@ -183,7 +157,9 @@ cul_errno FUNCTION(matrix_copy_row)(TYPE(Matrix) *this, const TYPE(Matrix) *othe
 	if( this->size_x != other->size_x )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
-	memcpy(this->data + this->size_x * row, other->data + other->size_x * other_row, this->size_x*sizeof(ATOM));
+	const size_t offset = this->size_x * row;
+	const size_t other_offset = other->size_x * other_row;
+	FUNCTION(copy)(this->data + offset, other->data + other_offset, this->size_x);
 
 	return CUL_SUCCESS;
 }
@@ -194,14 +170,9 @@ cul_errno FUNCTION(matrix_copy_col)(TYPE(Matrix) *this, const TYPE(Matrix) *othe
 	if( this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
-	ATOM *restrict data = this->data + col;
-	const size_t stride = this->size_x;
-	const ATOM *restrict other_data = other->data + other_col;
-	const size_t other_stride = other->size_x;
-
-	const size_t size = stride * this->size_y;
-	for(size_t i = 0, other_i = 0; i < size; i += stride, other_i += other_stride)
-		data[i] = other_data[other_i];
+	const size_t offset = col;
+	const size_t other_offset = other_col;
+	FUNCTION(copy_stride)(this->data + offset, other->data + other_offset, this->size_y, this->size_x, other->size_x);
 
 	return CUL_SUCCESS;
 }
@@ -211,24 +182,9 @@ cul_errno FUNCTION(matrix_copy_view)(TYPE(Matrix) *this, const VIEW(Matrix) *oth
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
 	if( other->tda == other->size_x )
-		memcpy(this->data, other->data, this->size_x*this->size_y*sizeof(ATOM));
-	else {
-		ATOM *restrict data = this->data;
-		const size_t tda = this->size_x;
-		const ATOM *restrict other_data = other->data;
-		const size_t other_tda = other->tda;
-
-		const size_t size = this->size_x;
-		const size_t rows = this->size_y;
-		for(size_t row = 0; row < rows; ++row) {
-			for(size_t i = 0; i < size; ++i)
-				data[i] = other_data[i];
-
-			/* adjust current row */
-			data += tda;
-			other_data += other_tda;
-		}
-	}
+		FUNCTION(copy)(this->data, other->data, this->size_x * this->size_y);
+	else
+		FUNCTION(copy_tda)(this->data, other->data, this->size_x, this->size_y, this->size_x, other->tda);
 
 	return CUL_SUCCESS;
 }
@@ -237,21 +193,8 @@ cul_errno FUNCTION(matrix_copy_view_offset)(TYPE(Matrix) *this, const VIEW(Matri
 	if( this->size_x - offset_x < other->size_x || this->size_y - offset_y < other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADPOS, CUL_EBADPOS);
 
-	ATOM *restrict data = this->data + this->size_x * offset_y + offset_x;
-	const size_t tda = this->size_x;
-	const ATOM *restrict other_data = other->data;
-	const size_t other_tda = other->tda;
-
-	const size_t size = other->size_x;
-	const size_t rows = other->size_y;
-	for(size_t row = 0; row < rows; ++row) {
-		for(size_t i = 0; i < size; ++i)
-			data[i] = other_data[i];
-
-		/* adjust current row */
-		data += tda;
-		other_data += other_tda;
-	}
+	const size_t offset = this->size_x * offset_y + offset_x;
+	FUNCTION(copy_tda)(this->data + offset, other->data, other->size_x, other->size_y, this->size_x, other->tda);
 
 	return CUL_SUCCESS;
 }
@@ -260,21 +203,7 @@ cul_errno FUNCTION(matrixview_copy)(VIEW(Matrix) *this, const VIEW(Matrix) *othe
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
-	ATOM *restrict data = this->data;
-	const size_t tda = this->tda;
-	const ATOM *restrict other_data = other->data;
-	const size_t other_tda = other->tda;
-
-	const size_t size = this->size_x;
-	const size_t rows = this->size_y;
-	for(size_t row = 0; row < rows; ++row) {
-		for(size_t i = 0; i < size; ++i)
-			data[i] = other_data[i];
-
-		/* adjust current row */
-		data += tda;
-		other_data += other_tda;
-	}
+	FUNCTION(copy_tda)(this->data, other->data, this->size_x, this->size_y, this->tda, other->tda);
 
 	return CUL_SUCCESS;
 }
@@ -283,21 +212,7 @@ cul_errno FUNCTION(matrixview_copy_matrix)(VIEW(Matrix) *this, const TYPE(Matrix
 	if( this->size_x != other->size_x || this->size_y != other->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
-	ATOM *restrict data = this->data;
-	const size_t tda = this->tda;
-	const ATOM *restrict other_data = other->data;
-	const size_t other_tda = other->size_x;
-
-	const size_t size = this->size_x;
-	const size_t rows = this->size_y;
-	for(size_t row = 0; row < rows; ++row) {
-		for(size_t i = 0; i < size; ++i)
-			data[i] = other_data[i];
-
-		/* adjust current row */
-		data += tda;
-		other_data += other_tda;
-	}
+	FUNCTION(copy_tda)(this->data, other->data, this->size_x, this->size_y, this->tda, other->size_x);
 
 	return CUL_SUCCESS;
 }
@@ -363,11 +278,11 @@ cul_errno FUNCTION(matrixview_swap)(VIEW(Matrix) *this, VIEW(Matrix) *other) {
 	const size_t other_tda = other->tda;
 	ATOM tmp;
 
-	const size_t size = this->size_x;
-	const size_t rows = this->size_y;
-	for(size_t row = 0; row < rows; ++row) {
-		for(size_t i = 0; i < size; ++i)
-			CUL_SWAP(data[i], other_data[i], tmp);
+	const size_t size_x = this->size_x;
+	const size_t size_y = this->size_y;
+	for(size_t x, y = 0; y < size_y; ++y) {
+		for(x = 0; x < size_x; ++x)
+			CUL_SWAP(data[x], other_data[x], tmp);
 
 		/* adjust current row */
 		data += tda;
@@ -402,27 +317,13 @@ cul_errno FUNCTION(matrix_resize)(TYPE(Matrix) *this, size_t x, size_t y) {
 	const size_t copy_x = x > this->size_x? this->size_x: x;
 	const size_t copy_y = y > this->size_y? this->size_y: y;
 
+	/* copy data */
 	if( x == copy_x )
-		memcpy(data, this->data, copy_x*copy_y*sizeof(ATOM));
-	else {
-		ATOM *restrict this_data = data;
-		const size_t this_tda = x;
-		const ATOM *restrict other_data = this->data;
-		const size_t other_tda = this->size_x;
-
-		const size_t size = copy_x;
-		const size_t rows = copy_y;
-		for(size_t row = 0; row < rows; ++row) {
-			for(size_t i = 0; i < size; ++i)
-				this_data[i] = other_data[i];
-
-			/* adjust current row */
-			this_data += this_tda;
-			other_data += other_tda;
-		}
-	}
-
+		FUNCTION(copy)(data, this->data, copy_x * copy_y);
+	else
+		FUNCTION(copy_tda)(data, this->data, copy_x, copy_y, x, this->size_x);
 	free(this->data);
+
 	FUNCTION(matrix_init_struct)(this, data, x, y);
 	return CUL_SUCCESS;
 }
@@ -603,32 +504,36 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 
 #ifndef TEMPLATE_CUL_PTR
 	void FUNCTION(matrixview_add_constant)(VIEW(Matrix) *this, double value) {
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
 
 		if( this->tda == this->size_x ) {
+			const size_t size = this->tda * this->size_y;
 			for(size_t i = 0; i < size; ++i)
 				data[i] += value;
 		} else {
-			const size_t row = this->size_x, tda = this->tda - row;
-			for(size_t i = 0; i < size; i += tda)
-				for(const size_t end = i + row; i < end; ++i)
-					data[i] += value;
+			const size_t size_x = this->size_x;
+			const size_t size_y = this->size_y;
+			const size_t tda = this->tda;
+			for(size_t x, y = 0; y < size_y; ++y, data += tda)
+				for(x = 0; x < size_x; ++x)
+					data[x] += value;
 		}
 	}
 
 	void FUNCTION(matrixview_scale)(VIEW(Matrix) *this, double value) {
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
 
 		if( this->tda == this->size_x ) {
+			const size_t size = this->tda * this->size_y;
 			for(size_t i = 0; i < size; ++i)
 				data[i] *= value;
 		} else {
-			const size_t row = this->size_x, tda = this->tda - row;
-			for(size_t i = 0; i < size; i += tda)
-				for(const size_t end = i + row; i < end; ++i)
-					data[i] *= value;
+			const size_t size_x = this->size_x;
+			const size_t size_y = this->size_y;
+			const size_t tda = this->tda;
+			for(size_t x, y = 0; y < size_y; ++y, data += tda)
+				for(x = 0; x < size_x; ++x)
+					data[x] *= value;
 		}
 	}
 #else /* TEMPLATE_CUL_PTR */
@@ -640,15 +545,15 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
 		ATOM *restrict data = this->data;
-		const size_t tda = this->size_x;
-		const ATOM *restrict other_data = other->data;
+		const size_t tda = this->tda;
+		ATOM *restrict other_data = other->data;
 		const size_t other_tda = other->tda;
 
-		const size_t size = this->size_x;
-		const size_t rows = this->size_y;
-		for(size_t row = 0; row < rows; ++row) {
-			for(size_t i = 0; i < size; ++i)
-				data[i] += other_data[i];
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y) {
+			for(x = 0; x < size_x; ++x)
+				data[x] += other_data[x];
 
 			/* adjust current row */
 			data += tda;
@@ -663,15 +568,15 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
 		ATOM *restrict data = this->data;
-		const size_t tda = this->size_x;
-		const ATOM *restrict other_data = other->data;
+		const size_t tda = this->tda;
+		ATOM *restrict other_data = other->data;
 		const size_t other_tda = other->tda;
 
-		const size_t size = this->size_x;
-		const size_t rows = this->size_y;
-		for(size_t row = 0; row < rows; ++row) {
-			for(size_t i = 0; i < size; ++i)
-				data[i] -= other_data[i];
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y) {
+			for(x = 0; x < size_x; ++x)
+				data[x] -= other_data[x];
 
 			/* adjust current row */
 			data += tda;
@@ -686,15 +591,15 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
 		ATOM *restrict data = this->data;
-		const size_t tda = this->size_x;
-		const ATOM *restrict other_data = other->data;
+		const size_t tda = this->tda;
+		ATOM *restrict other_data = other->data;
 		const size_t other_tda = other->tda;
 
-		const size_t size = this->size_x;
-		const size_t rows = this->size_y;
-		for(size_t row = 0; row < rows; ++row) {
-			for(size_t i = 0; i < size; ++i)
-				data[i] *= other_data[i];
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y) {
+			for(x = 0; x < size_x; ++x)
+				data[x] *= other_data[x];
 
 			/* adjust current row */
 			data += tda;
@@ -709,15 +614,15 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 			CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
 
 		ATOM *restrict data = this->data;
-		const size_t tda = this->size_x;
-		const ATOM *restrict other_data = other->data;
+		const size_t tda = this->tda;
+		ATOM *restrict other_data = other->data;
 		const size_t other_tda = other->tda;
 
-		const size_t size = this->size_x;
-		const size_t rows = this->size_y;
-		for(size_t row = 0; row < rows; ++row) {
-			for(size_t i = 0; i < size; ++i)
-				data[i] /= other_data[i];
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y) {
+			for(x = 0; x < size_x; ++x)
+				data[x] /= other_data[x];
 
 			/* adjust current row */
 			data += tda;
@@ -849,17 +754,16 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 		if( this->size_x == 0 || this->size_y == 0 )
 			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
 
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
+		const size_t tda = this->tda;
 		ATOM min = data[0];
 
-		const size_t row = this->size_x;
-		const size_t tda = this->tda - row;
-
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i)
-				if( data[i] < min )
-					min = data[i];
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y, data += tda)
+			for(x = 0; x < size_x; ++x)
+				if( data[x] < min )
+					min = data[x];
 
 		return min;
 	}
@@ -868,39 +772,37 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 		if( this->size_x == 0 || this->size_y == 0 )
 			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
 
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
+		const size_t tda = this->tda;
 		ATOM min = data[0];
 		size_t index = 0;
 
-		const size_t row = this->size_x;
-		const size_t tda = this->tda - row;
-
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i)
-				if( data[i] < min ) {
-					min = data[i];
-					index = i;
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y, data += tda)
+			for(x = 0; x < size_x; ++x)
+				if( data[x] < min ) {
+					min = data[x];
+					index = x;
 				}
 
-		return index;
+		return (data - this->data) + index;
 	}
 
 	ATOM FUNCTION(matrixview_max)(const VIEW(Matrix) *this) {
 		if( this->size_x == 0 || this->size_y == 0 )
 			CUL_ERROR_ERRNO_RET(EMPTY, CUL_EBADLEN);
 
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
+		const size_t tda = this->tda;
 		ATOM max = data[0];
 
-		const size_t row = this->size_x;
-		const size_t tda = this->tda - row;
-
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i)
-				if( data[i] > max )
-					max = data[i];
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y, data += tda)
+			for(x = 0; x < size_x; ++x)
+				if( data[x] > max )
+					max = data[x];
 
 		return max;
 	}
@@ -909,22 +811,21 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 		if( this->size_x == 0 || this->size_y == 0 )
 			CUL_ERROR_ERRNO_RET(0, CUL_EBADLEN);
 
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
+		const size_t tda = this->tda;
 		ATOM max = data[0];
 		size_t index = 0;
 
-		const size_t row = this->size_x;
-		const size_t tda = this->tda - row;
-
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i)
-				if( data[i] > max ) {
-					max = data[i];
-					index = i;
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y, data += tda)
+			for(x = 0; x < size_x; ++x)
+				if( data[x] > max ) {
+					max = data[x];
+					index = x;
 				}
 
-		return index;
+		return (data - this->data) + index;
 	}
 
 	void FUNCTION(matrixview_minmax)(const VIEW(Matrix) *this, ATOM *min_v, ATOM *max_v) {
@@ -934,19 +835,18 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
 		}
 
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
+		const size_t tda = this->tda;
 		ATOM min = data[0], max = data[0];
 
-		const size_t row = this->size_x;
-		const size_t tda = this->tda - row;
-
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i) {
-				if( data[i] < min )
-					min = data[i];
-				if( data[i] > max )
-					max = data[i];
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y, data += tda)
+			for(x = 0; x < size_x; ++x) {
+				if( data[x] < min )
+					min = data[x];
+				if( data[x] > max )
+					max = data[x];
 			}
 
 		if( min_v != NULL ) *min_v = min;
@@ -960,23 +860,22 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 			CUL_ERROR_ERRNO_RET_VOID(CUL_EBADLEN);
 		}
 
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
+		const size_t tda = this->tda;
 		ATOM min = data[0], max = data[0];
 		size_t min_index = 0, max_index = 0;
 
-		const size_t row = this->size_x;
-		const size_t tda = this->tda - row;
-
-		for(size_t i = 0; i < size; i += tda)
-			for(const size_t end = i + row; i < end; ++i) {
-				if( data[i] < min ) {
-					min = data[i];
-					min_index = i;
+		const size_t size_x = this->size_x;
+		const size_t size_y = this->size_y;
+		for(size_t x, y = 0; y < size_y; ++y, data += tda)
+			for(x = 0; x < size_x; ++x) {
+				if( data[x] < min ) {
+					min = data[x];
+					min_index = y * size_x + x;
 				}
-				if( data[i] > max ) {
-					max = data[i];
-					max_index = i;
+				if( data[x] > max ) {
+					max = data[x];
+					max_index = y * size_x + x;
 				}
 			}
 
@@ -1014,18 +913,20 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 	}
 
 	double FUNCTION(matrixview_mean)(const VIEW(Matrix) *this) {
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
 		long double mean = 0.0;
 
 		if( this->tda == this->size_x ) {
+			const size_t size = this->tda * this->size_y;
 			for(size_t i = 0, value_i = 1; i < size; ++i, ++value_i)
 				mean += (data[i] - mean)/value_i;
 		} else {
-			const size_t row = this->size_x, tda = this->tda - row;
-			for(size_t i = 0, value_i = 1; i < size; i += tda)
-				for(const size_t end = i + row; i < end; ++i, ++value_i)
-					mean += (data[i] - mean)/value_i;
+			const size_t tda = this->tda;
+			const size_t size_x = this->size_x;
+			const size_t size_y = this->size_y;
+			for(size_t x, y = 0, value_i = 1; y < size_y; ++y, data += tda)
+				for(x = 0; x < size_x; ++x, ++value_i)
+					mean += (data[x] - mean)/value_i;
 		}
 
 		return mean;
@@ -1037,18 +938,20 @@ void FUNCTION(matrixview_set_diag)(VIEW(Matrix) *this, ATOM value, ATOM diag) {
 	}
 
 	double FUNCTION(matrixview_variance_mean)(const VIEW(Matrix) *this, double mean) {
-		const size_t size = this->tda * this->size_y;
 		ATOM *restrict data = this->data;
 		double variance = 0.0;
 
 		if( this->tda == this->size_x ) {
+			const size_t size = this->tda * this->size_y;
 			for(size_t i = 0; i < size; ++i)
 				variance += (data[i] - mean)*(data[i] - mean);
 		} else {
-			const size_t row = this->size_x, tda = this->tda - row;
-			for(size_t i = 0; i < size; i += tda)
-				for(const size_t end = i + row; i < end; ++i)
-					variance += (data[i] - mean)*(data[i] - mean);
+			const size_t tda = this->tda;
+			const size_t size_x = this->size_x;
+			const size_t size_y = this->size_y;
+			for(size_t x, y = 0, i = 1; y < size_y; ++y, data += tda)
+				for(x = 0; x < size_x; ++x, ++i)
+					variance += (data[x] - mean)*(data[x] - mean);
 		}
 
 		return variance / (this->size_x * this->size_y);

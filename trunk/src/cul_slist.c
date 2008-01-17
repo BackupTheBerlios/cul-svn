@@ -225,16 +225,14 @@ CulSList *cul_slist_find(CulSList *this, cul_ptr data, cul_cmp_f *cmp_f) {
 void cul_slist_each(CulSList *this, cul_each_f *each_f) {
 	for(CulSList *next; this != NULL; this = next) {
 		next = cul_slist_next(this);
-		if( each_f(this->data) )
-			break;
+		each_f(this->data);
 	}
 }
 
 void cul_slist_each_prv(CulSList *this, cul_each_prv_f *each_prv_f, cul_ptr prv) {
 	for(CulSList *next; this != NULL; this = next) {
 		next = cul_slist_next(this);
-		if( each_prv_f(this->data, prv) )
-			break;
+		each_prv_f(this->data, prv);
 	}
 }
 

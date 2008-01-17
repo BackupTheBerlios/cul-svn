@@ -131,8 +131,7 @@ void cul_bbtree_each_key(CulBBTree *this, cul_each_key_f *each_f) {
 	CulBBTreeNode *node = cul_bbtree_first(this);
 	for(CulBBTreeNode *next; node != NULL; node = next) {
 		next = cul_bbtree_node_next(node);
-		if( each_f(node->key, node->data) )
-			break;
+		each_f(node->key, node->data);
 	}
 }
 
@@ -140,8 +139,7 @@ void cul_bbtree_each_key_prv(CulBBTree *this, cul_each_key_prv_f *each_prv_f, cu
 	CulBBTreeNode *node = cul_bbtree_first(this);
 	for(CulBBTreeNode *next; node != NULL; node = next) {
 		next = cul_bbtree_node_next(node);
-		if( each_prv_f(node->key, node->data, prv) )
-			break;
+		each_prv_f(node->key, node->data, prv);
 	}
 }
 

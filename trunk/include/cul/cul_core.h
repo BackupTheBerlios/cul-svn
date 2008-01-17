@@ -28,10 +28,11 @@ typedef int      cul_cmp_f         (cul_const_ptr a, cul_const_ptr b);
 typedef void     cul_free_f        (cul_ptr data);
 typedef cul_ptr  cul_clone_f       (cul_const_ptr data);
 typedef void     cul_cpy_f         (cul_ptr copy, cul_const_ptr data);
-typedef cul_bool cul_each_f        (cul_ptr data);
-typedef cul_bool cul_each_prv_f    (cul_ptr data, cul_ptr prv);
-typedef cul_bool cul_each_key_f    (cul_ptr key, cul_ptr data);
-typedef cul_bool cul_each_key_prv_f(cul_ptr key, cul_ptr data, cul_ptr prv);
+/* base traverse callback functions */
+typedef void     cul_each_f        (cul_ptr data);
+typedef void     cul_each_prv_f    (cul_ptr data, cul_ptr prv);
+typedef void     cul_each_key_f    (cul_ptr key, cul_ptr data);
+typedef void     cul_each_key_prv_f(cul_ptr key, cul_ptr data, cul_ptr prv);
 
 /* base callback macro helpers */
 #define CUL_EQ_F(ptr)           ((cul_eq_f *)(ptr))

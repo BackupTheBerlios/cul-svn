@@ -260,16 +260,14 @@ CulList *cul_list_find(CulList *this, cul_ptr data, cul_cmp_f *cmp_f) {
 void cul_list_each(CulList *this, cul_each_f *each_f) {
 	for(CulList *next; this != NULL; this = next) {
 		next = cul_list_next(this);
-		if( each_f(this->data) )
-			break;
+		each_f(this->data);
 	}
 }
 
 void cul_list_each_prv(CulList *this, cul_each_prv_f *each_prv_f, cul_ptr prv) {
 	for(CulList *next; this != NULL; this = next) {
 		next = cul_list_next(this);
-		if( each_prv_f(this->data, prv) )
-			break;
+		each_prv_f(this->data, prv);
 	}
 }
 

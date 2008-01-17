@@ -38,6 +38,7 @@ SET(CUL_SOURCES
 	src/cul_stream.c
 
 	src/prv/cul_prv_sort.c
+	src/prv/cul_prv_copy.c
 
 	src/cul_str.c
 	src/cul_str_type.c
