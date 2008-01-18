@@ -47,13 +47,14 @@ void            cul_cmatrix_free         (CulCMatrix *this);
 CulCMatrixView *cul_cmatrixview_new      ();
 void            cul_cmatrixview_free     (CulCMatrixView *this);
 
-CulCMatrixView *cul_cmatrixview_matrix   (CulCMatrixView *this, CulCMatrix *base);
-CulCMatrixView *cul_cmatrixview_submatrix(CulCMatrixView *this, CulCMatrix *base, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y);
-CulCVectorView *cul_cmatrixview_row      (CulCVectorView *this, const CulCMatrix *base, size_t base_row);
-CulCVectorView *cul_cmatrixview_col      (CulCVectorView *this, const CulCMatrix *base, size_t base_col);
-CulCVectorView *cul_cmatrixview_diag     (CulCVectorView *this, const CulCMatrix *base);
-CulCVectorView *cul_cmatrixview_subdiag  (CulCVectorView *this, const CulCMatrix *base, size_t base_k);
-CulCVectorView *cul_cmatrixview_superdiag(CulCVectorView *this, const CulCMatrix *base, size_t base_k);
+CulCMatrixView *cul_cmatrixview_matrix         (CulCMatrixView *this, CulCMatrix *base);
+CulCMatrixView *cul_cmatrixview_submatrix      (CulCMatrixView *this, CulCMatrix *base, size_t base_offset_x, size_t base_offset_y, size_t base_size_x, size_t base_size_y);
+CulCVectorView *cul_cvectorview_matrix_row     (CulCVectorView *this, const CulCMatrix *base, size_t base_row);
+CulCVectorView *cul_cvectorview_matrix_col     (CulCVectorView *this, const CulCMatrix *base, size_t base_col);
+CulCVectorView *cul_cvectorview_matrix_diag    (CulCVectorView *this, const CulCMatrix *base, size_t offset, int sub_or_sup);
+CulCVectorView *cul_cvectorview_matrixview_row (CulCVectorView *this, const CulCMatrixView *base, size_t base_row);
+CulCVectorView *cul_cvectorview_matrixview_col (CulCVectorView *this, const CulCMatrixView *base, size_t base_col);
+CulCVectorView *cul_cvectorview_matrixview_diag(CulCVectorView *this, const CulCMatrixView *base, size_t offset, int sub_or_sup);
 
 cul_errno cul_cmatrix_copy             (CulCMatrix *this, const CulCMatrix *other);
 cul_errno cul_cmatrix_copy_offset      (CulCMatrix *this, const CulCMatrix *other, size_t offset_x, size_t offset_y);
@@ -74,8 +75,8 @@ cul_errno cul_cmatrixview_transpose    (CulCMatrixView *this);
 
 cul_errno cul_cmatrix_resize           (CulCMatrix *this, size_t x, size_t y);
 cul_errno cul_cmatrix_resize_empty     (CulCMatrix *this, size_t x, size_t y);
-cul_errno cul_cmatrix_insert_row       (CulCMatrix *this, size_t row, const CulCVectorView *other);
-cul_errno cul_cmatrix_insert_col       (CulCMatrix *this, size_t col, const CulCVectorView *other);
+cul_errno cul_cmatrix_insert_row       (CulCMatrix *this, size_t row);
+cul_errno cul_cmatrix_insert_col       (CulCMatrix *this, size_t col);
 cul_errno cul_cmatrix_remove_row       (CulCMatrix *this, size_t row);
 cul_errno cul_cmatrix_remove_col       (CulCMatrix *this, size_t col);
 
