@@ -478,14 +478,18 @@ static inline CulArg *_cul_arg_process_ex(CulArg *table) {
 			if( (t->flags & CUL_ARG_EX) ) {
 				size_t index = CUL_ARG_FLAG_EX(t->flags);
 
-				/* check if EX was already found */
-				if( is_ex_present[index] )
-					return t;
+				if( t->flags & CUL_ARG_FOUND ) {
 
-				/* modify EX state */
-				is_ex_present[index] = CUL_TRUE;
-				if( t->flags & CUL_ARG_FOUND )
+					/* check if EX was already found */
+					if( is_ex_present[index] )
+						return t;
+
+					/* modify EX found state */
 					is_ex_found[index] = CUL_TRUE;
+				}
+
+				/* modify EX present state */
+				is_ex_present[index] = CUL_TRUE;
 			}
 
 			t += 1;
