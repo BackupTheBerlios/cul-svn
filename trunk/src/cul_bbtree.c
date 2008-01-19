@@ -85,6 +85,7 @@ void cul_bbtree_free(CulBBTree *this, cul_free_f *free_f) {
 
 CulBBTreeNode *cul_bbtree_insert(CulBBTree *this, cul_ptr key, cul_ptr data) {
 	CUL_UNUSED(this);
+	CUL_UNUSED(key);
 	CUL_UNUSED(data);
 	/* TODO cul_bbtree_insert stub */
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);

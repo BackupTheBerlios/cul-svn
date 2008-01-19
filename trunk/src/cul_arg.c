@@ -462,12 +462,10 @@ static inline cul_bool _cul_arg_flag_is_found(CulArgFlag flag) {
 
 static inline CulArg *_cul_arg_process_ex(CulArg *table) {
 	const size_t size = (CUL_ARG_EX_MASK >> CUL_ARG_EX_SHIFT) + 1;
-	cul_bool is_ex_found[size], is_ex_present[size];
+	cul_bool is_ex_found[size];
 
-	for(size_t i = 0; i < size; ++i) {
+	for(size_t i = 0; i < size; ++i)
 		is_ex_found[i] = CUL_FALSE;
-		is_ex_present[i] = CUL_FALSE;
-	}
 
 	/* initialize EX flags */
 	for(CulArg *t = table; t != NULL; ) {
@@ -475,21 +473,15 @@ static inline CulArg *_cul_arg_process_ex(CulArg *table) {
 		case CUL_ARG_END:   t = t->value; break;
 		case CUL_ARG_PRINT: t += 1; break;
 		default:
-			if( (t->flags & CUL_ARG_EX) ) {
-				size_t index = CUL_ARG_FLAG_EX(t->flags);
+			if( (t->flags & CUL_ARG_EX) && (t->flags & CUL_ARG_FOUND) ) {
+				const size_t index = CUL_ARG_FLAG_EX(t->flags);
 
-				if( t->flags & CUL_ARG_FOUND ) {
+				/* check if EX was already found */
+				if( is_ex_found[index] )
+					return t;
 
-					/* check if EX was already found */
-					if( is_ex_present[index] )
-						return t;
-
-					/* modify EX found state */
-					is_ex_found[index] = CUL_TRUE;
-				}
-
-				/* modify EX present state */
-				is_ex_present[index] = CUL_TRUE;
+				/* modify EX found state */
+				is_ex_found[index] = CUL_TRUE;
 			}
 
 			t += 1;
