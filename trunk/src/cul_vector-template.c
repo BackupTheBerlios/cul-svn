@@ -973,57 +973,150 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 		long double mean = 0.0;
 
 		const size_t size = this->size;
-		for(size_t i = 0, value_i = 1; i < size; ++i, ++value_i)
-			mean += (data[i] - mean)/value_i;
+		for(size_t i = 0, value_i = 0; i < size; ++i)
+			mean += (data[i] - mean) / (++value_i);
 
 		return mean;
 	}
+
+	#ifdef TEMPLATE_CUL_DOUBLE
+		double FUNCTION(vector_mean_nan)(const TYPE(Vector) *this) {
+			ATOM *restrict data = this->data;
+			long double mean = 0.0;
+			size_t value_i = 0;
+
+			const size_t size = this->size;
+			for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) )
+				mean += (data[i] - mean) / (++value_i);
+
+			if( value_i > 0 )
+				return mean;
+			return NAN;
+		}
+	#endif /* TEMPLATE_CUL_DOUBLE */
 
 	double FUNCTION(vector_variance)(const TYPE(Vector) *this) {
 		double mean = FUNCTION(vector_mean)(this);
 		return FUNCTION(vector_variance_mean)(this, mean);
 	}
 
+	#ifdef TEMPLATE_CUL_DOUBLE
+		double FUNCTION(vector_variance_nan)(const TYPE(Vector) *this) {
+			double mean = FUNCTION(vector_mean_nan)(this);
+			return FUNCTION(vector_variance_mean_nan)(this, mean);
+		}
+	#endif /* TEMPLATE_CUL_DOUBLE */
+
 	double FUNCTION(vector_variance_mean)(const TYPE(Vector) *this, double mean) {
 		ATOM *restrict data = this->data;
-		double variance = 0.0;
+		long double variance = 0.0;
 
 		const size_t size = this->size;
-		for(size_t i = 0; i < size; ++i)
-			variance += (data[i] - mean)*(data[i] - mean);
-		return variance / size;
+		for(size_t i = 0, value_i = 0; i < size; ++i) {
+			long double value = (data[i] - mean);
+			variance += (value*value - variance) / (++value_i);
+		}
+
+		return variance;
 	}
+
+	#ifdef TEMPLATE_CUL_DOUBLE
+		double FUNCTION(vector_variance_mean_nan)(const TYPE(Vector) *this, double mean) {
+			ATOM *restrict data = this->data;
+			long double variance = 0.0;
+			size_t value_i = 0;
+
+			const size_t size = this->size;
+			for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) ) {
+				long double value = (data[i] - mean);
+				variance += (value*value - variance) / (++value_i);
+			}
+
+			if( value_i > 0 )
+				return variance;
+			return NAN;
+		}
+	#endif /* TEMPLATE_CUL_DOUBLE */
 
 	double FUNCTION(vectorview_mean)(const VIEW(Vector) *this) {
 		const size_t stride = this->stride, size = stride * this->size;
 		ATOM *restrict data = this->data;
 		long double mean = 0.0;
 
-		if( stride == 1 ) for(size_t i = 0, value_i = 1; i < size; ++i, ++value_i)
-			mean += (data[i] - mean)/value_i;
-		else for(size_t i = 0, value_i = 1; i < size; i += stride, ++value_i)
-			mean += (data[i] - mean)/value_i;
+		if( stride == 1 ) for(size_t i = 0, value_i = 0; i < size; ++i)
+			mean += (data[i] - mean) / (++value_i);
+		else for(size_t i = 0, value_i = 1; i < size; i += stride)
+			mean += (data[i] - mean) / (++value_i);
 
 		return mean;
 	}
+
+	#ifdef TEMPLATE_CUL_DOUBLE
+		double FUNCTION(vectorview_mean_nan)(const VIEW(Vector) *this) {
+			const size_t stride = this->stride, size = stride * this->size;
+			ATOM *restrict data = this->data;
+			long double mean = 0.0;
+			size_t value_i = 0;
+
+			if( stride == 1 ) for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) )
+				mean += (data[i] - mean) / (++value_i);
+			else for(size_t i = 0; i < size; i += stride) if( !isnan(data[i]) )
+				mean += (data[i] - mean) / (++value_i);
+
+			if( value_i > 0 )
+				return mean;
+			return NAN;
+		}
+	#endif /* TEMPLATE_CUL_DOUBLE */
 
 	double FUNCTION(vectorview_variance)(const VIEW(Vector) *this) {
 		double mean = FUNCTION(vectorview_mean)(this);
 		return FUNCTION(vectorview_variance_mean)(this, mean);
 	}
 
+	#ifdef TEMPLATE_CUL_DOUBLE
+		double FUNCTION(vectorview_variance_nan)(const VIEW(Vector) *this) {
+			double mean = FUNCTION(vectorview_mean_nan)(this);
+			return FUNCTION(vectorview_variance_mean_nan)(this, mean);
+		}
+	#endif /* TEMPLATE_CUL_DOUBLE */
+
 	double FUNCTION(vectorview_variance_mean)(const VIEW(Vector) *this, double mean) {
 		const size_t stride = this->stride, size = stride * this->size;
 		ATOM *restrict data = this->data;
-		double variance = 0.0;
+		long double variance = 0.0;
 
-		if( stride == 1 ) for(size_t i = 0; i < size; ++i)
-			variance += (data[i] - mean)*(data[i] - mean);
-		else for(size_t i = 0; i < size; i += stride)
-			variance += (data[i] - mean)*(data[i] - mean);
-			
-		return variance / this->size;
+		if( stride == 1 ) for(size_t i = 0, value_i = 0; i < size; ++i) {
+			long double value = (data[i] - mean);
+			variance += (value*value - variance) / (++value_i);
+		} else for(size_t i = 0, value_i = 0; i < size; i += stride) {
+			long double value = (data[i] - mean);
+			variance += (value*value - variance) / (++value_i);
+		}
+
+		return variance;
 	}
+
+	#ifdef TEMPLATE_CUL_DOUBLE
+		double FUNCTION(vectorview_variance_mean_nan)(const VIEW(Vector) *this, double mean) {
+			const size_t stride = this->stride, size = stride * this->size;
+			ATOM *restrict data = this->data;
+			long double variance = 0.0;
+			size_t value_i = 0;
+
+			if( stride == 1 ) for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) ) {
+				long double value = (data[i] - mean);
+				variance += (value*value - variance) / (++value_i);
+			} else for(size_t i = 0; i < size; i += stride) if( !isnan(data[i]) ) {
+				long double value = (data[i] - mean);
+				variance += (value*value - variance) / (++value_i);
+			}
+
+			if( value_i > 0 )
+				return variance;
+			return NAN;
+		}
+	#endif /* TEMPLATE_CUL_DOUBLE */
 #else /* TEMPLATE_CUL_PTR */
 #endif /* TEMPLATE_CUL_PTR */
 

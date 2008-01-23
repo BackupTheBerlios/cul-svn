@@ -327,13 +327,48 @@ cul_errno FUNCTION(matrixview_swap)(VIEW(Matrix) *this, VIEW(Matrix) *other) {
 cul_errno FUNCTION(matrix_transpose)(TYPE(Matrix) *this) {
 	if( this->size_x != this->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	CUL_ERROR_ERRNO_RET(CUL_ESTUB, CUL_ESTUB);
+
+	ATOM *restrict data = this->data;
+	ATOM tmp;
+
+	const size_t size_x = this->size_x;
+	const size_t size_y = this->size_y - 1;
+	for(size_t y = 0; y < size_y; ++y) {
+
+		/* transpose row */
+		const size_t size = size_x - y;
+		for(size_t x = 1, other_x = size_x; x < size; ++x, other_x += size_x)
+			CUL_SWAP(data[x], data[other_x], tmp);
+
+		/* adjust positions */
+		data += size_x + 1;
+	}
+
+	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrixview_transpose)(VIEW(Matrix) *this) {
 	if( this->size_x != this->size_y )
 		CUL_ERROR_ERRNO_RET(CUL_EBADLEN, CUL_EBADLEN);
-	CUL_ERROR_ERRNO_RET(CUL_ESTUB, CUL_ESTUB);
+
+	ATOM *restrict data = this->data;
+	const size_t tda = this->tda;
+	ATOM tmp;
+
+	const size_t size_x = this->size_x;
+	const size_t size_y = this->size_y - 1;
+	for(size_t y = 0; y < size_y; ++y) {
+
+		/* transpose row */
+		const size_t size = size_x - y;
+		for(size_t x = 1, other_x = tda; x < size; ++x, other_x += tda)
+			CUL_SWAP(data[x], data[other_x], tmp);
+
+		/* adjust positions */
+		data += tda + 1;
+	}
+
+	return CUL_SUCCESS;
 }
 
 cul_errno FUNCTION(matrix_resize)(TYPE(Matrix) *this, size_t x, size_t y) {
