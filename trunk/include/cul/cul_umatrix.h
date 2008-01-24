@@ -118,9 +118,6 @@ double    cul_umatrixview_mean         (const CulUMatrixView *this);
 double    cul_umatrixview_variance     (const CulUMatrixView *this);
 double    cul_umatrixview_variance_mean(const CulUMatrixView *this, double mean);
 
-cul_errno cul_umatrix_fprintf          (FILE *stream, const CulUMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
-cul_errno cul_umatrix_fscanf           (FILE *stream, CulUMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
-
 /* implementation */
 
 static inline CulUMatrix *cul_umatrix_new_struct() {

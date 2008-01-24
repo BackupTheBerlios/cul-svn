@@ -1,6 +1,7 @@
 #include <cul/cul_global.h>
 #include <cul/cul_stream.h>
 #include <cul/cul_vector.h>
+#include <cul/cul_vector_io.h>
 #include <cul_prv_sort.h>
 #include <cul_prv_copy.h>
 #include <stdlib.h>

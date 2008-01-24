@@ -2,7 +2,6 @@
 #define __CUL_UVECTOR_H__
 
 #include <cul/cul_global.h>
-#include <stdio.h>
 
 #define CUL_UVECTOR(ptr)     ((CulUVector *)(ptr))
 #define CUL_UVECTORVIEW(ptr) ((CulUVectorView *)(ptr))
@@ -124,11 +123,6 @@ void      cul_uvectorview_sort_desc    (CulUVectorView *this);
 size_t    cul_uvectorview_unique       (CulUVectorView *this);
 size_t    cul_uvectorview_find         (const CulUVectorView *this, size_t offset, size_t key);
 size_t    cul_uvectorview_bfind        (const CulUVectorView *this, size_t key);
-
-cul_errno cul_uvector_fprintf          (FILE *stream, const CulUVector *this, const char *format, const char *separator, const char *begin, const char *end);
-cul_errno cul_uvector_fscanf           (FILE *stream, CulUVector *this, const char *format, const char *separator, const char *begin, const char *end);
-cul_errno cul_uvectorview_fprintf      (FILE *stream, const CulUVectorView *this, const char *format, const char *separator, const char *begin, const char *end);
-cul_errno cul_uvectorview_fscanf       (FILE *stream, CulUVectorView *this, const char *format, const char *separator, const char *begin, const char *end);
 
 /* implementations */
 

@@ -2,6 +2,7 @@
 #include <cul/cul_stream.h>
 #include <cul/cul_vector.h>
 #include <cul/cul_matrix.h>
+#include <cul/cul_matrix_io.h>
 #include <cul_prv_copy.h>
 #include <stdlib.h>
 #include <string.h>

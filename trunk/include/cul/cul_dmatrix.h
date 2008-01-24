@@ -118,9 +118,6 @@ double    cul_dmatrixview_mean         (const CulDMatrixView *this);
 double    cul_dmatrixview_variance     (const CulDMatrixView *this);
 double    cul_dmatrixview_variance_mean(const CulDMatrixView *this, double mean);
 
-cul_errno cul_dmatrix_fprintf          (FILE *stream, const CulDMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
-cul_errno cul_dmatrix_fscanf           (FILE *stream, CulDMatrix *this, const char *format, const char *separator, const char *begin, const char *end, const char *row);
-
 /* implementation */
 
 static inline CulDMatrix *cul_dmatrix_new_struct() {
