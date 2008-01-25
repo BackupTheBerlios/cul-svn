@@ -1043,10 +1043,12 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 		ATOM *restrict data = this->data;
 		long double mean = 0.0;
 
-		if( stride == 1 ) for(size_t i = 0, value_i = 0; i < size; ++i)
-			mean += (data[i] - mean) / (++value_i);
-		else for(size_t i = 0, value_i = 1; i < size; i += stride)
-			mean += (data[i] - mean) / (++value_i);
+		if( stride == 1 ) {
+			for(size_t i = 0, value_i = 0; i < size; ++i)
+				mean += (data[i] - mean) / (++value_i);
+		} else
+			for(size_t i = 0, value_i = 1; i < size; i += stride)
+				mean += (data[i] - mean) / (++value_i);
 
 		return mean;
 	}
@@ -1058,10 +1060,12 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 			long double mean = 0.0;
 			size_t value_i = 0;
 
-			if( stride == 1 ) for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) )
-				mean += (data[i] - mean) / (++value_i);
-			else for(size_t i = 0; i < size; i += stride) if( !isnan(data[i]) )
-				mean += (data[i] - mean) / (++value_i);
+			if( stride == 1 ) {
+				for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) )
+					mean += (data[i] - mean) / (++value_i);
+			} else
+				for(size_t i = 0; i < size; i += stride) if( !isnan(data[i]) )
+					mean += (data[i] - mean) / (++value_i);
 
 			if( value_i > 0 )
 				return mean;
@@ -1086,13 +1090,16 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 		ATOM *restrict data = this->data;
 		long double variance = 0.0;
 
-		if( stride == 1 ) for(size_t i = 0, value_i = 0; i < size; ++i) {
-			long double value = (data[i] - mean);
-			variance += (value*value - variance) / (++value_i);
-		} else for(size_t i = 0, value_i = 0; i < size; i += stride) {
-			long double value = (data[i] - mean);
-			variance += (value*value - variance) / (++value_i);
-		}
+		if( stride == 1 ) {
+			for(size_t i = 0, value_i = 0; i < size; ++i) {
+				long double value = (data[i] - mean);
+				variance += (value*value - variance) / (++value_i);
+			}
+		} else
+			for(size_t i = 0, value_i = 0; i < size; i += stride) {
+				long double value = (data[i] - mean);
+				variance += (value*value - variance) / (++value_i);
+			}
 
 		return variance;
 	}
@@ -1104,13 +1111,16 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 			long double variance = 0.0;
 			size_t value_i = 0;
 
-			if( stride == 1 ) for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) ) {
-				long double value = (data[i] - mean);
-				variance += (value*value - variance) / (++value_i);
-			} else for(size_t i = 0; i < size; i += stride) if( !isnan(data[i]) ) {
-				long double value = (data[i] - mean);
-				variance += (value*value - variance) / (++value_i);
-			}
+			if( stride == 1 ) {
+				for(size_t i = 0; i < size; ++i) if( !isnan(data[i]) ) {
+					long double value = (data[i] - mean);
+					variance += (value*value - variance) / (++value_i);
+				}
+			} else
+				for(size_t i = 0; i < size; i += stride) if( !isnan(data[i]) ) {
+					long double value = (data[i] - mean);
+					variance += (value*value - variance) / (++value_i);
+				}
 
 			if( value_i > 0 )
 				return variance;
