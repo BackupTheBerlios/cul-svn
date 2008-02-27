@@ -313,7 +313,7 @@ void FUNCTION(vectorview_reverse)(VIEW(Vector) *this) {
 			ATOM *restrict data = this->data;
 
 			const size_t size = this->size;
-			for(size_t i = 0; i < size; ++i)
+			for(size_t i = copy; i < size; ++i)
 				free_f(data[i]);
 		}
 		free(this->data);
