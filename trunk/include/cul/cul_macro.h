@@ -82,7 +82,6 @@
 		}                                                                          \
 	} CUL_STMT_END
 
-
 #define CUL_ASSERT(expr) CUL_STMT_START {                                      \
 		if( !(expr) ) CUL_FATAL("assertion '%s' failed\n", #expr);                 \
 	} CUL_STMT_END

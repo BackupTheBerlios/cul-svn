@@ -21,27 +21,34 @@ typedef CulErrno cul_errno;
  * used, but its previous value is restored.
  */
 enum _CulErrno {
-	CUL_UNKNOWN  = -1,
-	CUL_SUCCESS  =  0,
+	/* generic results */
+	CUL_UNKNOWN = -1,  /* unknown status */
+	CUL_SUCCESS =  0,  /* operation is successful */
+	CUL_EFAILED,       /* generic fail */
 
-	CUL_EFAIL,
-	CUL_ESTUB,
-	CUL_EINVAL,
-	CUL_EFAILED,
-	CUL_ENOMEM,
-	CUL_EBADLEN,
-	CUL_EBADPOS,
-	CUL_EPRINTF,
-	CUL_ESCANF,
-	CUL_EARGUNK,
-	CUL_EARGCONV,
-	CUL_EARGEX,
-	CUL_EARGNEED,
-	CUL_EFACCESS,
-	CUL_EFIO,
-	CUL_ECONVINVAL,
-	CUL_ECONVRANGE,
-	CUL_ECONVPART
+	/* generic error codes */
+	CUL_ESTUB,         /* stub implementation */
+	CUL_EINVAL,        /* invalid arguments */
+	CUL_ENOMEM,        /* not enough memory */
+	CUL_EBADLEN,       /* invalid length of objects */
+	CUL_EBADPOS,       /* invalid position */
+
+	/* conversion errors */
+	CUL_ECONVINVAL,    /* invalid conversion */
+	CUL_ECONVRANGE,    /* number out of range */
+	CUL_ECONVPART,     /* partial conversion occurred */
+
+	/* command line arguments */
+	CUL_EARGUNK,       /* unknown argument */
+	CUL_EARGCONV,      /* conversion error */
+	CUL_EARGEX,        /* two exclusive arguments present */
+	CUL_EARGNEED,      /* missing needed argument */
+
+	/* file/stream access */
+	CUL_EFACCESS,      /* file access error */
+	CUL_EFIO,          /* input/output error */
+
+	CUL_E_MASK,        /* maximum error mask */
 };
 
 const char *cul_error_string         (CulErrno error);

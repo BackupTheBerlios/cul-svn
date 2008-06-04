@@ -14,35 +14,33 @@ struct _CulList {
 };
 
 static inline CulList *cul_list_new_struct ();
-static inline void     cul_list_free_struct(CulList *this);
-static inline CulList *cul_list_init_struct(CulList *this, CulList *next, CulList *prev, cul_ptr data);
-static inline CulList *cul_list_next       (CulList *this);
-static inline CulList *cul_list_prev       (CulList *this);
+static inline void     cul_list_free_struct(CulList *list);
+static inline CulList *cul_list_init_struct(CulList *list, cul_ptr data, CulList *next, CulList *prev);
 
 CulList *cul_list_new        (cul_ptr data);
 CulList *cul_list_new_empty  ();
-void     cul_list_free       (CulList *this, cul_free_f *free_f);
-void     cul_list_free_all   (CulList *this, cul_free_f *free_f);
+void     cul_list_free       (CulList *list, cul_free_f *free_f);
+void     cul_list_free_all   (CulList *list, cul_free_f *free_f);
 
-CulList *cul_list_first      (CulList *this);
-CulList *cul_list_last       (CulList *this);
-CulList *cul_list_half       (CulList *this);
-CulList *cul_list_nth        (CulList *this, size_t n);
-size_t   cul_list_size       (CulList *this);
+CulList *cul_list_first      (CulList *list);
+CulList *cul_list_last       (CulList *list);
+CulList *cul_list_half       (CulList *list);
+CulList *cul_list_nth        (CulList *list, size_t n);
+size_t   cul_list_size       (CulList *list);
 
-CulList *cul_list_insert_next(CulList *this, cul_ptr data);
-CulList *cul_list_insert_prev(CulList *this, cul_ptr data);
-CulList *cul_list_remove     (CulList *this, cul_free_f *free_f);
+CulList *cul_list_insert_next(CulList *list, cul_ptr data);
+CulList *cul_list_insert_prev(CulList *list, cul_ptr data);
+CulList *cul_list_remove     (CulList *list, cul_free_f *free_f);
 
-CulList *cul_list_copy       (CulList *this);
-CulList *cul_list_detach     (CulList *this, cul_clone_f *clone_f);
-CulList *cul_list_reverse    (CulList *this);
+CulList *cul_list_copy       (CulList *list);
+CulList *cul_list_detach     (CulList *list, cul_clone_f *clone_f);
+CulList *cul_list_reverse    (CulList *list);
 
-CulList *cul_list_sort       (CulList *this, cul_cmp_f *cmp_f);
-size_t   cul_list_unique     (CulList *this, cul_cmp_f *cmp_f, cul_free_f *free_f);
-CulList *cul_list_find       (CulList *this, cul_ptr data, cul_cmp_f *cmp_f);
-void     cul_list_each       (CulList *this, cul_each_f *each_f);
-void     cul_list_each_prv   (CulList *this, cul_each_prv_f *each_prv_f, cul_ptr prv);
+CulList *cul_list_sort       (CulList *list, cul_cmp_f *cmp_f);
+size_t   cul_list_unique     (CulList *list, cul_cmp_f *cmp_f, cul_free_f *free_f);
+CulList *cul_list_find       (CulList *list, cul_ptr data, cul_cmp_f *cmp_f);
+void     cul_list_each       (CulList *list, cul_each_f *each_f);
+void     cul_list_each_prv   (CulList *list, cul_each_prv_f *each_prv_f, cul_ptr prv);
 
 /* implementations */
 
@@ -50,29 +48,15 @@ static inline CulList *cul_list_new_struct(void) {
 	return cul_slab_new(sizeof(CulList));
 }
 
-static inline void cul_list_free_struct(CulList *this) {
-	cul_slab_free(sizeof(CulList), this);
+static inline void cul_list_free_struct(CulList *list) {
+	cul_slab_free(sizeof(CulList), list);
 }
 
-static inline CulList *cul_list_init_struct(CulList *this, CulList *next, CulList *prev, cul_ptr data) {
-	this->data = data;
-	this->next = next;
-	this->prev = prev;
-	return this;
-}
-
-static inline CulList *cul_list_next(CulList *this) {
-#ifdef CUL_RANGE_CHECK
-	if( this == NULL ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
-#endif
-	return this->next;
-}
-
-static inline CulList *cul_list_prev(CulList *this) {
-#ifdef CUL_RANGE_CHECK
-	if( this == NULL ) CUL_ERROR_ERRNO_RET(NULL, CUL_EBADPOS);
-#endif
-	return this->prev;
+static inline CulList *cul_list_init_struct(CulList *list, cul_ptr data, CulList *next, CulList *prev) {
+	list->data = data;
+	list->next = next;
+	list->prev = prev;
+	return list;
 }
 
 #endif /* __CUL_LIST_H__ */

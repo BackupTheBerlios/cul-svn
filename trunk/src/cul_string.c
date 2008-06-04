@@ -212,7 +212,7 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 	/* copy data to buffer */
 #ifdef HAVE_ASPRINTF
 	if( (strsize = vasprintf(&str, format, arg)) < 0 )
-		CUL_ERROR_ERRNO_RET(NULL, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(NULL, CUL_EFIO);
 #else
 	char character;
 	if( (strsize = vsnprintf(&character, 1, format, arg)) < 0 )
@@ -428,7 +428,7 @@ CulList *cul_string_split(const CulString *s, const char *delimiter) {
 	CulList *split = NULL;
 
 	CulString *item;
-	for(char *item_str; (item_str = strstr(str, delimiter)) != NULL; split = cul_list_next(split)) {
+	for(char *item_str; (item_str = strstr(str, delimiter)) != NULL; split = split->next) {
 		/* allocate string and insert to list */
 		item = cul_string_new_block(item_str, item_str - str);
 		if( cul_list_insert_next(split, item) == NULL || item == NULL) {

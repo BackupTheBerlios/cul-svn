@@ -1081,22 +1081,22 @@ cul_errno FUNCTION(matrix_fprintf)(FILE *stream, const TYPE(Matrix) *this, const
 
 	/* print begin */
 	if( begin != NULL && fprintf(stream, "%s", begin) < 0 )
-		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 	/* print data */
 	for(size_t i = 0; i < size; ) {
 		/* print single row */
 		for(const size_t end = i + row_size; i < end; ++i)
 			if( fprintf(stream, separator) < 0 || fprintf(stream, format, data[i]) < 0 )
-				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		/* print row separator */
 		if( row != NULL && fprintf(stream, row) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 	}
 
 	/* print end */
 	if( end != NULL && fprintf(stream, "%s", end) < 0 )
-		CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+		CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 	return CUL_SUCCESS;
 }
@@ -1112,22 +1112,22 @@ cul_errno FUNCTION(matrix_fscanf)(FILE *stream, TYPE(Matrix) *this, const char *
 
 	/* print begin */
 	if( begin != NULL && fscanf(stream, begin) != 0 )
-		CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+		CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 	/* print data */
 	for(size_t i = 0; i < size; ) {
 		/* print single row */
 		for(const size_t end = i + row_size; i < end; ++i)
 			if( fscanf(stream, separator) != 0 || fscanf(stream, format, data[i]) != 1 )
-				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		/* print row separator */
 		if( row != NULL && fprintf(stream, row) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 	}
 
 	/* print end */
 	if( end != NULL && fscanf(stream, end) != 0 )
-		CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+		CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 	return CUL_SUCCESS;
 }

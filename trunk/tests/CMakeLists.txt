@@ -5,7 +5,15 @@ LINK_DIRECTORIES(${CUL_LIBRARY_DIR})
 SET(CMAKE_BUILD_TYPE Debug)
 SET(CMAKE_C_FLAGS "-std=c99")
 
-PROJECT(CUL_TEST_MATRIX)
+PROJECT(CUL_TEST_STR)
+ADD_EXECUTABLE(cul_str-test "cul_str-test.c")
+TARGET_LINK_LIBRARIES(cul_str-test cul)
+
+PROJECT(CUL_TEST_ARG)
+ADD_EXECUTABLE(cul_arg-test "cul_arg-test.c")
+TARGET_LINK_LIBRARIES(cul_arg-test cul)
+
+PROJECT(CUL_TEST_VECTOR)
 ADD_EXECUTABLE(cul_vector-test "cul_vector-test.c")
 TARGET_LINK_LIBRARIES(cul_vector-test cul)
 
@@ -17,6 +25,3 @@ PROJECT(CUL_TEST_RNG)
 ADD_EXECUTABLE(cul_rng-test "cul_rng-test.c")
 TARGET_LINK_LIBRARIES(cul_rng-test cul "-lm")
 
-PROJECT(CUL_TEST_STR)
-ADD_EXECUTABLE(cul_str-test "cul_str-test.c")
-TARGET_LINK_LIBRARIES(cul_str-test cul)

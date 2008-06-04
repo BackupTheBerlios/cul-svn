@@ -12,13 +12,11 @@
 typedef _Bool         CulBool;
 typedef void         *CulPtr;
 typedef const void   *CulConstPtr;
-typedef unsigned long CulHash;
 
 /* type mappings */
 typedef CulBool     cul_bool;
 typedef CulPtr      cul_ptr;
 typedef CulConstPtr cul_const_ptr;
-typedef CulHash     cul_hash;
 
 #define CUL_PTR(ptr)    ((cul_ptr)ptr)
 

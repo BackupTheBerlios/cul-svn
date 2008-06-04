@@ -1397,18 +1397,18 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 		/* print begin */
 		if( begin != NULL && fprintf(stream, "%s", begin) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* print data */
 		if( fprintf(stream, format, data[0]) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		for(size_t i = 1; i < size; ++i)
 			if( fprintf(stream, separator) < 0 || fprintf(stream, format, data[i]) < 0 )
-				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* print end */
 		if( end != NULL && fprintf(stream, "%s", end) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		return CUL_SUCCESS;
 	}
@@ -1422,18 +1422,18 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 		/* read begin */
 		if( begin != NULL && fscanf(stream, begin) != 0 )
-			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* read data */
 		if( fscanf(stream, format, data[0]) != 1 )
-			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		for(size_t i = 1; i < size; ++i)
 			if( fscanf(stream, separator) != 0 || fscanf(stream, format, data[i]) != 1 )
-				CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* read end */
 		if( end != NULL && fscanf(stream, end) != 0 )
-			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		return CUL_SUCCESS;
 	}
@@ -1447,18 +1447,18 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 		/* print begin */
 		if( begin != NULL && fprintf(stream, "%s", begin) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* print data */
 		if( fprintf(stream, format, data[0]) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		for(size_t i = stride; i < size; i += stride)
 			if( fprintf(stream, separator) < 0 || fprintf(stream, format, data[i]) < 0 )
-				CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* print end */
 		if( end != NULL && fprintf(stream, "%s", end) < 0 )
-			CUL_ERROR_ERRNO_RET(CUL_EPRINTF, CUL_EPRINTF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		return CUL_SUCCESS;
 	}
@@ -1472,18 +1472,18 @@ void FUNCTION(vectorview_set_basis)(VIEW(Vector) *this, size_t index, ATOM value
 
 		/* read begin */
 		if( begin != NULL && fscanf(stream, begin) != 0 )
-			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* read data */
 		if( fscanf(stream, format, data[0]) != 1 )
-			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 		for(size_t i = stride; i < size; i += stride)
 			if( fscanf(stream, separator) != 0 || fscanf(stream, format, data[i]) != 1 )
-				CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+				CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		/* read end */
 		if( end != NULL && fscanf(stream, end) != 0 )
-			CUL_ERROR_ERRNO_RET(CUL_ESCANF, CUL_ESCANF);
+			CUL_ERROR_ERRNO_RET(CUL_EFIO, CUL_EFIO);
 
 		return CUL_SUCCESS;
 	}
