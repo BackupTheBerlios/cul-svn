@@ -56,11 +56,11 @@ CulRng *cul_rng_new(CulRngType type) {
 		type = _cul_rng_get_default();
 
 	switch( type ) {
-		case CUL_RNG_DEFAULT:    rng = NULL; break;
-		case CUL_RNG_RAND:       rng = cul_rng_rand_new(); break;
-		case CUL_RNG_MT19937:    rng = cul_rng_mt19937_new(); break;
-		case CUL_RNG_MT19937_64: rng = cul_rng_mt19937_64_new(); break;
-		default:                 rng = NULL; break;
+	case CUL_RNG_DEFAULT:    rng = NULL; break;
+	case CUL_RNG_RAND:       rng = cul_rng_rand_new(); break;
+	case CUL_RNG_MT19937:    rng = cul_rng_mt19937_new(); break;
+	case CUL_RNG_MT19937_64: rng = cul_rng_mt19937_64_new(); break;
+	default:                 rng = NULL; break;
 	}
 	if( rng == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_EFAILED);
@@ -92,6 +92,21 @@ size_t cul_rng_max(const CulRng *rng) {
 
 double cul_rng_get_real(const CulRng *rng) {
 	return rng->get_real(rng->state);
+}
+
+size_t cul_rng_get_flat(const CulRng *rng, size_t max) {
+	const size_t range = _cul_rng_max(rng);
+	const size_t scale = range / max;
+	size_t value;
+
+	if( max > range || max == 0 )
+		CUL_ERROR_ERRNO_RET(0, CUL_EINVAL);
+
+	do {
+		value = rng->get(rng->state) / scale;
+	} while( value > max );
+
+	return value;
 }
 
 size_t cul_rng_get(const CulRng *rng) {
@@ -327,19 +342,19 @@ double cul_rng_mt19937_64_get_real(void *state) {
 /* internal helper function */
 static inline size_t _cul_rng_max(const CulRng *rng) {
 	switch( rng->type ) {
-		case CUL_RNG_RAND:       return (SIZE_MAX < CUL_RNG_RAND_MAX)? SIZE_MAX: CUL_RNG_RAND_MAX;
-		case CUL_RNG_MT19937:    return (SIZE_MAX < CUL_RNG_MT19937_MAX)? SIZE_MAX: CUL_RNG_MT19937_MAX;
-		case CUL_RNG_MT19937_64: return (SIZE_MAX < CUL_RNG_MT19937_64_MAX)? SIZE_MAX: CUL_RNG_MT19937_64_MAX;
-		default:                 return 0;
+	case CUL_RNG_RAND:       return (SIZE_MAX < CUL_RNG_RAND_MAX)? SIZE_MAX: CUL_RNG_RAND_MAX;
+	case CUL_RNG_MT19937:    return (SIZE_MAX < CUL_RNG_MT19937_MAX)? SIZE_MAX: CUL_RNG_MT19937_MAX;
+	case CUL_RNG_MT19937_64: return (SIZE_MAX < CUL_RNG_MT19937_64_MAX)? SIZE_MAX: CUL_RNG_MT19937_64_MAX;
+	default:                 return 0;
 	}
 }
 
 /* internal helper function, have to be at the end for sizeof operator */
 static inline size_t _cul_rng_size(const CulRng *rng) {
 	switch( rng->type ) {
-		case CUL_RNG_RAND:       return 0;
-		case CUL_RNG_MT19937:    return sizeof(_CulRngState_mt19937);
-		case CUL_RNG_MT19937_64: return sizeof(_CulRngState_mt19937_64);
-		default:                 return 0;
+	case CUL_RNG_RAND:       return 0;
+	case CUL_RNG_MT19937:    return sizeof(_CulRngState_mt19937);
+	case CUL_RNG_MT19937_64: return sizeof(_CulRngState_mt19937_64);
+	default:                 return 0;
 	}
 }
