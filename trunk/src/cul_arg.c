@@ -85,6 +85,7 @@ cul_errno cul_arg_parse(int *argc, char ***argv, CulArg **table) {
 			switch( error ) {
 			case CUL_EARGCONV: return CUL_EARGCONV;
 			case CUL_EARGUNK:  return CUL_EARGUNK;
+			case CUL_EFAILED:  return CUL_EFAILED;
 			default:           return CUL_UNKNOWN;
 			}
 		}

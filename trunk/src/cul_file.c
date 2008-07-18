@@ -154,7 +154,7 @@ cul_errno cul_file_read_strv(const char *filename, char ***contents, size_t *lin
 
 	/* copy data, we are currently at the end of the list */
 	linesv[line_size] = NULL;
-	for( CulList *node = line; line_size--; node = node->prev )
+	for( CulList *node = line; line_size--; node = node->next )
 		linesv[line_size] = node->data;
 
 	/* remove temporary data */
