@@ -30,104 +30,104 @@ struct _CulString {
 static const CulString CulStringNULL = {NULL, 0, 0};
 
 static inline CulString  *cul_string_new_struct ();
-static inline void        cul_string_free_struct(CulString *this);
-static inline CulString  *cul_string_init_struct(CulString *this, size_t size, size_t reserved, char *str);
+static inline void        cul_string_free_struct(CulString *string);
+static inline CulString  *cul_string_init_struct(CulString *string, char *str, size_t size, size_t reserved);
 
-static inline char       *cul_string_str        (CulString *this);
-static inline const char *cul_string_const_str  (const CulString *this);
-static inline size_t      cul_string_length     (const CulString *this);
-static inline cul_bool    cul_string_isnull     (const CulString *this);
-static inline cul_bool    cul_string_isempty    (const CulString *this);
-cul_bool                  cul_string_isspace    (const CulString *this);
+static inline char       *cul_string_str        (CulString *string);
+static inline const char *cul_string_const_str  (const CulString *string);
+static inline size_t      cul_string_length     (const CulString *string);
+static inline cul_bool    cul_string_isnull     (const CulString *string);
+static inline cul_bool    cul_string_isempty    (const CulString *string);
+cul_bool                  cul_string_isspace    (const CulString *string);
 
 CulString *cul_string_new             (const CulString *string);
 CulString *cul_string_new_empty       ();
 CulString *cul_string_new_printf      (const char *format, ...);
 CulString *cul_string_new_str         (const char *str);
 CulString *cul_string_new_block       (const char *block, size_t size);
-void       cul_string_free            (CulString *this);
+void       cul_string_free            (CulString *string);
 
-CulString *cul_string_clean           (CulString *this);
-CulString *cul_string_clear           (CulString *this);
-CulString *cul_string_resize          (CulString *this, size_t size);
-CulString *cul_string_reserve         (CulString *this, size_t size);
-CulString *cul_string_shrink          (CulString *this);
+CulString *cul_string_clean           (CulString *string);
+CulString *cul_string_clear           (CulString *string);
+CulString *cul_string_resize          (CulString *string, size_t size);
+CulString *cul_string_reserve         (CulString *string, size_t size);
+CulString *cul_string_shrink          (CulString *string);
 
-CulString *cul_string_copy            (CulString *this, const CulString *copy);
-CulString *cul_string_copy_str        (CulString *this, const char *copy);
-CulString *cul_string_copy_block      (CulString *this, const char *copy, size_t size);
+CulString *cul_string_copy            (CulString *string, const CulString *copy);
+CulString *cul_string_copy_str        (CulString *string, const char *copy);
+CulString *cul_string_copy_block      (CulString *string, const char *copy, size_t size);
 
-CulString *cul_string_append          (CulString *this, const CulString *append);
-CulString *cul_string_append_printf   (CulString *this, const char *format, ...);
-CulString *cul_string_append_str      (CulString *this, const char *append);
-CulString *cul_string_prepend         (CulString *this, const CulString *prepend);
-CulString *cul_string_prepend_printf  (CulString *this, const char *format, ...);
-CulString *cul_string_prepend_str     (CulString *this, const char *prepend);
+CulString *cul_string_append          (CulString *string, const CulString *append);
+CulString *cul_string_append_printf   (CulString *string, const char *format, ...);
+CulString *cul_string_append_str      (CulString *string, const char *append);
+CulString *cul_string_prepend         (CulString *string, const CulString *prepend);
+CulString *cul_string_prepend_printf  (CulString *string, const char *format, ...);
+CulString *cul_string_prepend_str     (CulString *string, const char *prepend);
 
-CulString *cul_string_insert          (CulString *this, size_t pos, const CulString *insert);
-CulString *cul_string_insert_printf   (CulString *this, size_t pos, const char *format, ...);
-CulString *cul_string_insert_str      (CulString *this, size_t pos, const char *insert);
-CulString *cul_string_insert_block    (CulString *this, size_t pos, const char *insert, size_t size);
+CulString *cul_string_insert          (CulString *string, size_t pos, const CulString *insert);
+CulString *cul_string_insert_printf   (CulString *string, size_t pos, const char *format, ...);
+CulString *cul_string_insert_str      (CulString *string, size_t pos, const char *insert);
+CulString *cul_string_insert_block    (CulString *string, size_t pos, const char *insert, size_t size);
 
-CulString *cul_string_cut             (CulString *this, size_t pos, size_t size);
-CulString *cul_string_cut_begin       (CulString *this, size_t size);
-CulString *cul_string_cut_end         (CulString *this, size_t size);
+CulString *cul_string_cut             (CulString *string, size_t pos, size_t size);
+CulString *cul_string_cut_begin       (CulString *string, size_t size);
+CulString *cul_string_cut_end         (CulString *string, size_t size);
 
-int        cul_string_compare         (const CulString *this, const CulString *compare);
-int        cul_string_compare_str     (const CulString *this, const char *compare);
-int        cul_string_compare_block   (const CulString *this, const char *compare, size_t size);
+int        cul_string_compare         (const CulString *string, const CulString *compare);
+int        cul_string_compare_str     (const CulString *string, const char *compare);
+int        cul_string_compare_block   (const CulString *string, const char *compare, size_t size);
 
-int        cul_string_subcompare      (const CulString *this, size_t pos, const CulString *compare);
-int        cul_string_subcompare_str  (const CulString *this, size_t pos, const char *compare);
-int        cul_string_subcompare_block(const CulString *this, size_t pos, const char *compare, size_t size);
+int        cul_string_subcompare      (const CulString *string, size_t pos, const CulString *compare);
+int        cul_string_subcompare_str  (const CulString *string, size_t pos, const char *compare);
+int        cul_string_subcompare_block(const CulString *string, size_t pos, const char *compare, size_t size);
 
-cul_bool   cul_string_equal           (const CulString *this, const CulString *compare);
-cul_bool   cul_string_equal_str       (const CulString *this, const char *compare);
-cul_bool   cul_string_start_with      (const CulString *this, const CulString *prefix);
-cul_bool   cul_string_start_with_str  (const CulString *this, const char *prefix);
-cul_bool   cul_string_end_with        (const CulString *this, const CulString *postfix);
-cul_bool   cul_string_end_with_str    (const CulString *this, const char *postfix);
+cul_bool   cul_string_equal           (const CulString *string, const CulString *compare);
+cul_bool   cul_string_equal_str       (const CulString *string, const char *compare);
+cul_bool   cul_string_start_with      (const CulString *string, const CulString *prefix);
+cul_bool   cul_string_start_with_str  (const CulString *string, const char *prefix);
+cul_bool   cul_string_end_with        (const CulString *string, const CulString *postfix);
+cul_bool   cul_string_end_with_str    (const CulString *string, const char *postfix);
 
-CulString *cul_string_trim            (CulString *this);
-CulString *cul_string_trim_left       (CulString *this);
-CulString *cul_string_trim_right      (CulString *this);
+CulString *cul_string_trim            (CulString *string);
+CulString *cul_string_trim_left       (CulString *string);
+CulString *cul_string_trim_right      (CulString *string);
 
-CulList   *cul_string_split           (const CulString *this, const char *delimiter);
+CulList   *cul_string_split           (const CulString *string, const char *delimiter);
 
 /* implemenations */
 
-static inline CulString *cul_string_new_struct(void) {
+static inline CulString *cul_string_new_struct() {
 	return cul_slab_new(sizeof(CulString));
 }
 
-static inline void cul_string_free_struct(CulString *this) {
-	cul_slab_free(sizeof(CulString), this);
+static inline void cul_string_free_struct(CulString *string) {
+	cul_slab_free(sizeof(CulString), string);
 }
 
-static inline CulString *cul_string_init_struct(CulString *this, size_t size, size_t reserved, char *str) {
-	this->str = str;
-	this->size = size;
-	this->reserved = reserved;
-	return this;
+static inline CulString *cul_string_init_struct(CulString *string, char *str, size_t size, size_t reserved) {
+	string->str = str;
+	string->size = size;
+	string->reserved = reserved;
+	return string;
 }
 
-static inline char *cul_string_str(CulString *this) {
-	return this->str;
+static inline char *cul_string_str(CulString *string) {
+	return string->str;
 }
-static inline const char *cul_string_const_str(const CulString *this) {
-	return this->str;
-}
-
-static inline size_t cul_string_length(const CulString *this) {
-	return this->size;
+static inline const char *cul_string_const_str(const CulString *string) {
+	return string->str;
 }
 
-static inline cul_bool cul_string_isnull(const CulString *this) {
-	return this->str == NULL? CUL_TRUE: CUL_FALSE;
+static inline size_t cul_string_length(const CulString *string) {
+	return string->size;
 }
 
-static inline cul_bool cul_string_isempty(const CulString *this) {
-	return this->size == 0? CUL_TRUE: CUL_FALSE;
+static inline cul_bool cul_string_isnull(const CulString *string) {
+	return string->str == NULL? CUL_TRUE: CUL_FALSE;
+}
+
+static inline cul_bool cul_string_isempty(const CulString *string) {
+	return string->size == 0? CUL_TRUE: CUL_FALSE;
 }
 
 #endif /* __CUL_STRING_H__ */

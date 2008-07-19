@@ -35,7 +35,7 @@ CulString *cul_string_new_printf(const char *format, ...) {
 
 	if( (s = cul_string_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	cul_string_init_struct(s, 0, 0, NULL);
+	cul_string_init_struct(s, NULL, 0, 0);
 
 	va_start(arg, format);
 	if( _cul_string_insert_vprintf(s, 0, format, arg) == NULL ) {
@@ -58,7 +58,7 @@ CulString *cul_string_new_block(const char *block, size_t size) {
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
 
 	/* initialize */
-	cul_string_init_struct(s, 0, 0, NULL);
+	cul_string_init_struct(s, NULL, 0, 0);
 
 	/* copy block */
 	if( cul_string_copy_block(s, block, size) == NULL )
@@ -82,7 +82,7 @@ CulString *cul_string_clean(CulString *s) {
 
 CulString *cul_string_clear(CulString *s) {
 	free(s->str);
-	cul_string_init_struct(s, 0, 0, NULL);
+	cul_string_init_struct(s, NULL, 0, 0);
 	return s;
 }
 
@@ -101,7 +101,7 @@ CulString *cul_string_resize(CulString *s, size_t size) {
 	str[copy_size] = '\0';
 	free(s->str);
 
-	return cul_string_init_struct(s, copy_size, size + 1, str);
+	return cul_string_init_struct(s, str, copy_size, size + 1);
 }
 
 /**
@@ -122,7 +122,7 @@ CulString *cul_string_reserve(CulString *s, size_t size) {
 	memcpy(str, s->str, (s->size + 1)*sizeof(char));
 	free(s->str);
 
-	return cul_string_init_struct(s, s->size, size + 1, str);
+	return cul_string_init_struct(s, str, s->size, size + 1);
 }
 
 CulString *cul_string_shrink(CulString *s) {
@@ -226,7 +226,7 @@ CulString *_cul_string_insert_vprintf(CulString *s, size_t pos, const char *form
 	/* insert buffer to string */
 	if( cul_string_isnull(s) )
 		/* we don't know exactly size of reserved space, use minial possible value */
-		cul_string_init_struct(s, strsize, strsize+1, str);
+		cul_string_init_struct(s, str, strsize, strsize+1);
 	else {
 		if( cul_string_insert_block(s, pos, str, strsize ) == NULL ) {
 			free(str);
