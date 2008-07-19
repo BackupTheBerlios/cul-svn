@@ -44,7 +44,7 @@ void     cul_list_each_prv   (CulList *list, cul_each_prv_f *each_prv_f, cul_ptr
 
 /* implementations */
 
-static inline CulList *cul_list_new_struct(void) {
+static inline CulList *cul_list_new_struct() {
 	return cul_slab_new(sizeof(CulList));
 }
 

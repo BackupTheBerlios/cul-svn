@@ -4,7 +4,7 @@ CulList *cul_list_new(cul_ptr data) {
 	CulList *list;
 	if( (list = cul_list_new_struct()) == NULL )
 		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	return cul_list_init_struct(list, NULL, NULL, data);
+	return cul_list_init_struct(list, data, NULL, NULL);
 }
 
 CulList *cul_list_new_empty() {
@@ -72,14 +72,14 @@ CulList *cul_list_insert_next(CulList *list, cul_ptr data) {
 	if( list != NULL ) {
 		CulList *next = list->next;
 
-		cul_list_init_struct(n, next, list, data);
+		cul_list_init_struct(n, data, next, list);
 		/* adjust list pointers */
 		if( next != NULL )
 			next->prev = n;
 		list->next = n;
 	}
 	else
-		cul_list_init_struct(n, NULL, NULL, data);
+		cul_list_init_struct(n, data, NULL, NULL);
 	return n;
 }
 
@@ -91,14 +91,14 @@ CulList *cul_list_insert_prev(CulList *list, cul_ptr data) {
 	if( list != NULL ) {
 		CulList *prev = list->prev;
 
-		cul_list_init_struct(n, list, prev, data);
+		cul_list_init_struct(n, data, list, prev);
 		/* adjust list pointers */
 		if( prev != NULL )
 			prev->next = n;
 		list->prev = n;
 	}
 	else
-		cul_list_init_struct(n, NULL, NULL, data);
+		cul_list_init_struct(n, data, NULL, NULL);
 	return n;
 }
 
@@ -147,8 +147,11 @@ CulList *cul_list_detach(CulList *list, cul_clone_f *clone_f) {
 }
 
 CulList *cul_list_reverse(CulList *list) {
-	CulList *last;
-	for( last = list; list != NULL; last = list) {
+	CulList *last = NULL;
+	while( list != NULL ) {
+		last = list;
+
+		/* swap nodes */
 		list = last->next;
 		last->next = last->prev;
 		last->prev = list;
