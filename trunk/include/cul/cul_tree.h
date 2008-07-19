@@ -1,5 +1,5 @@
-#if !defined(CUL_TREE_H)
-#define CUL_TREE_H
+#ifndef __CUL_TREE_H__
+#define __CUL_TREE_H__
 
 #include <cul/cul_global.h>
 
@@ -15,66 +15,49 @@ struct _CulTree {
 	CulTree *child;     /* child node */
 };
 
-/* Allocation */
+static inline CulTree *cul_tree_new_struct ();
+static inline void     cul_tree_free_struct(CulTree *tree);
+static inline CulTree *cul_tree_init_struct(CulTree *tree, cul_ptr data, CulTree *parent, CulTree *next, CulTree *prev, CulTree *child);
 
-static inline CulTree *cul_tree_new_struct(void);
-static inline void cul_tree_free_struct(CulTree *t);
-static inline CulTree *cul_tree_init_struct(CulTree *t, CulTree *parent, CulTree *next, CulTree *prev, CulTree *child, cul_ptr data);
+CulTree *cul_tree_new               ();
+void     cul_tree_free              (CulTree *tree, cul_free_f *free_f);
+void     cul_tree_free_all          (CulTree *tree, cul_free_f *free_f);
 
-CulTree *cul_tree_new(void);
-void cul_tree_free(CulTree *t, cul_free_f *free_f);
-void cul_tree_free_all(CulTree *t, cul_free_f *free_f);
+CulTree *cul_tree_first             (CulTree *tree);
+CulTree *cul_tree_last              (CulTree *tree);
+CulTree *cul_tree_nth               (CulTree *tree, size_t n);
+CulTree *cul_tree_root              (CulTree *tree);
 
-/* Basic Tree Operators */
+CulTree *cul_tree_insert_next       (CulTree *tree, cul_ptr data);
+CulTree *cul_tree_insert_prev       (CulTree *tree, cul_ptr data);
+CulTree *cul_tree_insert_child_first(CulTree *tree, cul_ptr data);
+CulTree *cul_tree_insert_child_last (CulTree *tree, cul_ptr data);
+CulTree *cul_tree_remove            (CulTree *tree, cul_free_f *free_f);
+CulTree *cul_tree_remove_child_first(CulTree *tree, cul_free_f *free_f);
+CulTree *cul_tree_remove_child_last (CulTree *tree, cul_free_f *free_f);
 
-static inline CulTree *cul_tree_parent(CulTree *t);
-static inline CulTree *cul_tree_child(CulTree *t);
-static inline CulTree *cul_tree_next(CulTree *t);
-static inline CulTree *cul_tree_prev(CulTree *t);
-CulTree *cul_tree_first(CulTree *t);
-CulTree *cul_tree_last(CulTree *t);
-CulTree *cul_tree_root(CulTree *t);
-
-/* Resize */
-
-CulTree *cul_tree_insert_next(CulTree *t, cul_ptr data);
-CulTree *cul_tree_insert_prev(CulTree *t, cul_ptr data);
-CulTree *cul_tree_insert_child_first(CulTree *t, cul_ptr data);
-CulTree *cul_tree_insert_child_last(CulTree *t, cul_ptr data);
+CulTree *cul_tree_copy              (CulTree *tree);
+CulTree *cul_tree_copy_child        (CulTree *tree);
+CulTree *cul_tree_detach            (CulTree *tree, cul_clone_f *clone_f);
+CulTree *cul_tree_reverse           (CulTree *tree);
 
 /* implementations */
 
-static inline CulTree *cul_tree_new_struct(void) {
+static inline CulTree *cul_tree_new_struct() {
 	return cul_slab_new(sizeof(CulTree));
 }
 
-static inline void cul_tree_free_struct(CulTree *t) {
-	cul_slab_free(sizeof(CulTree), t);
+static inline void cul_tree_free_struct(CulTree *tree) {
+	cul_slab_free(sizeof(CulTree), tree);
 }
 
-static inline CulTree *cul_tree_init_struct(CulTree *t, CulTree *parent, CulTree *next, CulTree *prev, CulTree *child, cul_ptr data) {
-	t->data = data;
-	t->parent = parent;
-	t->next = next;
-	t->prev = prev;
-	t->child = child;
-	return t;
+static inline CulTree *cul_tree_init_struct(CulTree *tree, cul_ptr data, CulTree *parent, CulTree *next, CulTree *prev, CulTree *child) {
+	tree->data = data;
+	tree->parent = parent;
+	tree->next = next;
+	tree->prev = prev;
+	tree->child = child;
+	return tree;
 }
 
-static inline CulTree *cul_tree_parent(CulTree *t) {
-	return t->parent;
-}
-
-static inline CulTree *cul_tree_child(CulTree *t) {
-	return t->child;
-}
-
-static inline CulTree *cul_tree_next(CulTree *t) {
-	return t->next;
-}
-
-static inline CulTree *cul_tree_prev(CulTree *t) {
-	return t->prev;
-}
-
-#endif
+#endif /* __CUL_TREE_H__ */
