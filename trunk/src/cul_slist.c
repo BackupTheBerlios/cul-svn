@@ -79,7 +79,7 @@ CulSList *cul_slist_insert_prev(CulSList *slist, cul_ptr data) {
 	return n;
 }
 
-CulSList *cul_slist_remove(CulSList *slist, cul_free_f *free_f) {
+CulSList *cul_slist_remove_node(CulSList *slist, cul_free_f *free_f) {
 	if( slist != NULL ) {
 		CulSList *n = slist->next;
 		cul_slist_free(slist, free_f);
@@ -95,6 +95,22 @@ CulSList *cul_slist_remove_next(CulSList *slist, cul_free_f *free_f) {
 			slist->next = n->next;
 			cul_slist_free(n, free_f);
 		}
+	}
+	return slist;
+}
+
+CulSList *cul_slist_unlink_node(CulSList *slist) {
+	if( slist != NULL )
+		slist->next = NULL;
+	return slist;
+}
+
+CulSList *cul_slist_unlink_next(CulSList *slist) {
+	if( slist != NULL ) {
+		CulSList *n = slist->next;
+		if( n != NULL )
+			slist->next = n->next;
+		return n;
 	}
 	return slist;
 }

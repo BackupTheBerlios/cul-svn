@@ -58,6 +58,14 @@ CulTree *cul_tree_root(CulTree *tree) {
 	return tree;
 }
 
+size_t cul_tree_level(CulTree *tree) {
+	size_t level = 0;
+	if( tree != NULL )
+		for(; tree->parent != NULL; ++level)
+			tree = tree->parent;
+	return level;
+}
+
 CulTree *cul_tree_insert_next(CulTree *tree, cul_ptr data) {
 	CulTree *n;
 	if( (n = cul_tree_new_struct()) == NULL )
@@ -141,15 +149,19 @@ CulTree *cul_tree_remove(CulTree *tree, cul_free_f *free_f) {
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
-CulTree *cul_tree_remove_child_first(CulTree *tree, cul_free_f *free_f) {
+CulTree *cul_tree_remove_child(CulTree *tree, cul_free_f *free_f) {
 	CUL_UNUSED(tree);
 	CUL_UNUSED(free_f);
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
-CulTree *cul_tree_remove_child_last(CulTree *tree, cul_free_f *free_f) {
+CulTree *cul_tree_unlink(CulTree *tree) {
 	CUL_UNUSED(tree);
-	CUL_UNUSED(free_f);
+	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
+}
+
+CulTree *cul_tree_unlink_child(CulTree *tree) {
+	CUL_UNUSED(tree);
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 

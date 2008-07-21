@@ -27,14 +27,16 @@ CulTree *cul_tree_first             (CulTree *tree);
 CulTree *cul_tree_last              (CulTree *tree);
 CulTree *cul_tree_nth               (CulTree *tree, size_t n);
 CulTree *cul_tree_root              (CulTree *tree);
+size_t   cul_tree_level             (CulTree *tree);
 
 CulTree *cul_tree_insert_next       (CulTree *tree, cul_ptr data);
 CulTree *cul_tree_insert_prev       (CulTree *tree, cul_ptr data);
 CulTree *cul_tree_insert_child_first(CulTree *tree, cul_ptr data);
 CulTree *cul_tree_insert_child_last (CulTree *tree, cul_ptr data);
 CulTree *cul_tree_remove            (CulTree *tree, cul_free_f *free_f);
-CulTree *cul_tree_remove_child_first(CulTree *tree, cul_free_f *free_f);
-CulTree *cul_tree_remove_child_last (CulTree *tree, cul_free_f *free_f);
+CulTree *cul_tree_remove_child      (CulTree *tree, cul_free_f *free_f);
+CulTree *cul_tree_unlink            (CulTree *tree);
+CulTree *cul_tree_unlink_child      (CulTree *tree);
 
 CulTree *cul_tree_copy              (CulTree *tree);
 CulTree *cul_tree_copy_child        (CulTree *tree);
