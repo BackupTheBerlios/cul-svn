@@ -22,16 +22,14 @@ void      cul_slist_free       (CulSList *slist, cul_free_f *free_f);
 void      cul_slist_free_all   (CulSList *slist, cul_free_f *free_f);
 
 CulSList *cul_slist_last       (CulSList *slist);
-CulSList *cul_slist_half       (CulSList *slist);
 CulSList *cul_slist_nth        (CulSList *slist, size_t n);
+CulSList *cul_slist_nth_last   (CulSList *slist, size_t n);
 size_t    cul_slist_size       (CulSList *slist);
 
 CulSList *cul_slist_insert_next(CulSList *slist, cul_ptr data);
 CulSList *cul_slist_insert_prev(CulSList *slist, cul_ptr data);
-CulSList *cul_slist_remove_node(CulSList *slist, cul_free_f *free_f);
-CulSList *cul_slist_remove_next(CulSList *slist, cul_free_f *free_f);
-CulSList *cul_slist_unlink_node(CulSList *slist);
-CulSList *cul_slist_unlink_next(CulSList *slist);
+CulSList *cul_slist_remove     (CulSList *slist, cul_free_f *free_f);
+static inline void cul_slist_remove_next(CulSList *slist, cul_free_f *free_f);
 
 CulSList *cul_slist_copy       (CulSList *slist);
 CulSList *cul_slist_detach     (CulSList *slist, cul_clone_f *clone_f);
@@ -57,6 +55,10 @@ static inline CulSList *cul_slist_init_struct(CulSList *slist, cul_ptr data, Cul
 	slist->data = data;
 	slist->next = next;
 	return slist;
+}
+
+static inline void cul_slist_remove_next(CulSList *slist, cul_free_f *free_f) {
+	slist->next = cul_slist_remove(slist->next, free_f);
 }
 
 #endif

@@ -51,6 +51,20 @@ CulTree *cul_tree_nth(CulTree *tree, size_t n) {
 	return tree;
 }
 
+CulTree *cul_tree_nth_last(CulTree *tree, size_t n) {
+	if( tree != NULL )
+		while( tree->next != NULL && n-- )
+			tree = tree->next;
+	return tree;
+}
+
+size_t cul_tree_size(CulTree *tree) {
+	size_t size = 0;
+	for( ; tree != NULL; tree = tree->next)
+		++size;
+	return size;
+}
+
 CulTree *cul_tree_root(CulTree *tree) {
 	if( tree != NULL )
 		while( tree->parent != NULL )
@@ -149,22 +163,6 @@ CulTree *cul_tree_remove(CulTree *tree, cul_free_f *free_f) {
 	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
 }
 
-CulTree *cul_tree_remove_child(CulTree *tree, cul_free_f *free_f) {
-	CUL_UNUSED(tree);
-	CUL_UNUSED(free_f);
-	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
-}
-
-CulTree *cul_tree_unlink(CulTree *tree) {
-	CUL_UNUSED(tree);
-	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
-}
-
-CulTree *cul_tree_unlink_child(CulTree *tree) {
-	CUL_UNUSED(tree);
-	CUL_ERROR_ERRNO_RET(NULL, CUL_ESTUB);
-}
-
 /*
  * copy all tree node childs to corresponding copy node
  * NOTE: on memory error no cleaning is done
@@ -258,6 +256,24 @@ CulTree *cul_tree_reverse(CulTree *tree) {
 		last->next = last->prev;
 		last->prev = tree;
 	}
+	return last;
+}
+
+CulTree *cul_tree_reverse_level(CulTree *tree) {
+	CulTree *last = NULL;
+	while( tree != NULL ) {
+		last = tree;
+
+		/* swap nodes */
+		tree = last->next;
+		last->next = last->prev;
+		last->prev = tree;
+	}
+
+	/* adjust parent child node */
+	if( last != NULL )
+		last->parent->child = last;
+
 	return last;
 }
 

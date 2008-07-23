@@ -33,14 +33,11 @@ CulSList *cul_slist_last(CulSList *slist) {
 	return slist;
 }
 
-CulSList *cul_slist_half(CulSList *slist) {
-	CulSList *n = slist;
-	for( ; slist != NULL; slist = slist->next) {
-		if( (slist = slist->next) == NULL )
-			break;
-		n = n->next;
-	}
-	return n;
+CulSList *cul_slist_nth_last(CulSList *slist, size_t n) {
+	if( slist != NULL )
+		while( slist->next != NULL && n-- )
+			slist = slist->next;
+	return slist;
 }
 
 CulSList *cul_slist_nth(CulSList *slist, size_t n) {
@@ -79,37 +76,10 @@ CulSList *cul_slist_insert_prev(CulSList *slist, cul_ptr data) {
 	return n;
 }
 
-CulSList *cul_slist_remove_node(CulSList *slist, cul_free_f *free_f) {
+CulSList *cul_slist_remove(CulSList *slist, cul_free_f *free_f) {
 	if( slist != NULL ) {
 		CulSList *n = slist->next;
 		cul_slist_free(slist, free_f);
-		return n;
-	}
-	return slist;
-}
-
-CulSList *cul_slist_remove_next(CulSList *slist, cul_free_f *free_f) {
-	if( slist != NULL ) {
-		CulSList *n = slist->next;
-		if( n != NULL ) {
-			slist->next = n->next;
-			cul_slist_free(n, free_f);
-		}
-	}
-	return slist;
-}
-
-CulSList *cul_slist_unlink_node(CulSList *slist) {
-	if( slist != NULL )
-		slist->next = NULL;
-	return slist;
-}
-
-CulSList *cul_slist_unlink_next(CulSList *slist) {
-	if( slist != NULL ) {
-		CulSList *n = slist->next;
-		if( n != NULL )
-			slist->next = n->next;
 		return n;
 	}
 	return slist;

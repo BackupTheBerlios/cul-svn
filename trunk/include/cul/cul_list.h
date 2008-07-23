@@ -24,14 +24,13 @@ void     cul_list_free_all   (CulList *list, cul_free_f *free_f);
 
 CulList *cul_list_first      (CulList *list);
 CulList *cul_list_last       (CulList *list);
-CulList *cul_list_half       (CulList *list);
 CulList *cul_list_nth        (CulList *list, size_t n);
+CulList *cul_list_nth_last   (CulList *list, size_t n);
 size_t   cul_list_size       (CulList *list);
 
 CulList *cul_list_insert_next(CulList *list, cul_ptr data);
 CulList *cul_list_insert_prev(CulList *list, cul_ptr data);
-CulList *cul_list_remove_node(CulList *list, cul_free_f *free_f);
-CulList *cul_list_unlink_node(CulList *list);
+CulList *cul_list_remove     (CulList *list, cul_free_f *free_f);
 
 CulList *cul_list_copy       (CulList *list);
 CulList *cul_list_detach     (CulList *list, cul_clone_f *clone_f);
