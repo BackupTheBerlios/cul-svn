@@ -31,8 +31,9 @@ MACRO(CUL_TEMPLATE_FILE InputFile OutputFile Template)
     # set output flag
     SET(Output 1)
 
-    # load file
+    # load file and clean output file
     FILE(STRINGS ${InputFile} InputContents)
+    FILE(REMOVE ${OutputFile})
 
     # initialize loop
     SET(LineNr 0)
@@ -66,14 +67,11 @@ MACRO(CUL_TEMPLATE_FILE InputFile OutputFile Template)
             STRING(REPLACE "\@LOWER\@" ${LOWER} Line "${Line}")
             STRING(REPLACE "\@UPPER\@" ${UPPER} Line "${Line}")
             STRING(REPLACE "\@ATOM\@" ${ATOM} Line "${Line}")
-            LIST(APPEND OutputContents "${Line}\n")
+            FILE(APPEND ${OutputFile} "${Line}\n")
         ENDIF()
 
         MATH(EXPR LineNr "${LineNr} + 1")
     ENDWHILE()
-
-    # write created file
-    FILE(WRITE ${OutputFile} ${OutputContents})
 ENDMACRO(CUL_TEMPLATE_FILE)
 
 MACRO(CUL_TEMPLATE_HEADER InputFile OutputDir Templates)
