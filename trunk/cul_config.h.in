@@ -4,10 +4,7 @@
 /* auto generated header from build process. */
 
 /* Version number.  */
-#define CUL_MAJOR_VERSION ${CUL_MAJOR_VERSION}
-#define CUL_MINOR_VERSION ${CUL_MINOR_VERSION}
-#define CUL_PATCH_VERSION ${CUL_PATCH_VERSION}
-#define CUL_VERSION "${CUL_VERSION}"
+#define CUL_VERSION "@CUL_VERSION@"
 
 /* resize factors */
 #define CUL_EFACTOR_MUL 1
@@ -19,6 +16,6 @@
 #cmakedefine HAVE_ASPRINTF
 
 /* additional macros used *only* in headers */
-/* #define CUL_RANGE_CHECK */
 
 #endif /* __CUL_CONFIG_H__ */
+
