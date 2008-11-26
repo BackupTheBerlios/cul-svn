@@ -27,17 +27,17 @@
     #error TEMPLATE_* directive undifined!
 #endif
 
-#define CONCAT2x   (a1, a2)         a1 ## a2
-#define CONCAT2    (a1, a2)         CONCAT2x(a1, a2)
-#define CONCAT3x   (a1, a2, a3)     a1 ## a2 ## a3
-#define CONCAT3    (a1, a2, a3)     CONCAT3x(a1, a2, a3)
-#define CONCAT4x   (a1, a2, a3, a4) a1 ## a2 ## a3 ## a4
-#define CONCAT4    (a1, a2, a3, a4) CONCAT4x(a1, a2, a3, a4)
-#define CONCATEX2x (a1, a2)         a1 ## _ ## a2
-#define CONCATEX2  (a1,a2)          CONCATEX2x(a1, a2)
+#define CONCAT2x(a1, a2)         a1 ## a2
+#define CONCAT2(a1, a2)          CONCAT2x(a1, a2)
+#define CONCAT3x(a1, a2, a3)     a1 ## a2 ## a3
+#define CONCAT3(a1, a2, a3)      CONCAT3x(a1, a2, a3)
+#define CONCAT4x(a1, a2, a3, a4) a1 ## a2 ## a3 ## a4
+#define CONCAT4(a1, a2, a3, a4)  CONCAT4x(a1, a2, a3, a4)
+#define CONCATEX2x(a1, a2)       a1 ## _ ## a2
+#define CONCATEX2(a1,a2)         CONCATEX2x(a1, a2)
 
-#define FUNCTION   (base)           CONCAT2(CONCATEX2(cul, LOWER), base)
-#define PFUNCTION  (base)           CONCAT3(_, CONCATEX2(cul, LOWER), base)
-#define TYPE       (base)           CONCAT3(Cul, UPPER, base)
-#define VIEW       (base)           CONCAT4(Cul, UPPER, base, View)
+#define FUNCTION(base)           CONCAT2(CONCATEX2(cul, LOWER), base)
+#define PFUNCTION(base)          CONCAT3(_, CONCATEX2(cul, LOWER), base)
+#define TYPE(base)               CONCAT3(Cul, UPPER, base)
+#define VIEW(base)               CONCAT4(Cul, UPPER, base, View)
 
