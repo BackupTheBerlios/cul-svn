@@ -51,8 +51,8 @@ SET(CUL_SOURCES
     src/cul_mem.c
     src/cul_stream.c
 
-    src/prv/cul_prv_sort.c
-    src/prv/cul_prv_copy.c
+    src/private/cul_sort_prv.c
+    src/private/cul_copy_prv.c
 
     src/cul_dnode.c
     src/cul_dlist.c
