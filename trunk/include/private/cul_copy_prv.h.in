@@ -1,0 +1,51 @@
+#ifndef __CUL_@UPPER@COPY_PRV__H__
+#define __CUL_@UPPER@COPY_PRV_H__
+
+#include <cul/cul_core.h>
+#include <string.h>
+
+static inline void      cul_@LOWER@copy                     (@ATOM@ *data,
+                                                       const @ATOM@ *other,
+                                                       size_t size);
+static inline void      cul_@LOWER@move                     (@ATOM@ *data,
+                                                       const @ATOM@ *other,
+                                                       size_t size);
+
+void                    cul_@LOWER@copy_stride              (@ATOM@ *data,
+                                                       const @ATOM@ *other,
+                                                       size_t size,
+                                                       size_t stride,
+                                                       size_t other_stride);
+void                    cul_@LOWER@copy_stride_data         (@ATOM@ *data,
+                                                       const @ATOM@ *other,
+                                                       size_t size,
+                                                       size_t stride);
+void                    cul_@LOWER@copy_stride_other        (@ATOM@ *data,
+                                                       const @ATOM@ *other,
+                                                       size_t size,
+                                                       size_t other_stride);
+void                    cul_@LOWER@copy_tda                 (@ATOM@ *data,
+                                                       const @ATOM@ *other,
+                                                       size_t size_x,
+                                                       size_t size_y,
+                                                       size_t tda,
+                                                       size_t other_tda);
+
+/* impelemntations */
+
+static inline void cul_@LOWER@copy(@ATOM@ *data,
+                             const @ATOM@ *other,
+                             size_t size)
+{
+    memcpy(data, other, size*sizeof(@ATOM@));
+}
+
+static inline void cul_@LOWER@move(@ATOM@ *data,
+                             const @ATOM@ *other,
+                             size_t size)
+{
+    memmove(data, other, size*sizeof(@ATOM@));
+}
+
+#endif /* __CUL_@UPPER@COPY_PRV_H__ */
+

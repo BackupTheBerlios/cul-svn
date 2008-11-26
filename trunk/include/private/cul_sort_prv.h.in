@@ -1,0 +1,28 @@
+#ifndef __CUL_@UPPER@SORT_PRV_H__
+#define __CUL_@UPPER@SORT_PRV_H__
+
+#include <cul/cul_core.h>
+
+#cmakeifndef TEMPLATE_CUL_PTR
+void                    cul_@LOWER@sort_asc                 (@ATOM@ *data,
+                                                       size_t size);
+void                    cul_@LOWER@sort_asc_stride          (@ATOM@ *data,
+                                                       size_t size,
+                                                       size_t stride);
+void                    cul_@LOWER@sort_dsc                 (@ATOM@ *data,
+                                                       size_t size);
+void                    cul_@LOWER@sort_dsc_stride          (@ATOM@ *data,
+                                                       size_t size,
+                                                       size_t stride);
+#cmakeelse
+void                    cul_@LOWER@sort                     (@ATOM@ *data,
+                                                       size_t size,
+                                                       cul_cmp_f *cmp_f);
+void                    cul_@LOWER@sort_stride              (@ATOM@ *data,
+                                                       size_t size,
+                                                       size_t stride,
+                                                       cul_cmp_f *cmp_f);
+#cmakeendif
+
+#endif /* __CUL_@UPPER@SORT_PRV_H__ */
+
