@@ -1,5 +1,5 @@
-#undef FUNC_GEN
-#undef TYPE_GEN
+#undef LOWER
+#undef UPPER
 #undef ATOM
 #undef EMPTY
 
@@ -16,3 +16,4 @@
 #undef PFUNCTION
 #undef TYPE
 #undef VIEW
+
