@@ -1,236 +1,353 @@
 #include <cul/cul_slist.h>
 
-CulSList *cul_slist_new(cul_ptr data) {
-	CulSList *slist;
-	if( (slist = cul_slist_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-	return cul_slist_init_struct(slist, data, NULL);
+struct _CulSList {
+    CulSNode *first;   /* first node in the list */
+    CulSNode *last;    /* last node in the list */
+};
+
+static inline CulSList *cul_slist_struct_new()
+{
+    return cul_slab_new(sizeof(CulSList));
 }
 
-CulSList *cul_slist_new_empty() {
-	return cul_slist_new(NULL);
+static inline void cul_slist_struct_free(CulSList *list)
+{
+    cul_slab_free(sizeof(CulSList), list);
 }
 
-void cul_slist_free(CulSList *slist, cul_free_f *free_f) {
-	if( slist != NULL && free_f != NULL )
-		free_f(slist->data);
-	cul_slist_free_struct(slist);
+static inline void cul_slist_struct_set(CulSList *list,
+                                        CulSNode *first,
+                                        CulSNode *last)
+{
+    list->first = first;
+    list->last = last;
 }
 
-void cul_slist_free_all(CulSList *slist, cul_free_f *free_f) {
-	for( CulSList *n; slist != NULL; slist = n) {
-		n = slist->next;
-		if( free_f != NULL )
-			free_f(slist->data);
-		cul_slist_free_struct(slist);
-	}
+static inline void cul_slist_struct_init(CulSList *list,
+                                         CulSNode *first)
+{
+    if (first != NULL)
+        cul_slist_struct_set(list, first, cul_snode_last(first));
+    else
+        cul_slist_struct_set(list, NULL, NULL);
 }
 
-CulSList *cul_slist_last(CulSList *slist) {
-	if( slist != NULL )
-		while( slist->next != NULL )
-			slist = slist->next;
-	return slist;
+static inline void cul_slist_struct_init_empty(CulSList *list)
+{
+    cul_slist_struct_set(list, NULL, NULL);
 }
 
-CulSList *cul_slist_nth_last(CulSList *slist, size_t n) {
-	if( slist != NULL )
-		while( slist->next != NULL && n-- )
-			slist = slist->next;
-	return slist;
+CulSList *cul_slist_new(CulSNode *first)
+{
+    CulSList *list;
+
+    if ((list = cul_slist_struct_new()) == NULL)
+        CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
+    cul_slist_struct_init(list, first);
+
+    return list;
 }
 
-CulSList *cul_slist_nth(CulSList *slist, size_t n) {
-	while( slist != NULL && n-- )
-		slist = slist->next;
-	return slist;
+CulSList *cul_slist_new_empty()
+{
+    CulSList *list;
+
+    if ((list = cul_slist_struct_new()) == NULL)
+        CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
+    cul_slist_struct_init_empty(list);
+
+    return list;
 }
 
-size_t cul_slist_size(CulSList *slist) {
-	size_t size = 0;
-	for( ; slist != NULL; slist = slist->next)
-		++size;
-	return size;
+void cul_slist_free(CulSList *list, cul_free_f *free_f)
+{
+    if (list != NULL) {
+        cul_snode_each_free(list->first, NULL, free_f);
+        cul_slist_struct_free(list);
+    }
 }
 
-CulSList *cul_slist_insert_next(CulSList *slist, cul_ptr data) {
-	CulSList *n;
-	if( (n = cul_slist_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-
-	if( slist != NULL ) {
-		cul_slist_init_struct(n, data, slist->next);
-		slist->next = n;
-	}
-	else
-		cul_slist_init_struct(n, data, NULL);
-	return n;
+void cul_slist_init(CulSList *list,
+                    CulSNode *first)
+{
+    cul_slist_struct_init(list, first);
 }
 
-CulSList *cul_slist_insert_prev(CulSList *slist, cul_ptr data) {
-	CulSList *n;
-	if( (n = cul_slist_new_struct()) == NULL )
-		CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-
-	cul_slist_init_struct(n, data, slist);
-	return n;
+void cul_slist_init_empty(CulSList *list)
+{
+    cul_slist_struct_init_empty(list);
 }
 
-CulSList *cul_slist_remove(CulSList *slist, cul_free_f *free_f) {
-	if( slist != NULL ) {
-		CulSList *n = slist->next;
-		cul_slist_free(slist, free_f);
-		return n;
-	}
-	return slist;
+CulSNode *cul_slist_first(CulSList *list)
+{
+    return list->first;
 }
 
-CulSList *cul_slist_copy(CulSList *slist) {
-	CulSList *first = NULL, *n;
-	if( slist != NULL ) {
-		if( (first = cul_slist_insert_next(first, slist->data)) == NULL )
-			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-		for( n = first, slist = slist->next; slist != NULL; slist = slist->next)
-			if( (n = cul_slist_insert_next(n, slist->data)) == NULL ) {
-				cul_slist_free_all(first, NULL);
-				CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-			}
-	}
-	return first;
+CulSNode *cul_slist_last(CulSList *list)
+{
+    return list->last;
 }
 
-CulSList *cul_slist_detach(CulSList *slist, cul_clone_f *clone_f) {
-	CulSList *first = slist;
-	for( ; slist != NULL; slist = slist->next) {
-		if( (slist->data = clone_f(slist->data)) == NULL ) {
-			/* erase rest of undetached pointers */
-			for( slist = slist->next; slist != NULL; slist = slist->next)
-				slist->data = NULL;
-			CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
-		}
-	}
-	return first;
+CulSNode *cul_slist_nth(CulSList *list, size_t n)
+{
+    return cul_snode_nth(list->first, n);
 }
 
-CulSList *cul_slist_reverse(CulSList *slist) {
-	CulSList *prev = NULL, *next;
-	for( ; slist != NULL; prev = slist, slist = next) {
-		next = slist->next;;
-		slist->next = prev;
-	}
-	return prev;
+size_t cul_slist_size(CulSList *list)
+{
+    return cul_snode_size(list->first, NULL);
 }
 
-CulSList *_cul_slist_sort(CulSList *slist, cul_cmp_f *cmp, size_t size);
-CulSList *_cul_slist_merge(CulSList *l1, CulSList *l2, cul_cmp_f *cmp_f);
+cul_bool cul_slist_valid(CulSList *list)
+{
+    CulSNode *prev, *node;
 
-CulSList *_cul_slist_merge(CulSList *l1, CulSList *l2, cul_cmp_f *cmp_f) {
-	CulSList *slist, *result;
+    /* check if list is empty */
+    if (list->first == NULL && list->last == NULL)
+        return CUL_TRUE;
 
-	/* initialize result (head of return list) */
-	if( cmp_f(l1->data, l2->data) <= 0 ) {
-		result = l1;
-		l1 = l1->next;
-	} else {
-		result = l2;
-		l2 = l2->next;
-	}
+    /* check presence of basic links */
+    if ((list->first == NULL && list->last != NULL) ||
+        (list->first != NULL && list->last == NULL))
+        return CUL_FALSE;
 
-	/* initialize processing */
-	slist = result;
+    /* check basic links */
+    if (list->last->next != NULL)
+        return CUL_FALSE;
 
-	/* process rest */
-	while( l1 != NULL && l2 != NULL ) {
-		if( cmp_f(l1->data, l2->data) <= 0 ) {
-			slist->next = l1;
-			l1 = l1->next;
-		} else {
-			slist->next = l2;
-			l2 = l2->next;
-		}
-		slist = slist->next;
-	}
+    /* scan other links */
+    prev = list->first;
+    node = list->first->next;
+    for (; node != NULL; prev = node, node = node->next)
+        ;
 
-	/* merge last item */
-	slist->next = l1 != NULL? l1: l2;
+    /* check last link (should be last prev) */
+    if (prev != list->last)
+        return CUL_FALSE;
 
-	return result;
+    /* list appears to be valid */
+    return CUL_TRUE;
 }
 
-CulSList *_cul_slist_sort(CulSList *slist, cul_cmp_f *cmp_f, size_t size) {
-	CulSList *l_half, *l_half_prev;
-
-	if( size == 1 )
-		return slist;
-
-	const size_t i_half = size >> 1;
-	l_half_prev = cul_slist_nth(slist, i_half - 1);
-	l_half = l_half_prev->next;
-	l_half_prev->next = NULL;
-
-	return _cul_slist_merge(
-			_cul_slist_sort(slist, cmp_f, i_half),
-			_cul_slist_sort(l_half, cmp_f, size - i_half),
-			cmp_f);
+CulSNode *cul_slist_insert(CulSList *list,
+                           CulSNode *node,
+                           cul_ptr data)
+{
+    if (node == list->first)
+        return cul_slist_push_front(list, data);
 }
 
-CulSList *cul_slist_sort(CulSList *slist, cul_cmp_f *cmp_f) {
-	if( slist == NULL )
-		return NULL;
-
-	return _cul_slist_sort(slist, cmp_f, cul_slist_size(slist));
+CulSNode *cul_slist_insert_next(CulSList *list,
+                                CulSNode *node,
+                                cul_ptr data)
+{
+    if (node == list->last)
+        return cul_slist_push_back(list, data);
+    else
+        return cul_snode_insert_next(node, data);
 }
 
-size_t cul_slist_unique(CulSList *slist, cul_cmp_f *cmp_f, cul_free_f *free_f) {
-	if( slist == NULL )
-		return 0;
+void cul_slist_remove(CulSList *list,
+                      CulSNode *node,
+                      cul_free_f *free_f)
+{
+    CulSNode *prev, *rm;
 
-	size_t unique = 0;
-	CulSList *l_last = slist, *next = slist->next;
+    if (list->first == node)
+        cul_slist_pop_front(list, free_f);
+    else if (list->last == node)
+        cul_slist_pop_back(list, free_f);
+    else if (node != NULL) {
+        /* extract previous node */
+        for (rm = list->first; rm != node; rm = rm->next)
+            prev = rm;
 
-	for(slist = next; slist != NULL; slist = next)
-		if( cmp_f(l_last->data, slist->data) == 0 ) {
-			/* item is not unique */
-			next = slist->next;
-			l_last->next = next;
-
-			/* free item */
-			if( free_f != NULL )
-				free_f(slist->data);
-			cul_slist_free_struct(slist);
-		} else {
-			/* item is unique */
-			next = slist->next;
-			l_last = slist;
-			++unique;
-		}
-
-	return unique;
+        prev->next = node->next;
+        cul_snode_free(node, free_f);
+    }
 }
 
-CulSList *cul_slist_find(CulSList *slist, cul_ptr data, cul_cmp_f *cmp_f) {
-	if( cmp_f == NULL )
-		for( ; slist != NULL; slist = slist->next)
-			if( slist->data == data )
-				return slist;
-	else
-		for( ; slist != NULL; slist = slist->next)
-			if( !cmp_f(slist->data, data) )
-				return slist;
-	return NULL;
+void cul_slist_remove_next(CulSList *list,
+                           CulSNode *node,
+                           cul_free_f *free_f)
+{
+    CulSNode *rm;
+
+    if (node != NULL) {
+        if ((rm = node->next) == NULL)
+            return;
+
+        /* update last node if needed */
+        if (list->last == rm) {
+            list->last = node;
+            list->last->next = NULL;
+        } else
+            node->next = rm->next;
+
+        cul_snode_free(rm, free_f);
+    }
 }
 
-void cul_slist_each(CulSList *slist, cul_each_f *each_f) {
-	for(CulSList *next; slist != NULL; slist = next) {
-		next = slist->next;
-		each_f(slist->data);
-	}
+CulSNode *cul_slist_push_front(CulSList *list,
+                               cul_ptr data)
+{
+    CulSNode *first;
+
+    if ((first = cul_snode_insert_prev(list->first, data)) == NULL)
+        return NULL;
+
+    /* update list links */
+    if (list->last == NULL)
+        list->last = first;
+    list->first = first;
+
+    return first;
 }
 
-void cul_slist_each_prv(CulSList *slist, cul_each_prv_f *each_prv_f, cul_ptr prv) {
-	for(CulSList *next; slist != NULL; slist = next) {
-		next = slist->next;
-		each_prv_f(slist->data, prv);
-	}
+void cul_slist_pop_front(CulSList *list,
+                         cul_free_f *free_f)
+{
+    CulSNode *first = list->first;
+
+    if (first != NULL) {
+        /* adjust nodes */
+        if (list->last == first) {
+            list->first = NULL;
+            list->last = NULL;
+        } else
+            list->first = first->next;
+
+        /* free node */
+        cul_snode_free(first, free_f);
+    }
+}
+
+CulSNode *cul_slist_push_back(CulSList *list,
+                              cul_ptr data)
+{
+    CulSNode *last;
+
+    if ((last = cul_snode_insert_next(list->last, data)) == NULL)
+        return NULL;
+
+    /* update list links */
+    if (list->first == NULL)
+        list->first = last;
+    list->last = last;
+
+    return last;
+}
+
+void cul_slist_pop_back(CulSList *list,
+                        cul_free_f *free_f)
+{
+    CulSNode *prev, *rm;
+    CulSNode *last = list->last;
+
+    if (last != NULL) {
+        /* adjust nodes */
+        if (list->first == last) {
+            list->first = NULL;
+            list->last = NULL;
+        } else {
+            /* extract previous node */
+            for (rm = list->first; rm != last; rm = rm->next)
+                prev = rm;
+
+            list->last = prev;
+            prev->next = NULL;
+        }
+
+        /* remove node */
+        cul_snode_free(last, free_f);
+    }
+}
+
+CulSList *cul_slist_copy(CulSList *list)
+{
+    CulSNode *node = list->first, *n;
+    CulSList *copy;
+
+    if ((copy = cul_slist_struct_new()) == NULL)
+        CUL_ERROR_ERRNO_RET(NULL, CUL_ENOMEM);
+
+    if (node != NULL) {
+        /* copy first node */
+        if ((n = cul_snode_insert_next(NULL, node->data)) == NULL) {
+            cul_slist_struct_free(copy);
+            return NULL;
+        }
+
+        /* set first node */
+        copy->first = n;
+
+        /* copy other nodes */
+        for (node = node->next; node != NULL; node = node->next)
+            if ((n = cul_snode_insert_next(n, node->data)) == NULL) {
+                cul_snode_each_free(copy->first, NULL, NULL);
+                cul_slist_struct_free(copy);
+                return NULL;
+            }
+
+        /* set last node */
+        copy->last = n;
+    } else
+        cul_slist_struct_init_empty(copy);
+
+    return copy;
+}
+
+cul_bool cul_slist_detach(CulSList *list,
+                          cul_clone_f *clone_f)
+{
+    if (cul_snode_detach(list->first, NULL, clone_f) == NULL) {
+        /* when list is empty then detach returns NULL */
+        if (list->first == NULL)
+            return CUL_TRUE;
+        return CUL_FALSE;
+    } else
+        return CUL_TRUE;
+}
+
+void cul_slist_reverse(CulSList *list)
+{
+    CulSNode *swap;
+
+    cul_snode_reverse(list->first, NULL);
+    CUL_SWAP(list->first, list->last, swap);
+}
+
+void cul_slist_sort(CulSList *list,
+                    cul_cmp_f *cmp_f)
+{
+    list->first = cul_snode_sort(list->first, NULL, cmp_f);
+    list->last = cul_snode_last(list->first);
+}
+
+void cul_slist_unique(CulSList *list,
+                      cul_cmp_f *cmp_f,
+                      cul_free_f *free_f)
+{
+    list->last = cul_snode_unique(list->first, NULL, cmp_f, free_f);
+}
+
+CulSNode *cul_slist_find(CulSList *list,
+                         cul_cmp_f *cmp_f,
+                         cul_ptr data)
+{
+    return cul_snode_find(list->first, NULL, cmp_f, data);
+}
+
+void cul_slist_each(CulSList *list,
+                    cul_each_f *each_f)
+{
+    cul_snode_each(list->first, NULL, each_f);
+}
+
+void cul_slist_each_data(CulSList *list,
+                         cul_each_data_f *each_f,
+                         cul_ptr data)
+{
+    cul_snode_each_data(list->first, NULL, each_f, data);
 }
 
